@@ -52,8 +52,11 @@ jobs:
       - aws-cli/setup
       - serverless/setup
       - run:
-          command: serverless deploy --region $AWS_DEFAULT_REGION --stage prd --verbose
-          name: deploy
+          name: Create serverless production config
+          command: head -n -2 serverless.yml >> serverless-prd.yml
+      - run:
+          name: Deploy
+          command: serverless deploy --region $AWS_DEFAULT_REGION --stage prd --config serverless-prd.yml --verbose
 
 workflows:
   version: 2
@@ -74,4 +77,8 @@ workflows:
 
   build-and-deploy-lambdas:
     jobs:
-      - build-and-deploy-lambdas
+      - build-and-deploy-lambdas:
+          filters:
+            branches:
+              only:
+                - master

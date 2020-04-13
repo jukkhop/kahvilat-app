@@ -1,10 +1,9 @@
 {
   "name": "kahvilat-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "hello.js",
+  "private": true,
   "author": "Jukka Hopeavuori <jukka.hopea@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "api": "sls offline start"
   },
