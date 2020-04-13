@@ -1,52 +1,55 @@
-version: 2.1
+version: 2
 jobs:
   build:
     docker:
       - image: circleci/node:8.11.2
     parallelism: 1
-    working_directory: ~/react-application
-  steps:
-    - checkout
-    - attach_workspace:
-        at: ~/react-application
-    - run: yarn install
-    - run: yarn build
-    - persist_to_workspace:
-        root: .
-        paths: dist
+    working_directory: ~/repo/frontend
+    steps:
+      - checkout:
+          path: ~/repo
+      - attach_workspace:
+          at: ~/repo/frontend
+      - run: yarn install
+      - run: yarn build
+      - persist_to_workspace:
+          root: ~/repo/frontend
+          paths:
+            - build
   deploy:
     docker:
       - image: circleci/golang:1.9.6
     parallelism: 1
-    working_directory: ~/react-application
+    working_directory: ~/repo/frontend
     steps:
-    - checkout
-    - attach_workspace:
-        at: ~/react-application
-    - restore_cache:
-        key: v1-pkg-cache
-    - run: go get -v github.com/bep/s3deploy
-    - save_cache:
-        key: v1-pkg-cache
-        paths:
-           - /go/pkg
-    - run:
-      name: Deploy to S3
-      command: |
-        s3deploy -source=dist/ -region=us-east-1 -key=$AWS_ACCESS_KEY_ID -secret=$AWS_SECRET_ACCESS_KEY -distribution-id=$AWS_CLOUDFRONT_DISTRIBUTION_ID -bucket=$BUCKET_NAME
+      - checkout:
+          path: ~/repo
+      - attach_workspace:
+          at: ~/repo/frontend
+      - restore_cache:
+          key: v1-pkg-cache
+      - run: go get -v github.com/bep/s3deploy
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - /go/pkg
+      - run:
+          name: Deploy to S3
+          command: |
+            s3deploy -source=build/ -region=eu-west-1 -key=$AWS_ACCESS_KEY_ID -secret=$AWS_SECRET_ACCESS_KEY -distribution-id=$AWS_CLOUDFRONT_DISTRIBUTION_ID -bucket=$AWS_S3_BUCKET_NAME
 workflows:
   version: 2
   build-and-deploy:
     jobs:
       - build:
-        filters:
-          branches:
-            only:
-              - master
+          filters:
+            branches:
+              only:
+                - master
       - deploy:
-        requires:
-          - build
-            filters:
-              branches:
-                only:
-                  - master
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
