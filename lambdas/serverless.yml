@@ -1,0 +1,31 @@
+service: kahvilat-api
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'dev'}
+
+functions:
+  hello:
+    handler: hello.handler
+    cors: true
+    events:
+      - http:
+          path: /hello
+          method: get
+
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+
+plugins:
+  - serverless-offline

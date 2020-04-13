@@ -1,6 +1,4 @@
-provider "aws" {
-  region = "eu-west-1"
-}
+provider "aws" {}
 
 variable "domain_name" {
   default = "kahvilat.app"

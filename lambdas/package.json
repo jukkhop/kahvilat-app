@@ -1,0 +1,17 @@
+{
+  "name": "kahvilat-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hello.js",
+  "author": "Jukka Hopeavuori <jukka.hopea@gmail.com>",
+  "license": "ISC",
+  "scripts": {
+    "api": "sls offline start"
+  },
+  "devDependencies": {
+    "serverless-offline": "^6.1.4"
+  },
+  "dependencies": {
+    "serverless": "^1.67.3"
+  }
+}
