@@ -1,4 +1,6 @@
-Under construction &nbsp;🔧
+https://kahvilat.app/
+
+<small>Under construction &nbsp;🔧</small>
 
 ## Setup
 
@@ -67,7 +69,7 @@ Set environment variables for AWS
 
 ```
 export AWS_ACCESS_KEY_ID=some_access_key_id
-export AWS_SECRET_ACCESS_KEY=some_secret_access
+export AWS_SECRET_ACCESS_KEY=some_secret_access_key
 export AWS_DEFAULT_REGION=some_region
 ```
 
