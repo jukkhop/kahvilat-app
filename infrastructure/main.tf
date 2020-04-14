@@ -8,7 +8,7 @@ variable "application_subdomain" {
   default = "kahvilat.app"
 }
 
-resource "aws_s3_bucket" "s3_bucket" {
+resource "aws_s3_bucket" "frontend_s3_bucket" {
   bucket = "${var.application_subdomain}"
   acl = "public-read"
   policy = <<POLICY
@@ -37,7 +37,7 @@ resource "aws_cloudfront_distribution" "frontend_cloudfront_distribution" {
       origin_protocol_policy = "http-only"
       origin_ssl_protocols = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
-    domain_name = "${aws_s3_bucket.s3_bucket.website_endpoint}"
+    domain_name = "${aws_s3_bucket.frontend_s3_bucket.website_endpoint}"
     origin_id = "${var.application_subdomain}"
   }
 
@@ -83,12 +83,12 @@ resource "aws_cloudfront_distribution" "frontend_cloudfront_distribution" {
   }
 }
 
-resource "aws_route53_zone" "zone" {
+resource "aws_route53_zone" "frontend_zone" {
   name = "${var.domain_name}"
 }
 
 resource "aws_route53_record" "frontend_record" {
-  zone_id = "${aws_route53_zone.zone.zone_id}"
+  zone_id = "${aws_route53_zone.frontend_zone.zone_id}"
   name = "${var.application_subdomain}"
   type = "A"
   alias = {
