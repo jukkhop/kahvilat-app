@@ -43,9 +43,9 @@ jobs:
           command: |
             s3deploy -source=build/ -region=$AWS_DEFAULT_REGION -key=$AWS_ACCESS_KEY_ID -secret=$AWS_SECRET_ACCESS_KEY -distribution-id=$AWS_CLOUDFRONT_DISTRIBUTION_ID -bucket=$AWS_S3_BUCKET_NAME
 
-  build-and-deploy-lambdas:
+  build-and-deploy-backend:
     executor: serverless/default
-    working_directory: ~/repo/lambdas
+    working_directory: ~/repo/backend
     steps:
       - checkout:
           path: ~/repo
@@ -75,9 +75,9 @@ workflows:
               only:
                 - master
 
-  build-and-deploy-lambdas:
+  build-and-deploy-backend:
     jobs:
-      - build-and-deploy-lambdas:
+      - build-and-deploy-backend:
           filters:
             branches:
               only:

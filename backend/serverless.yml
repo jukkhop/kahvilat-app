@@ -8,7 +8,7 @@ provider:
 
 functions:
   hello:
-    handler: hello.handler
+    handler: lambdas/hello.handler
     cors: true
     events:
       - http:

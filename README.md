@@ -9,14 +9,14 @@ git clone https://github.com/jukkhop/kahvilat-app.git
 cd kahvilat-app
 ```
 
-#### Backend API
+#### Backend
 
 Install [Node](https://nodejs.org/en/) and [Serverless](https://github.com/serverless/serverless#quick-start)
 
 Change directory
 
 ```
-cd lambdas
+cd backend
 ```
 
 Install deps
@@ -25,7 +25,7 @@ Install deps
 npm install
 ```
 
-Run api
+Run
 
 ```
 npm run api

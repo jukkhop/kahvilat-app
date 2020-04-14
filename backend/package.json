@@ -5,7 +5,7 @@
   "author": "Jukka Hopeavuori <jukka.hopea@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "api": "sls offline start"
+    "api": "sls offline --httpPort 3001 start"
   },
   "devDependencies": {
     "serverless-offline": "^6.1.4"
