@@ -88,4 +88,4 @@ terraform apply
 
 Add your project to CircleCI.
 
-Push a new commit to the `master` branch to trigger a deployment.
+Push a new commit to the `master` branch to trigger a new deployment.
