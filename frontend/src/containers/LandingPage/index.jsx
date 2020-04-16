@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useQuery } from '@apollo/react-hooks'
 
 import LandingPage from '../../components/LandingPage'
-import { GET_HELLO } from '../../graphql'
+import { GET_PLACES } from '../../graphql'
 
 const Message = styled.p`
   font-size: 1.5rem;
@@ -12,7 +12,7 @@ const Message = styled.p`
 `
 
 function LandingPageContainer() {
-  const { loading, error, data } = useQuery(GET_HELLO)
+  const { loading, error, data } = useQuery(GET_PLACES)
 
   if (loading) {
     return <Message>Loading...</Message>

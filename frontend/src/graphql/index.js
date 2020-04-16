@@ -1,9 +1,13 @@
 import { gql } from 'apollo-boost'
 
-export const GET_HELLO = gql`
+export const GET_PLACES = gql`
   query {
-    getHello @rest(type: "[Object]", path: "/hello", method: "GET") {
-      message
+    getPlaces @rest(type: "Object", path: "/places", method: "GET") {
+      places @type(name: "Place") {
+        id
+        externalId: external_id
+        name
+      }
     }
   }
 `

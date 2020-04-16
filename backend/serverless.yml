@@ -6,19 +6,19 @@ provider:
   region: ${opt:region, 'eu-west-1'}
   stage: ${opt:stage, 'dev'}
   environment:
-    PGHOST: ${env:POSTGRES_HOST}
-    PGPORT: ${env:POSTGRES_PORT}
-    PGDATABASE: ${env:POSTGRES_DB}
-    PGUSER: ${env:POSTGRES_USER}
-    PGPASSWORD: ${env:POSTGRES_PASSWORD}
+    PGHOST: ${env:POSTGRES_HOST, 'localhost'}
+    PGPORT: ${env:POSTGRES_PORT, '5433'}
+    PGDATABASE: ${env:POSTGRES_DB, 'kahvilat_db'}
+    PGUSER: ${env:POSTGRES_USER, 'kahvilat_user'}
+    PGPASSWORD: ${env:POSTGRES_PASSWORD, 'kahvilat_password'}
 
 functions:
-  hello:
-    handler: src/lambdas/hello.handler
+  get-places:
+    handler: src/lambdas/get-places.handler
     cors: true
     events:
       - http:
-          path: /hello
+          path: /places
           method: get
 
 resources:
@@ -46,14 +46,14 @@ resources:
     pgDB:
       Type: 'AWS::RDS::DBInstance'
       Properties:
-        DBName: ${env:POSTGRES_DB}
+        DBName: ${env:POSTGRES_DB, ''}
         AllocatedStorage: 5
         DBInstanceClass: 'db.t2.micro'
         DBInstanceIdentifier: kahvilat-db-${self:provider.stage}
         Engine: 'postgres'
         EngineVersion: '11.5'
-        MasterUsername: ${env:POSTGRES_USER}
-        MasterUserPassword: ${env:POSTGRES_PASSWORD}
+        MasterUsername: ${env:POSTGRES_USER, ''}
+        MasterUserPassword: ${env:POSTGRES_PASSWORD, ''}
         VPCSecurityGroups:
           - Fn::GetAtt:
               - pgSecurityGroup
