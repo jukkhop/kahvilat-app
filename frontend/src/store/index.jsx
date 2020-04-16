@@ -13,6 +13,9 @@ if (!REACT_APP_BACKEND_URL) {
 
 const restLink = new RestLink({
   uri: `${REACT_APP_BACKEND_URL}`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 })
 
 const client = new ApolloClient({
