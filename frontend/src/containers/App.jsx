@@ -46,7 +46,7 @@ function App() {
       </Header>
       <Main />
       <Footer>
-        <p>© Purelogic Softworks, 2020</p>
+        <p>© 2020 Purelogic Softworks</p>
       </Footer>
     </Container>
   )

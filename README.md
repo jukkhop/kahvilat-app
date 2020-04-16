@@ -1,8 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/jukkhop/kahvilat-app/master/frontend/public/logo192.png" />
-  <h3 align="center">https://kahvilat.app</h3>
   <h3 align="center">Discover nearby cafeterias</h3>
-  <h4 align="center">Under construction</h4>
+  <h4 align="center">https://kahvilat.app - under construction</h4>
 </p>
 
 ## Setup
