@@ -1,11 +1,10 @@
 'use strict'
 
-const placesModel = require('../models/places')
+const { getPlaces } = require('../models/places')
 const { getCorsHeaders } = require('../utils/cors')
 
 module.exports.handler = async () => {
-  const places = await placesModel.getPlaces()
-
+  const places = await getPlaces()
   return {
     statusCode: 200,
     headers: getCorsHeaders(),

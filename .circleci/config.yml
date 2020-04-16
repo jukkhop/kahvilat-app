@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@1.0.0
-  serverless: circleci/serverless-framework@1.0.1
 
 jobs:
   build-frontend:
@@ -21,6 +20,7 @@ jobs:
           root: ~/repo/frontend
           paths:
             - build
+
   deploy-frontend:
     docker:
       - image: circleci/golang:1.9.6
@@ -47,21 +47,33 @@ jobs:
             s3deploy -source=build/ -region=$AWS_DEFAULT_REGION -key=$AWS_ACCESS_KEY_ID -secret=$AWS_SECRET_ACCESS_KEY -distribution-id=$AWS_CLOUDFRONT_DISTRIBUTION_ID -bucket=$AWS_S3_BUCKET_NAME
 
   build-and-deploy-backend:
-    executor: serverless/default
+    docker:
+      - image: circleci/node:12.16.2
     working_directory: ~/repo/backend
     steps:
       - checkout:
           path: ~/repo
       - aws-cli/setup
-      - serverless/setup
+      - restore_cache:
+          keys:
+            - v1-deps-cache
       - run:
-          name: Create serverless production config
-          command: head -n -2 serverless.yml >> serverless-prd.yml
+          name: Install Serverless CLI and dependencies
+          command: |
+            sudo npm i -g serverless
+            npm install
+      - save_cache:
+          key: v1-deps-cache
+          paths:
+            - node_modules
       - run:
           name: Copy node_modules folder to correct location
           command: |
             mkdir -p nodejs/node_modules
             cp -r node_modules/* nodejs/node_modules/
+      - run:
+          name: Create serverless production config
+          command: head -n -2 serverless.yml >> serverless-prd.yml
       - run:
           name: Deploy
           command: serverless deploy --region $AWS_DEFAULT_REGION --stage prd --config serverless-prd.yml --verbose

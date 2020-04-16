@@ -12,25 +12,19 @@ provider:
     PGUSER: ${env:POSTGRES_USER, 'kahvilat_user'}
     PGPASSWORD: ${env:POSTGRES_PASSWORD, 'kahvilat_password'}
     STAGE: ${self:provider.stage}
+    FRONTEND_URL: ${env:FRONTEND_URL, 'http://localhost:3000'}
+
+package:
+  excludeDevDependencies: false
 
 functions:
   get-places:
     handler: src/lambdas/get-places.handler
-    cors: true
     events:
       - http:
           path: /places
           method: get
-          cors:
-            origin: ${env:FRONTEND_URL, '*'}
-            headers:
-              - Authorization
-              - Content-Type
-              - X-Amz-Date
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-              - X-Api-Key
-            allowCredentials: false
+          cors: true
 
 resources:
   Resources:
