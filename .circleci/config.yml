@@ -33,7 +33,10 @@ jobs:
           at: ~/repo/frontend
       - restore_cache:
           key: v1-pkg-cache
-      - run: go get -v github.com/bep/s3deploy
+      - run:
+          command: |
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            go get -v github.com/bep/s3deploy
       - save_cache:
           key: v1-pkg-cache
           paths:
