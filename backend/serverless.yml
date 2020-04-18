@@ -6,7 +6,7 @@ provider:
   region: ${opt:region, 'eu-west-1'}
   stage: ${opt:stage, 'dev'}
   environment:
-    PGHOST: ${env:POSTGRES_HOST, 'localhost'}
+    PGHOST: ${opt:pghost, 'localhost'}
     PGPORT: ${env:POSTGRES_PORT, '5433'}
     PGDATABASE: ${env:POSTGRES_DB, 'kahvilat_db'}
     PGUSER: ${env:POSTGRES_USER, 'kahvilat_user'}

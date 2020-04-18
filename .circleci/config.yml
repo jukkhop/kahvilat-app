@@ -5,6 +5,9 @@ orbs:
 
 jobs:
   build-frontend:
+    parameters:
+      stage:
+        type: string
     docker:
       - image: circleci/node:12.16.2
     parallelism: 1
@@ -14,6 +17,7 @@ jobs:
           path: ~/repo
       - attach_workspace:
           at: ~/repo/frontend
+      - run: mv .env.<< parameters.stage >> .env
       - run: yarn install
       - run: yarn build
       - persist_to_workspace:
@@ -22,6 +26,11 @@ jobs:
             - build
 
   deploy-frontend:
+    parameters:
+      distribution-id:
+        type: env_var_name
+      bucket-name:
+        type: env_var_name
     docker:
       - image: circleci/golang:1.9.6
     parallelism: 1
@@ -44,9 +53,20 @@ jobs:
       - run:
           name: Deploy to S3
           command: |
-            s3deploy -source=build/ -region=$AWS_DEFAULT_REGION -key=$AWS_ACCESS_KEY_ID -secret=$AWS_SECRET_ACCESS_KEY -distribution-id=$AWS_CLOUDFRONT_DISTRIBUTION_ID -bucket=$AWS_S3_BUCKET_NAME
+            s3deploy \
+              -source=build/ \
+              -region=$AWS_DEFAULT_REGION \
+              -key=$AWS_ACCESS_KEY_ID \
+              -secret=$AWS_SECRET_ACCESS_KEY \
+              -distribution-id=${<< parameters.distribution-id >>} \
+              -bucket=${<< parameters.bucket-name >>}
 
   build-and-deploy-backend:
+    parameters:
+      stage:
+        type: string
+      postgres-host:
+        type: env_var_name
     docker:
       - image: circleci/node:12.16.2
     working_directory: ~/repo/backend
@@ -73,21 +93,30 @@ jobs:
             cp -r node_modules/* nodejs/node_modules/
       - run:
           name: Create serverless production config
-          command: head -n -2 serverless.yml >> serverless-prd.yml
+          command: head -n -2 serverless.yml >> serverless-<< parameters.stage >>.yml
       - run:
           name: Deploy
-          command: serverless deploy --region $AWS_DEFAULT_REGION --stage prd --config serverless-prd.yml --verbose
+          command: |
+            serverless deploy \
+              --region $AWS_DEFAULT_REGION \
+              --stage << parameters.stage >> \
+              --config serverless-<< parameters.stage >>.yml \
+              --pghost ${<< parameters.postgres-host >>} \
+              --verbose
 
 workflows:
   version: 2
-  build-and-deploy-frontend:
+  build-and-deploy-frontend-dev:
     jobs:
       - build-frontend:
+          stage: dev
           filters:
             branches:
               only:
                 - master
       - deploy-frontend:
+          distribution-id: DEV_AWS_CLOUDFRONT_DISTRIBUTION_ID
+          bucket-name: DEV_AWS_S3_BUCKET_NAME
           requires:
             - build-frontend
           filters:
@@ -95,10 +124,40 @@ workflows:
               only:
                 - master
 
-  build-and-deploy-backend:
+  build-and-deploy-frontend-prd:
+    jobs:
+      - build-frontend:
+          stage: prd
+          filters:
+            branches:
+              only:
+                - production
+      - deploy-frontend:
+          distribution-id: PRD_AWS_CLOUDFRONT_DISTRIBUTION_ID
+          bucket-name: PRD_AWS_S3_BUCKET_NAME
+          requires:
+            - build-frontend
+          filters:
+            branches:
+              only:
+                - production
+
+  build-and-deploy-backend-dev:
     jobs:
       - build-and-deploy-backend:
+          stage: dev
+          postgres-host: DEV_POSTGRES_HOST
           filters:
             branches:
               only:
                 - master
+
+  build-and-deploy-backend-prd:
+    jobs:
+      - build-and-deploy-backend:
+          stage: prd
+          postgres-host: PRD_POSTGRES_HOST
+          filters:
+            branches:
+              only:
+                - production
