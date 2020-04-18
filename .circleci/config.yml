@@ -67,6 +67,8 @@ jobs:
         type: string
       postgres-host:
         type: env_var_name
+      frontend-url:
+        type: env_var_name
     docker:
       - image: circleci/node:12.16.2
     working_directory: ~/repo/backend
@@ -102,6 +104,7 @@ jobs:
               --stage << parameters.stage >> \
               --config serverless-<< parameters.stage >>.yml \
               --pghost ${<< parameters.postgres-host >>} \
+              --frontend-url ${<< parameters.frontend-url >>} \
               --verbose
 
 workflows:
@@ -147,6 +150,7 @@ workflows:
       - build-and-deploy-backend:
           stage: dev
           postgres-host: DEV_POSTGRES_HOST
+          frontend-url: DEV_FRONTEND_URL
           filters:
             branches:
               only:
@@ -157,6 +161,7 @@ workflows:
       - build-and-deploy-backend:
           stage: prd
           postgres-host: PRD_POSTGRES_HOST
+          frontend-url: DEV_FRONTEND_URL
           filters:
             branches:
               only:

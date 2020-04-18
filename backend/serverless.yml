@@ -4,7 +4,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: ${opt:region, 'eu-west-1'}
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'local'}
   environment:
     PGHOST: ${opt:pghost, 'localhost'}
     PGPORT: ${env:POSTGRES_PORT, '5433'}
@@ -12,7 +12,7 @@ provider:
     PGUSER: ${env:POSTGRES_USER, 'kahvilat_user'}
     PGPASSWORD: ${env:POSTGRES_PASSWORD, 'kahvilat_password'}
     STAGE: ${self:provider.stage}
-    FRONTEND_URL: ${env:FRONTEND_URL, 'http://localhost:3000'}
+    FRONTEND_URL: ${opt:frontend-url, 'http://localhost:3000'}
 
 package:
   excludeDevDependencies: false
