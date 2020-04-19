@@ -63,12 +63,20 @@ jobs:
 
   build-and-deploy-backend:
     parameters:
-      stage:
-        type: string
-      postgres-host:
-        type: env_var_name
       frontend-url:
         type: env_var_name
+      pg-database:
+        type: env_var_name
+      pg-host:
+        type: env_var_name
+      pg-password:
+        type: env_var_name
+      pg-port:
+        type: env_var_name
+      pg-user:
+        type: env_var_name
+      stage:
+        type: string
     docker:
       - image: circleci/node:12.16.2
     working_directory: ~/repo/backend
@@ -100,11 +108,15 @@ jobs:
           name: Deploy
           command: |
             serverless deploy \
+              --config serverless-<< parameters.stage >>.yml \
+              --frontend-url ${<< parameters.frontend-url >>} \
+              --pg-database ${<< parameters.pg-database >>} \
+              --pg-host ${<< parameters.pg-host >>} \
+              --pg-password ${<< parameters.pg-password >>} \
+              --pg-port ${<< parameters.pg-port >>} \
+              --pg-user ${<< parameters.pg-user >>} \
               --region $AWS_DEFAULT_REGION \
               --stage << parameters.stage >> \
-              --config serverless-<< parameters.stage >>.yml \
-              --pghost ${<< parameters.postgres-host >>} \
-              --frontend-url ${<< parameters.frontend-url >>} \
               --verbose
 
 workflows:
@@ -148,9 +160,13 @@ workflows:
   build-and-deploy-backend-dev:
     jobs:
       - build-and-deploy-backend:
-          stage: dev
-          postgres-host: DEV_POSTGRES_HOST
           frontend-url: DEV_FRONTEND_URL
+          pg-database: DEV_POSTGRES_DB
+          pg-host: DEV_POSTGRES_HOST
+          pg-password: DEV_POSTGRES_PASSWORD
+          pg-port: DEV_POSTGRES_PORT
+          pg-user: DEV_POSTGRES_USER
+          stage: dev
           filters:
             branches:
               only:
@@ -159,9 +175,13 @@ workflows:
   build-and-deploy-backend-prd:
     jobs:
       - build-and-deploy-backend:
+          frontend-url: PRD_FRONTEND_URL
+          pg-database: PRD_POSTGRES_DB
+          pg-host: PRD_POSTGRES_HOST
+          pg-password: PRD_POSTGRES_PASSWORD
+          pg-port: PRD_POSTGRES_PORT
+          pg-user: PRD_POSTGRES_USER
           stage: prd
-          postgres-host: PRD_POSTGRES_HOST
-          frontend-url: DEV_FRONTEND_URL
           filters:
             branches:
               only:

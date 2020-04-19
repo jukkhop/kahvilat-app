@@ -17,10 +17,10 @@ cd kahvilat-app
 
 - Install [Node](https://nodejs.org/en/), [Docker](https://www.docker.com/get-started) and [Serverless](https://github.com/serverless/serverless#quick-start)
 - Change directory `cd backend`
-- Up the database `docker-compose up`
+- Up the database `docker-compose up -d`
 - Install deps `npm install`
 - Run `npm run start`
-- Run `curl http://localhost:3001/local/places` to verify
+- Run `curl http://localhost:3001/local/places` to verify that the API works as expected
 
 #### Frontend
 
@@ -53,22 +53,29 @@ export AWS_DEFAULT_REGION=some_region
 #### Manual deployment
 
 - Change directory `cd backend`
-- Set environment variables for RDS
+- Deploy to dev environment
 
 ```
-export POSTGRES_DB=some_db
-export POSTGRES_USER=some_user
-export POSTGRES_PASSWORD=some_password
+serverless deploy \
+  --stage dev \
+  --frontend-url some_url \
+  --pg-database some_db \
+  --pg-user some_user \
+  --pg-password some_password
 ```
 
-- Deploy to dev environment `serverless deploy --stage dev`
-- Use a different password for prd environment (recommended)
+- Deploy to prd environment
 
 ```
-export POSTGRES_PASSWORD=some_other_password
+serverless deploy \
+  --stage prd \
+  --frontend-url some_other_url \
+  --pg-database some_other_db \
+  --pg-user some_other_user \
+  --pg-password some_other_password
 ```
 
-- Deploy to prd environment `serverless deploy --stage prd`
+- The first deployment creates the RDS instance, which will give you host and port for the database. For consequent manual deployments, you have to pass `--pg-host` and `--pg-port` for the deploy command.
 
 #### Automatic deployment
 
@@ -76,9 +83,9 @@ export POSTGRES_PASSWORD=some_other_password
 - Add the following environment variables for the project (run manual deployment once to get some of these)
 
 ```
-AWS_ACCESS_KEY_ID                   # it's recommended to use separate credentials for CircleCI
+AWS_ACCESS_KEY_ID                   # recommend to use separate AWS credentials for CircleCI
 AWS_DEFAULT_REGION
-AWS_SECRET_ACCESS_KEY               # it's recommended to use separate credentials for CircleCI
+AWS_SECRET_ACCESS_KEY               # recommend to use separate AWS credentials for CircleCI
 
 DEV_AWS_CLOUDFRONT_DISTRIBUTION_ID  # you get this after terraform setup
 DEV_AWS_S3_BUCKET_NAME              # you get this after terraform setup
@@ -86,7 +93,7 @@ DEV_FRONTEND_URL                    # you get this after terraform setup
 DEV_POSTGRES_DB
 DEV_POSTGRES_HOST                   # you get this after serverless deploy
 DEV_POSTGRES_PASSWORD
-DEV_POSTGRES_PORT
+DEV_POSTGRES_PORT                   # you get this after serverless deploy
 DEV_POSTGRES_USER
 
 PRD_AWS_CLOUDFRONT_DISTRIBUTION_ID  # you get this after terraform setup
@@ -95,7 +102,7 @@ PRD_FRONTEND_URL                    # you get this after terraform setup
 PRD_POSTGRES_DB
 PRD_POSTGRES_HOST                   # you get this after serverless deploy
 PRD_POSTGRES_PASSWORD
-PRD_POSTGRES_PORT
+PRD_POSTGRES_PORT                   # you get this after serverless deploy
 PRD_POSTGRES_USER
 ```
 

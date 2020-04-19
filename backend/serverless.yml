@@ -6,13 +6,13 @@ provider:
   region: ${opt:region, 'eu-west-1'}
   stage: ${opt:stage, 'local'}
   environment:
-    PGHOST: ${opt:pghost, 'localhost'}
-    PGPORT: ${env:POSTGRES_PORT, '5433'}
-    PGDATABASE: ${env:POSTGRES_DB, 'kahvilat_db'}
-    PGUSER: ${env:POSTGRES_USER, 'kahvilat_user'}
-    PGPASSWORD: ${env:POSTGRES_PASSWORD, 'kahvilat_password'}
-    STAGE: ${self:provider.stage}
     FRONTEND_URL: ${opt:frontend-url, 'http://localhost:3000'}
+    PGDATABASE: ${opt:pg-database, 'kahvilat_db'}
+    PGHOST: ${opt:pg-host, 'localhost'}
+    PGPASSWORD: ${opt:pg-password, 'kahvilat_password'}
+    PGPORT: ${opt:pg-port, '5433'}
+    PGUSER: ${opt:pg-user, 'kahvilat_user'}
+    STAGE: ${self:provider.stage}
 
 package:
   excludeDevDependencies: false
@@ -61,14 +61,14 @@ resources:
     pgDB:
       Type: 'AWS::RDS::DBInstance'
       Properties:
-        DBName: ${env:POSTGRES_DB, ''}
+        DBName: ${opt:pg-database, ''}
         AllocatedStorage: 5
         DBInstanceClass: 'db.t2.micro'
         DBInstanceIdentifier: kahvilat-db-${self:provider.stage}
         Engine: 'postgres'
         EngineVersion: '11.5'
-        MasterUsername: ${env:POSTGRES_USER, ''}
-        MasterUserPassword: ${env:POSTGRES_PASSWORD, ''}
+        MasterUsername: ${opt:pg-user, ''}
+        MasterUserPassword: ${opt:pg-password, ''}
         VPCSecurityGroups:
           - Fn::GetAtt:
               - pgSecurityGroup
