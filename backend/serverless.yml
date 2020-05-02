@@ -76,4 +76,5 @@ resources:
       DeletionPolicy: 'Snapshot'
 
 plugins:
+  - serverless-plugin-typescript
   - serverless-offline

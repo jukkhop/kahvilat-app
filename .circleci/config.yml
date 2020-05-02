@@ -103,7 +103,7 @@ jobs:
             cp -r node_modules/* nodejs/node_modules/
       - run:
           name: Create serverless production config
-          command: head -n -2 serverless.yml >> serverless-<< parameters.stage >>.yml
+          command: head -n -1 serverless.yml >> serverless-<< parameters.stage >>.yml
       - run:
           name: Deploy
           command: |
