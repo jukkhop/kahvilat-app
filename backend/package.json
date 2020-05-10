@@ -8,7 +8,11 @@
     "start": "sls offline --httpPort 3001 start"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.51",
+    "@types/node-fetch": "^2.5.7",
     "@types/pg": "^7.14.3",
+    "@types/qs": "^6.9.2",
+    "@types/redis": "^2.8.20",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "eslint": "^6.8.0",
@@ -21,6 +25,9 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "pg": "^8.0.2"
+    "node-fetch": "^2.6.0",
+    "pg": "^8.0.2",
+    "qs": "^6.9.4",
+    "redis": "^3.0.2"
   }
 }

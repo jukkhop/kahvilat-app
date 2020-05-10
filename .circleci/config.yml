@@ -75,6 +75,10 @@ jobs:
         type: env_var_name
       pg-user:
         type: env_var_name
+      redis-host:
+        type: env_var_name
+      redis-port:
+        type: env_var_name
       stage:
         type: string
     docker:
@@ -109,12 +113,15 @@ jobs:
           command: |
             serverless deploy \
               --config serverless-<< parameters.stage >>.yml \
+              --facebook-access-token $FACEBOOK_ACCESS_TOKEN \
               --frontend-url ${<< parameters.frontend-url >>} \
               --pg-database ${<< parameters.pg-database >>} \
               --pg-host ${<< parameters.pg-host >>} \
               --pg-password ${<< parameters.pg-password >>} \
               --pg-port ${<< parameters.pg-port >>} \
               --pg-user ${<< parameters.pg-user >>} \
+              --redis-host ${<< parameters.redis-host >>} \
+              --redis-port ${<< parameters.redis-port >>} \
               --region $AWS_DEFAULT_REGION \
               --stage << parameters.stage >> \
               --verbose
@@ -166,6 +173,8 @@ workflows:
           pg-password: DEV_POSTGRES_PASSWORD
           pg-port: DEV_POSTGRES_PORT
           pg-user: DEV_POSTGRES_USER
+          redis-host: DEV_REDIS_HOST
+          redis-port: DEV_REDIS_PORT
           stage: dev
           filters:
             branches:
@@ -181,6 +190,8 @@ workflows:
           pg-password: PRD_POSTGRES_PASSWORD
           pg-port: PRD_POSTGRES_PORT
           pg-user: PRD_POSTGRES_USER
+          redis-host: PRD_REDIS_HOST
+          redis-port: PRD_REDIS_PORT
           stage: prd
           filters:
             branches:

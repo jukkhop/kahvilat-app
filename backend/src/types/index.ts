@@ -5,12 +5,5 @@ export interface Place {
 }
 
 export interface Headers {
-  'Access-Control-Allow-Origin': string
-  'Access-Control-Allow-Credentials': boolean
-}
-
-export interface Response {
-  statusCode: number
-  headers: Headers
-  body: string
+  [header: string]: boolean | number | string
 }
