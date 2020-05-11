@@ -16,11 +16,12 @@ export async function handler(_event: APIGatewayProxyEvent): Promise<APIGatewayP
   }
 
   const center = ['60.1586', '24.9355'].join(',')
+  const distance = 2000
   const fields = ['id', 'name', 'location', 'hours', 'is_permanently_closed'].join(',')
   const q = 'kahvila'
 
   const cacheClient = cache.createClient()
-  const cacheKey = qs.stringify({ center, fields, q }, { encode: false })
+  const cacheKey = qs.stringify({ center, distance, fields, q }, { encode: false })
   const cacheResult = await cache.get(cacheClient, cacheKey)
   const headers = getCorsHeaders()
 
@@ -36,6 +37,7 @@ export async function handler(_event: APIGatewayProxyEvent): Promise<APIGatewayP
     {
       access_token: FACEBOOK_ACCESS_TOKEN,
       center,
+      distance,
       fields,
       limit: 200,
       q,
@@ -47,7 +49,7 @@ export async function handler(_event: APIGatewayProxyEvent): Promise<APIGatewayP
   const url = `https://graph.facebook.com/search?${queryString}`
   const response = await fetch(url)
   const responseData = await response.json()
-  const responseJson = JSON.stringify(responseData.data)
+  const responseJson = JSON.stringify({ data: responseData.data })
 
   if (response.status === 200) {
     await cache.set(cacheClient, cacheKey, responseJson)
