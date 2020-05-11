@@ -64,17 +64,6 @@ serverless deploy \
   --pg-password some_password
 ```
 
-- Deploy to prd environment
-
-```
-serverless deploy \
-  --stage prd \
-  --frontend-url some_other_url \
-  --pg-database some_other_db \
-  --pg-user some_other_user \
-  --pg-password some_other_password
-```
-
 - The first deployment creates the RDS instance, which will give you host and port for the database. For consequent manual deployments, you have to pass `--pg-host` and `--pg-port` for the deploy command.
 
 #### Automatic deployment
