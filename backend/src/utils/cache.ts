@@ -27,10 +27,4 @@ async function set(client: RedisClient, key: string, value: string): Promise<voi
   await expire(key, DAY_IN_SECONDS)
 }
 
-async function del(client: RedisClient, key: string): Promise<void> {
-  const del = promisify(client.del).bind(client)
-  // @ts-ignore
-  await del(key)
-}
-
-export { createClient, del, get, set }
+export { createClient, get, set }

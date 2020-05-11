@@ -21,7 +21,6 @@ export async function handler(_event: APIGatewayProxyEvent): Promise<APIGatewayP
 
   const cacheClient = cache.createClient()
   const cacheKey = qs.stringify({ center, fields, q }, { encode: false })
-  await cache.del(cacheClient, cacheKey)
   const cacheResult = await cache.get(cacheClient, cacheKey)
   const headers = getCorsHeaders()
 
