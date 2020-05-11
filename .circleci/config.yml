@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@1.0.0
+  compare-url: iynere/compare-url@1.2.0
 
 jobs:
   build-frontend:
@@ -15,6 +16,13 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
+      - compare-url/reconstruct
+      - compare-url/use:
+          custom-logic: |
+            if [[ $(git diff $COMMIT_RANGE --name-status | grep "frontend") == "" ]]; then
+              echo "No changes to frontend code, skipping job."
+              circleci step halt
+            fi
       - attach_workspace:
           at: ~/repo/frontend
       - run: mv .env.<< parameters.stage >> .env
@@ -38,6 +46,13 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
+      - compare-url/reconstruct
+      - compare-url/use:
+          custom-logic: |
+            if [[ $(git diff $COMMIT_RANGE --name-status | grep "frontend") == "" ]]; then
+              echo "No changes to frontend code, skipping job."
+              circleci step halt
+            fi
       - attach_workspace:
           at: ~/repo/frontend
       - restore_cache:
@@ -87,6 +102,13 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
+      - compare-url/reconstruct
+      - compare-url/use:
+          custom-logic: |
+            if [[ $(git diff $COMMIT_RANGE --name-status | grep "backend") == "" ]]; then
+              echo "No changes to backend code, skipping job."
+              circleci step halt
+            fi
       - aws-cli/setup
       - restore_cache:
           keys:
