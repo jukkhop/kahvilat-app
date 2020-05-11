@@ -47,7 +47,7 @@ export async function handler(_event: APIGatewayProxyEvent): Promise<APIGatewayP
   const url = `https://graph.facebook.com/search?${queryString}`
   const response = await fetch(url)
   const responseData = await response.json()
-  const responseJson = JSON.stringify(responseData)
+  const responseJson = JSON.stringify(responseData.data)
 
   if (response.status === 200) {
     await cache.set(cacheClient, cacheKey, responseJson)

@@ -2,11 +2,13 @@ import { gql } from 'apollo-boost'
 
 export const GET_PLACES = gql`
   query {
-    getPlaces @rest(type: "Object", path: "/search-places", method: "GET") {
-      places @type(name: "Place") {
+    searchPlaces @rest(type: "Object", path: "/search-places", method: "GET") {
+      data @type(name: "[Place]") {
         id
-        externalId: external_id
         name
+        location
+        hours
+        isPermanentlyClosed: is_permanently_closed
       }
     }
   }
