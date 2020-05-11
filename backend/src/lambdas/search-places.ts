@@ -9,13 +9,19 @@ import * as cache from '../utils/cache'
 import { getCorsHeaders } from '../utils/cors'
 
 export async function handler(_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const { FACEBOOK_ACCESS_TOKEN = '' } = process.env
+  const { FACEBOOK_ACCESS_TOKEN } = process.env
+
+  if (!FACEBOOK_ACCESS_TOKEN) {
+    throw new Error('Missing environment variable FACEBOOK_ACCESS_TOKEN')
+  }
+
   const center = ['60.1586', '24.9355'].join(',')
   const fields = ['id', 'name', 'location', 'hours', 'is_permanently_closed'].join(',')
   const q = 'kahvila'
 
   const cacheClient = cache.createClient()
   const cacheKey = qs.stringify({ center, fields, q }, { encode: false })
+  await cache.del(cacheClient, cacheKey)
   const cacheResult = await cache.get(cacheClient, cacheKey)
   const headers = getCorsHeaders()
 
@@ -44,7 +50,9 @@ export async function handler(_event: APIGatewayProxyEvent): Promise<APIGatewayP
   const responseData = await response.json()
   const responseJson = JSON.stringify(responseData)
 
-  await cache.set(cacheClient, cacheKey, responseJson)
+  if (response.status === 200) {
+    await cache.set(cacheClient, cacheKey, responseJson)
+  }
 
   return {
     statusCode: 200,
