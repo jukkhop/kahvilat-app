@@ -1,19 +1,24 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
-import LandingPageContainer from './LandingPage'
-import Privacy from '../components/Privacy'
-import Terms from '../components/Terms'
+import LandingPageContainer from './LandingPageContainer'
+import PlacesPageContainer from './PlacesPageContainer'
+
+import PrivacyPage from '../components/PrivacyPage'
+import TermsPage from '../components/TermsPage'
 
 function App() {
   return (
     <Router>
       <Switch>
         <Route exact path="/privacy">
-          <Privacy />
+          <PrivacyPage />
         </Route>
         <Route exact path="/terms">
-          <Terms />
+          <TermsPage />
+        </Route>
+        <Route exact path="/places">
+          <PlacesPageContainer />
         </Route>
         <Route path="/">
           <LandingPageContainer />

@@ -1,8 +1,9 @@
 import { gql } from 'apollo-boost'
 
-export const GET_PLACES = gql`
-  query {
-    searchPlaces @rest(type: "Object", path: "/search-places", method: "GET") {
+export const SEARCH_PLACES = gql`
+  query($center: String, $distance: Int, $q: String, $pathFunction: any) {
+    searchPlaces(center: $center, distance: $distance, q: $q)
+      @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       data @type(name: "[Place]") {
         id
         name

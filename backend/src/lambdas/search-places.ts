@@ -8,17 +8,15 @@ import qs from 'qs'
 import * as cache from '../utils/cache'
 import { getCorsHeaders } from '../utils/cors'
 
-export async function handler(_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const { FACEBOOK_ACCESS_TOKEN } = process.env
 
   if (!FACEBOOK_ACCESS_TOKEN) {
     throw new Error('Missing environment variable FACEBOOK_ACCESS_TOKEN')
   }
 
-  const center = ['60.1586', '24.9355'].join(',')
-  const distance = 2000
+  const { center, distance, q } = event.queryStringParameters || {}
   const fields = ['id', 'name', 'location', 'hours', 'is_permanently_closed'].join(',')
-  const q = 'kahvila'
 
   const cacheClient = cache.createClient()
   const cacheKey = qs.stringify({ center, distance, fields, q }, { encode: false })

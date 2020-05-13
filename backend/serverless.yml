@@ -33,6 +33,12 @@ functions:
           path: /search-places
           method: get
           cors: true
+    request:
+      parameters:
+        querystrings:
+          center: true
+          distance: true
+          q: true
 
 resources:
   Resources:
