@@ -122,14 +122,16 @@ function PlacesPage({ coords, error, loading, onSearch, places, register }) {
         if (error) {
           return <Message>Haussa tapahtui virhe.</Message>
         }
+        console.log('coords', coords)
+        console.log('places', places)
         if (coords && places.length > 0) {
           return (
-            <>
+            <div>
               <PlacesMapWrapper>
                 <PlacesMap coords={coords} places={places} />
               </PlacesMapWrapper>
               <PlacesComponent places={places} />
-            </>
+            </div>
           )
         }
         return <Message>Klikkaa &quot;HAE KAHVILAT&quot; aloittaksesi.</Message>
