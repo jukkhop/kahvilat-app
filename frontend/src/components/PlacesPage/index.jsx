@@ -18,23 +18,25 @@ import Layout from '../SiteLayout'
 const Form = styled.form`
   font-family: Source Sans Pro;
   margin: 0 auto;
-  max-width: 650px;
+  max-width: 680px;
 `
 
 const Label = styled.label`
+  display: block;
   font-size: 0.85rem;
   font-family: Source Sans Pro;
 `
 
 const Input = styled.input`
+  display: block;
   font-family: Source Sans Pro;
   margin-left: 0.25rem;
   padding: 0.25rem 0.5rem;
+  width: 100%;
 
-  @media (max-width: 650px) {
+  @media (max-width: 680px) {
     margin-left: 0rem;
     margin-top: 0.25rem;
-    width: 100%;
   }
 `
 
@@ -42,6 +44,7 @@ const Fields = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  max-width: calc(100% - 1.5rem);
 
   @media (max-width: 680px) {
     align-items: flex-start;
@@ -50,16 +53,19 @@ const Fields = styled.div`
   }
 `
 
-const Field = styled.span`
-  display: block;
+const Field = styled.div`
+  align-items: baseline;
+  display: flex;
+  flex-direction: row;
 
   &:not(:first-of-type) {
     margin-left: 0.75rem;
   }
 
-  @media (max-width: 650px) {
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
+  @media (max-width: 680px) {
+    flex-direction: column;
+    margin-top: 0.45rem;
+    margin-bottom: 0.45rem;
     width: 100%;
 
     &:not(:first-of-type) {

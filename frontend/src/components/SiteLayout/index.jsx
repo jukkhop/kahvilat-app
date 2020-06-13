@@ -24,7 +24,7 @@ const Main = styled.main`
   margin-left: auto;
   margin-right: auto;
 
-  @media (max-width: 425px) {
+  @media (max-width: 680px) {
     margin-left: 0;
     margin-right: 0;
   }

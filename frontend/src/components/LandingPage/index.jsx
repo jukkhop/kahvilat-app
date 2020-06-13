@@ -43,11 +43,19 @@ const Button = styled.button`
   display: block;
   font-family: Montserrat;
   font-weight: 600;
-  height: 35px;
+  height: 45px;
   letter-spacing: 1.5px;
   margin-top: 0.75rem;
   text-transform: uppercase;
   width: 100%;
+
+  @media (max-width: 650px) {
+    height: 35px;
+  }
+
+  @media (max-width: 350px) {
+    height: 30px;
+  }
 `
 
 function LandingPage() {

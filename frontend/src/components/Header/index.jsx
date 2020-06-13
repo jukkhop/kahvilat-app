@@ -16,6 +16,7 @@ const Container = styled.header`
 
   @media (max-width: 700px) {
     min-width: auto;
+    width: 100%;
   }
 `
 
