@@ -44,12 +44,13 @@ const Fields = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  max-width: calc(100% - 1.5rem);
+  max-width: 680px;
 
   @media (max-width: 680px) {
     align-items: flex-start;
     flex-direction: column;
     justify-content: flex-start;
+    max-width: calc(100% - 1.5rem);
   }
 `
 

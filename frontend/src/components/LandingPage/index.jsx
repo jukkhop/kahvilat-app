@@ -11,12 +11,17 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+
+  @media (max-width: 660px) {
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+  }
 `
 
 const Header = styled.header`
   color: rgba(1, 1, 1, 0.625);
   font-family: Source Sans Pro;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(15px + 2vmin);
   font-weight: 300;
   text-align: center;
   margin: auto;
@@ -28,7 +33,7 @@ const Header = styled.header`
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   color: #c8ad90;
-  font-size: 20vmin;
+  font-size: 30vmin;
 `
 
 const Main = styled.main``
@@ -51,10 +56,6 @@ const Button = styled.button`
 
   @media (max-width: 650px) {
     height: 35px;
-  }
-
-  @media (max-width: 350px) {
-    height: 30px;
   }
 `
 
