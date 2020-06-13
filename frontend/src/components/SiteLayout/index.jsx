@@ -18,9 +18,16 @@ const Container = styled.div`
 `
 
 const Main = styled.main`
-  margin: 1.25rem auto 0 auto;
-  max-width: 60ch;
+  max-width: 1000px;
   padding-bottom: 5rem;
+  margin-top: 1.25rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: 425px) {
+    margin-left: 0;
+    margin-right: 0;
+  }
 `
 
 function Layout({ children }) {

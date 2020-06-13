@@ -14,7 +14,7 @@ const Container = styled.div`
 
 const Header = styled.header`
   color: rgba(1, 1, 1, 0.625);
-  font-family: Neuton;
+  font-family: Source Sans Pro;
   font-size: calc(10px + 2vmin);
   font-weight: 300;
   text-align: center;

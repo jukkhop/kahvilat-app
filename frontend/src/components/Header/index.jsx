@@ -5,15 +5,18 @@ import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 
 const Container = styled.header`
   color: rgba(1, 1, 1, 0.625);
-  font-family: Neuton;
   font-size: calc(10px + 2vmin);
   font-weight: 300;
   text-align: center;
   margin: 2rem auto 0 auto;
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 2rem;
-  width: 100%;
-  max-width: 660px;
+  min-width: 650px;
+  max-width: 1000px;
+
+  @media (max-width: 700px) {
+    min-width: auto;
+  }
 `
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`

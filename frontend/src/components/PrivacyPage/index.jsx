@@ -4,14 +4,18 @@ import styled from 'styled-components'
 import Layout from '../SiteLayout'
 
 const Heading2 = styled.h2`
-  font-family: Source Sans Pro;
+  color: rgba(0, 0, 0, 0.85);
+  font-family: Montserrat;
   font-size: 1.35rem;
+  font-weight: 600;
   padding-bottom: 0.35rem;
+  text-transform: uppercase;
 `
 
 const Paragraph = styled.p`
+  color: rgba(0, 0, 0, 0.85);
   font-family: Source Sans Pro;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 `
 
 function PrivacyPage() {

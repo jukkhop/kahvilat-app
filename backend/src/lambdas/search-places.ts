@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import fetch from 'node-fetch'
 import qs from 'qs'
 
-import * as cache from '../utils/cache'
+import * as cache from '../cache'
 import { getCorsHeaders } from '../utils/cors'
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const { FACEBOOK_ACCESS_TOKEN } = process.env
+  const { GOOGLE_API_KEY } = process.env
+  const queryParams = event.queryStringParameters || {}
 
-  if (!FACEBOOK_ACCESS_TOKEN) {
-    throw new Error('Missing environment variable FACEBOOK_ACCESS_TOKEN')
+  if (!queryParams.cursor) {
+    checkQueryStringParameters(Object.keys(queryParams), ['location', 'radius', 'type'])
   }
 
-  const { center, distance, q } = event.queryStringParameters || {}
-  const fields = ['id', 'name', 'location', 'hours', 'is_permanently_closed'].join(',')
-
+  const { cursor, location, radius, type } = queryParams
   const cacheClient = cache.createClient()
-  const cacheKey = qs.stringify({ center, distance, fields, q }, { encode: false })
+  const cacheKey = qs.stringify(queryParams, { encode: false })
   const cacheResult = await cache.get(cacheClient, cacheKey)
   const headers = getCorsHeaders()
 
@@ -31,23 +31,30 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
   }
 
-  const queryString = qs.stringify(
-    {
-      access_token: FACEBOOK_ACCESS_TOKEN,
-      center,
-      distance,
-      fields,
-      limit: 200,
-      q,
-      type: 'place',
-    },
-    { encode: false },
-  )
+  const params = cursor
+    ? {
+        key: GOOGLE_API_KEY,
+        pagetoken: cursor,
+      }
+    : {
+        key: GOOGLE_API_KEY,
+        keyword: 'coffee',
+        location,
+        radius,
+        types: type,
+      }
 
-  const url = `https://graph.facebook.com/search?${queryString}`
+  const queryString = qs.stringify(params, { encode: false })
+  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?${queryString}`
+
   const response = await fetch(url)
   const responseData = await response.json()
-  const responseJson = JSON.stringify({ data: responseData.data })
+  const { results, next_page_token } = responseData
+
+  const responseJson = JSON.stringify({
+    places: results,
+    cursor: next_page_token,
+  })
 
   if (response.status === 200) {
     await cache.set(cacheClient, cacheKey, responseJson)
@@ -58,4 +65,12 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     headers,
     body: responseJson,
   }
+}
+
+function checkQueryStringParameters(actualParams: string[], expectedParams: string[]): void {
+  expectedParams.forEach((expectedParam) => {
+    if (!actualParams.includes(expectedParam)) {
+      throw new Error(`Missing query string parameter: ${expectedParam}`)
+    }
+  })
 }

@@ -6,13 +6,8 @@ provider:
   region: ${opt:region, 'eu-west-1'}
   stage: ${opt:stage, 'local'}
   environment:
-    FACEBOOK_ACCESS_TOKEN: ${opt:facebook-access-token, ''}
     FRONTEND_URL: ${opt:frontend-url, 'http://localhost:3000'}
-    PGDATABASE: ${opt:pg-database, 'kahvilat_db'}
-    PGHOST: ${opt:pg-host, 'localhost'}
-    PGPASSWORD: ${opt:pg-password, 'kahvilat_password'}
-    PGPORT: ${opt:pg-port, '5433'}
-    PGUSER: ${opt:pg-user, 'kahvilat_user'}
+    GOOGLE_API_KEY: ${opt:google-api-key, ''}
     REDIS_HOST: ${opt:redis-host, 'localhost'}
     REDIS_PORT: ${opt:redis-port, '6380'}
     STAGE: ${self:provider.stage}
@@ -36,9 +31,9 @@ functions:
     request:
       parameters:
         querystrings:
-          center: true
-          distance: true
-          q: true
+          location: true
+          radius: true
+          types: true
 
 resources:
   Resources:
@@ -61,33 +56,6 @@ resources:
         ResponseType: DEFAULT_5XX
         RestApiId:
           Ref: 'ApiGatewayRestApi'
-
-    pgSecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupDescription: Access to Postgres
-        SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: '5432'
-            ToPort: '5432'
-            CidrIp: 0.0.0.0/0
-
-    pgDB:
-      Type: 'AWS::RDS::DBInstance'
-      Properties:
-        DBName: ${opt:pg-database, ''}
-        AllocatedStorage: 5
-        DBInstanceClass: 'db.t2.micro'
-        DBInstanceIdentifier: kahvilat-db-${self:provider.stage}
-        Engine: 'postgres'
-        EngineVersion: '11.5'
-        MasterUsername: ${opt:pg-user, ''}
-        MasterUserPassword: ${opt:pg-password, ''}
-        VPCSecurityGroups:
-          - Fn::GetAtt:
-              - pgSecurityGroup
-              - GroupId
-      DeletionPolicy: 'Snapshot'
 
     VPC:
       Type: AWS::EC2::VPC

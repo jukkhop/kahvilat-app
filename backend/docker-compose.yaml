@@ -11,6 +11,7 @@ db:
     - ./sql:/docker-entrypoint-initdb.d/
 
 redis:
+  container_name: kahvilat-redis
   image: redis:latest
   ports:
     - '6380:6379'

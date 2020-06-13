@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 const Container = styled.footer`
-  font-size: 0.75rem;
+  font-size: 0.775rem;
+  font-family: Source Sans Pro;
   text-align: center;
   padding-bottom: 4rem;
 

@@ -23,14 +23,18 @@ const Main = styled.main`
 `
 
 const Heading2 = styled.h2`
-  font-family: Source Sans Pro;
+  color: rgba(0, 0, 0, 0.85);
+  font-family: Montserrat;
   font-size: 1.35rem;
+  font-weight: 600;
   padding-bottom: 0.35rem;
+  text-transform: uppercase;
 `
 
 const Paragraph = styled.p`
+  color: rgba(0, 0, 0, 0.85);
   font-family: Source Sans Pro;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 `
 
 function TermsPage() {
@@ -46,7 +50,7 @@ function TermsPage() {
         <Paragraph>
           This service is the intellectual property of Purelogic Softworks
           (legal name), who retains all rights to modify the service in any way
-          it sees fit, or remove the service at any point in time, without prior
+          it sees fit, or remove the service at any point in time without prior
           notice.
         </Paragraph>
       </Main>

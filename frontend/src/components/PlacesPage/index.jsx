@@ -10,93 +10,151 @@ import {
 
 import React from 'react'
 import styled from 'styled-components'
+
+import PlacesComponent from '../PlacesComponent'
+import PlacesMap from '../PlacesMap'
 import Layout from '../SiteLayout'
 
-const Form = styled.form``
-const Label = styled.label``
-const Input = styled.input``
-const Heading4 = styled.h4``
+const Form = styled.form`
+  font-family: Source Sans Pro;
+  margin: 0 auto;
+  max-width: 650px;
+`
+
+const Label = styled.label`
+  font-size: 0.85rem;
+  font-family: Source Sans Pro;
+`
+
+const Input = styled.input`
+  font-family: Source Sans Pro;
+  margin-left: 0.15rem;
+`
 
 const Fields = styled.div`
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 `
 
 const Field = styled.span`
   &:not(:first-of-type) {
-    margin-left: 0.5rem;
+    margin-left: 0.75rem;
   }
 `
 
 const Button = styled.button`
+  background-color: #c8ad90;
+  border-radius: 3px;
+  border: none;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+  cursor: pointer;
   display: block;
-  margin-top: 0.5rem;
-  width: 100%;
+  font-family: Montserrat;
+  font-weight: 600;
   height: 35px;
+  letter-spacing: 1.5px;
+  margin-top: 0.75rem;
+  text-transform: uppercase;
+  width: 100%;
+`
+
+const PlacesMapWrapper = styled.div`
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  margin-top: 1.5rem;
+
+  @media (max-width: 425px) {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+  }
 `
 
 const Message = styled.p`
-  color: rgba(1, 1, 1, 0.8);
-  font-size: 1.75rem;
-  margin: 1rem auto;
+  color: rgba(1, 1, 1, 0.85);
+  font-size: 0.85rem;
+  margin-top: 5rem;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
 `
 
-const Places = styled.ul``
-const Place = styled.li``
-
-function PlacesPage({ data, error, loading, onSubmit, register }) {
-  const places = (data.searchPlaces ? data.searchPlaces.data : []) || []
+function PlacesPage({ coords, error, loading, onSearch, places, register }) {
   return (
     <Layout>
-      <Form onSubmit={onSubmit}>
+      <Form onSubmit={onSearch}>
         <Fields>
           <Field>
-            <Label htmlFor="latitude">Latitude</Label>
-            <Input id="latitude" name="latitude" ref={register} />
+            <Label htmlFor="latitude">Leveysaste</Label>
+            <Input
+              id="latitude"
+              name="latitude"
+              ref={register}
+              defaultValue={coords ? coords.latitude : null}
+            />
           </Field>
           <Field>
-            <Label htmlFor="longitude">Longitude</Label>
-            <Input id="longitude" name="longitude" ref={register} />
+            <Label htmlFor="longitude">Pituusaste</Label>
+            <Input
+              id="longitude"
+              name="longitude"
+              ref={register}
+              defaultValue={coords ? coords.longitude : null}
+            />
           </Field>
           <Field>
-            <Label htmlFor="distance">Distance</Label>
-            <Input id="distance" name="distance" ref={register} />
+            <Label htmlFor="distance">Etäisyys</Label>
+            <Input
+              id="distance"
+              name="distance"
+              ref={register}
+              defaultValue="500"
+            />
           </Field>
         </Fields>
-        <Button type="submit">Search</Button>
+        <Button type="submit">Hae kahvilat</Button>
       </Form>
       {(() => {
         if (loading) {
-          return <Message>Loading...</Message>
+          return <Message>Ladataan...</Message>
         }
         if (error) {
-          return <Message>Search error.</Message>
+          return <Message>Haussa tapahtui virhe.</Message>
         }
-        return (
-          <Places>
-            {places.map((place) => (
-              <Place key={place.id}>
-                <Heading4>{place.name}</Heading4>
-              </Place>
-            ))}
-          </Places>
-        )
+        if (coords && places.length > 0) {
+          return (
+            <>
+              <PlacesMapWrapper>
+                <PlacesMap coords={coords} places={places} />
+              </PlacesMapWrapper>
+              <PlacesComponent
+                error={error}
+                loading={loading}
+                places={places}
+              />
+            </>
+          )
+        }
+        return <Message>Klikkaa &quot;HAE KAHVILAT&quot; aloittaksesi.</Message>
       })()}
     </Layout>
   )
 }
 
 PlacesPage.propTypes = {
-  data: oneOfType([arrayOf(shape({})), object]),
-  error: string,
+  coords: shape({}),
+  error: oneOfType([shape({}), object, string]),
   loading: bool.isRequired,
-  onSubmit: func.isRequired,
+  onSearch: func.isRequired,
+  places: arrayOf(shape({})),
   register: func.isRequired,
 }
 
 PlacesPage.defaultProps = {
-  data: [],
+  coords: null,
   error: null,
+  places: [],
 }
 
 export default PlacesPage
