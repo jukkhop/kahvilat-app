@@ -186,7 +186,7 @@ workflows:
           google-api-key: DEV_BACKEND_GOOGLE_API_KEY
           redis-host: DEV_REDIS_HOST
           redis-port: DEV_REDIS_PORT
-          stage: dev
+          stage: dev2
           filters:
             branches:
               only:
