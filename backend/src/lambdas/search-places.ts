@@ -6,7 +6,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import fetch from 'node-fetch'
 import qs from 'qs'
 
-import * as cache from '../cache'
+// import * as cache from '../cache'
 import { getCorsHeaders } from '../utils/cors'
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -18,18 +18,18 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 
   const { cursor, location, radius, type } = queryParams
-  const cacheClient = cache.createClient()
-  const cacheKey = qs.stringify(queryParams, { encode: false })
-  const cacheResult = await cache.get(cacheClient, cacheKey)
+  // const cacheClient = cache.createClient()
+  // const cacheKey = qs.stringify(queryParams, { encode: false })
+  // const cacheResult = await cache.get(cacheClient, cacheKey)
   const headers = getCorsHeaders()
 
-  if (cacheResult) {
-    return {
-      statusCode: 200,
-      headers,
-      body: cacheResult,
-    }
-  }
+  // if (cacheResult) {
+  //   return {
+  //     statusCode: 200,
+  //     headers,
+  //     body: cacheResult,
+  //   }
+  // }
 
   const params = cursor
     ? {
@@ -56,9 +56,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     cursor: next_page_token,
   })
 
-  if (response.status === 200) {
-    await cache.set(cacheClient, cacheKey, responseJson)
-  }
+  // if (response.status === 200) {
+  //   await cache.set(cacheClient, cacheKey, responseJson)
+  // }
 
   return {
     statusCode: 200,
@@ -74,5 +74,3 @@ function checkQueryStringParameters(actualParams: string[], expectedParams: stri
     }
   })
 }
-
-//
