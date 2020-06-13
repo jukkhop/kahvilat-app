@@ -40,17 +40,19 @@ const Input = styled.input`
 
 const Fields = styled.div`
   display: flex;
-  flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
 
-  @media (max-width: 650px) {
+  @media (max-width: 680px) {
     align-items: flex-start;
     flex-direction: column;
+    justify-content: flex-start;
   }
 `
 
 const Field = styled.span`
+  display: block;
+
   &:not(:first-of-type) {
     margin-left: 0.75rem;
   }
@@ -58,6 +60,7 @@ const Field = styled.span`
   @media (max-width: 650px) {
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
+    width: 100%;
 
     &:not(:first-of-type) {
       margin-left: 0rem;
@@ -144,8 +147,6 @@ function PlacesPage({ coords, error, loading, onSearch, places, register }) {
         if (error) {
           return <Message>Haussa tapahtui virhe.</Message>
         }
-        console.log('coords', coords)
-        console.log('places', places)
         if (coords && places.length > 0) {
           return (
             <div>

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCoffee } from '@fortawesome/free-solid-svg-icons'
@@ -19,6 +20,10 @@ const Header = styled.header`
   font-weight: 300;
   text-align: center;
   margin: auto;
+
+  a {
+    text-decoration: none !important;
+  }
 `
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
@@ -28,13 +33,32 @@ const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
 
 const Main = styled.main``
 
+const Button = styled.button`
+  background-color: #c8ad90;
+  border-radius: 3px;
+  border: none;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+  cursor: pointer;
+  display: block;
+  font-family: Montserrat;
+  font-weight: 600;
+  height: 35px;
+  letter-spacing: 1.5px;
+  margin-top: 0.75rem;
+  text-transform: uppercase;
+  width: 100%;
+`
+
 function LandingPage() {
   return (
     <Container>
       <Header>
         <StyledFontAwesomeIcon icon={faCoffee} />
-        <p>Getting you to your favorite cafeterias, faster.</p>
-        <p style={{ marginTop: 0 }}>Coming soon.</p>
+        <p>Varhainen versio nyt kokeiltavissa.</p>
+        <Link to="/places">
+          <Button>Kokeile nyt</Button>
+        </Link>
       </Header>
       <Main />
       <Footer />
