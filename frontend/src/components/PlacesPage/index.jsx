@@ -28,18 +28,40 @@ const Label = styled.label`
 
 const Input = styled.input`
   font-family: Source Sans Pro;
-  margin-left: 0.15rem;
+  margin-left: 0.25rem;
+  padding: 0.25rem 0.5rem;
+
+  @media (max-width: 650px) {
+    margin-left: 0rem;
+    margin-top: 0.25rem;
+    width: 100%;
+  }
 `
 
 const Fields = styled.div`
   display: flex;
   flex-wrap: wrap;
+  flex-direction: row;
   justify-content: space-between;
+
+  @media (max-width: 650px) {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 `
 
 const Field = styled.span`
   &:not(:first-of-type) {
     margin-left: 0.75rem;
+  }
+
+  @media (max-width: 650px) {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+
+    &:not(:first-of-type) {
+      margin-left: 0rem;
+    }
   }
 `
 

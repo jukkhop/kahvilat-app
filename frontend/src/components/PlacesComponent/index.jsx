@@ -17,9 +17,16 @@ const Places = styled.ul`
 function PlacesComponent({ places }) {
   return (
     <Places>
-      {places.map(({ id, ...place }) => (
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        <PlaceComponent key={id} {...place} />
+      {places.map(({ distance, icon, id, name, openNow, rating, vicinity }) => (
+        <PlaceComponent
+          distance={distance}
+          icon={icon}
+          key={id}
+          name={name}
+          openNow={openNow}
+          rating={rating}
+          vicinity={vicinity}
+        />
       ))}
     </Places>
   )
