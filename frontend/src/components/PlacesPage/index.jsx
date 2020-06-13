@@ -128,11 +128,7 @@ function PlacesPage({ coords, error, loading, onSearch, places, register }) {
               <PlacesMapWrapper>
                 <PlacesMap coords={coords} places={places} />
               </PlacesMapWrapper>
-              <PlacesComponent
-                error={error}
-                loading={loading}
-                places={places}
-              />
+              <PlacesComponent places={places} />
             </>
           )
         }
