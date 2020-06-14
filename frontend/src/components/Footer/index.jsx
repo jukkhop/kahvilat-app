@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 const Container = styled.footer`
-  font-size: 0.775rem;
+  font-size: 0.875rem;
   font-family: Source Sans Pro;
   text-align: center;
   padding-bottom: 4rem;
 
-  @media (max-height: 600px) {
+  @media (max-width: 600px) {
     padding-bottom: 1rem;
   }
 `

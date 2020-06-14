@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import fetch from 'node-fetch'
 import qs from 'qs'
@@ -11,13 +9,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const { GOOGLE_API_KEY } = process.env
   const queryParams = event.queryStringParameters || {}
 
-  if (!queryParams.cursor) {
-    checkQueryStringParameters(Object.keys(queryParams), ['location', 'radius', 'type'])
-  }
+  checkQueryStringParameters(Object.keys(queryParams), ['latitude', 'longitude'])
 
-  const { cursor, location, radius, type } = queryParams
+  const { latitude, longitude } = queryParams
   const cacheClient = cache.createClient()
-  const cacheKey = 'search-places?' + qs.stringify(queryParams, { encode: false })
+  const cacheKey = 'find-address?' + qs.stringify(queryParams, { encode: false })
   const cacheResult = await cache.get(cacheClient, cacheKey)
   const headers = getCorsHeaders()
 
@@ -29,33 +25,22 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
   }
 
-  const params = cursor
-    ? {
-        key: GOOGLE_API_KEY,
-        pagetoken: cursor,
-      }
-    : {
-        key: GOOGLE_API_KEY,
-        keyword: 'coffee',
-        location,
-        radius,
-        types: type,
-      }
+  const params = {
+    key: GOOGLE_API_KEY,
+    language: 'fi',
+    latlng: `${latitude},${longitude}`,
+  }
 
   const queryString = qs.stringify(params, { encode: false })
-  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?${queryString}`
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?${queryString}`
 
   const response = await fetch(url)
   const responseData = await response.json()
-  const { results, next_page_token } = responseData
-
-  const responseJson = JSON.stringify({
-    places: results,
-    cursor: next_page_token,
-  })
+  const { results } = responseData
+  const responseJson = JSON.stringify({ addresses: results })
 
   if (response.status === 200) {
-    await cache.set(cacheClient, cacheKey, responseJson, 60)
+    await cache.set(cacheClient, cacheKey, responseJson)
   }
 
   return {

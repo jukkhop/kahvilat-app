@@ -5,7 +5,6 @@ import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 
 const Container = styled.header`
   color: rgba(1, 1, 1, 0.625);
-  font-size: calc(10px + 2vmin);
   font-weight: 300;
   text-align: center;
   margin: 2rem auto 0 auto;
@@ -22,7 +21,7 @@ const Container = styled.header`
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   color: #c8ad90;
-  font-size: 5rem;
+  font-size: 6.5rem;
 `
 
 function Header() {

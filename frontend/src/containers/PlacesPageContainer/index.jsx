@@ -1,41 +1,69 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-use-before-define */
-/* eslint-disable react/jsx-curly-newline */
 
+import get from 'lodash.get'
 import { getDistance } from 'geolib'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLazyQuery } from '@apollo/react-hooks'
-
 import PlacesPage from '../../components/PlacesPage'
-import { buildPath, SEARCH_PLACES, SEARCH_MORE_PLACES } from '../../graphql'
+import {
+  buildPath,
+  FIND_ADDRESS,
+  FIND_COORDINATES,
+  SEARCH_MORE_PLACES,
+  SEARCH_PLACES,
+} from '../../graphql'
 import { sleep } from '../../utils'
 
 function PlacesPageContainer() {
-  const { register, handleSubmit, getValues } = useForm()
-  const [searchPlaces, { loading, data, error, fetchMore }] = useLazyQuery(
-    SEARCH_PLACES,
+  const { errors, getValues, handleSubmit, register } = useForm()
+  const [userCoords, setUserCoords] = useState(null)
+  const [prevAddress, setPrevAddress] = useState(null)
+  const [findAddress, findAddressData] = useLazyQuery(FIND_ADDRESS)
+  const [findCoordinates, findCoordinatesData] = useLazyQuery(FIND_COORDINATES)
+  const [searchPlaces, searchPlacesData] = useLazyQuery(SEARCH_PLACES)
+
+  const foundAddress = get(
+    findAddressData,
+    'data.findAddress.addresses[0].address',
   )
+  const foundCoords = get(
+    findCoordinatesData,
+    'data.findCoordinates.addresses[0].geometry.location',
+  )
+  const places = get(searchPlacesData, 'data.searchPlaces.places', [])
+  const cursor = get(searchPlacesData, 'data.searchPlaces.cursor')
 
-  const [browserCoords, setBrowserCoords] = useState(null)
+  const { loading, error, fetchMore } = searchPlacesData
 
-  const { latitude: browserLatitude, longitude: browserLongitude } = getValues()
-  const { searchPlaces: entry } = data || {}
-  const { cursor, places = [] } = entry || {}
+  const onFindCoordinates = ({ address }) => {
+    if (prevAddress === address) return
+    const options = {
+      variables: {
+        address,
+        pathFunction: buildPath('/find-coordinates'),
+      },
+    }
+    setUserCoords(null)
+    setPrevAddress(address)
+    findCoordinates(options)
+  }
 
-  const onSearch = ({ latitude, longitude, distance }) => {
+  const onSearchPlaces = ({ longitude, latitude, distance }) => {
+    if (!userCoords) return
     const options = {
       variables: {
         location: [latitude.toString(), longitude.toString()].join(','),
+        pathFunction: buildPath('/search-places'),
         radius: distance,
         type: 'cafe',
-        pathFunction: buildPath('/search-places'),
       },
     }
     searchPlaces(options)
   }
 
-  const onSearchMore = async () => {
+  const onSearchMorePlaces = async () => {
     if (!cursor) return Promise.resolve()
     await sleep(2000)
     return fetchMore({
@@ -61,44 +89,65 @@ function PlacesPageContainer() {
     })
   }
 
-  const memoizedOnSearchMore = useCallback(onSearchMore, [cursor])
+  const memoizedOnSearchPlaces = useCallback(onSearchPlaces, [userCoords])
+  const memoizedOnSearchMorePlaces = useCallback(onSearchMorePlaces, [cursor])
 
   useEffect(() => {
-    memoizedOnSearchMore()
-  }, [cursor, memoizedOnSearchMore])
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords
+      const options = {
+        variables: {
+          latitude,
+          longitude,
+          pathFunction: buildPath('/find-address'),
+        },
+      }
+      setUserCoords({ latitude, longitude })
+      findAddress(options)
+    })
+  }, [findAddress])
 
   useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(position => {
-        setBrowserCoords({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        })
-      })
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('Geolocation API is not available')
+    if (foundCoords) {
+      setUserCoords({ latitude: foundCoords.lat, longitude: foundCoords.lng })
     }
-  }, [])
+  }, [foundCoords])
+
+  useEffect(() => {
+    if (!userCoords) return
+    const { distance } = getValues()
+    memoizedOnSearchPlaces({
+      distance,
+      latitude: userCoords.latitude,
+      longitude: userCoords.longitude,
+    })
+  }, [getValues, userCoords, memoizedOnSearchPlaces])
+
+  useEffect(() => {
+    memoizedOnSearchMorePlaces()
+  }, [cursor, memoizedOnSearchMorePlaces])
 
   const sortedPlaces = places
     .filter(place => place.businessStatus === 'OPERATIONAL')
-    .map(mapPlace(browserLatitude, browserLongitude))
+    .map(userCoords ? mapPlace(userCoords) : x => x)
     .sort(sortPlaces)
 
   return (
     <PlacesPage
-      coords={browserCoords}
-      error={error}
+      address={foundAddress}
+      coords={userCoords}
+      inputErrors={errors}
       loading={loading}
-      onSearch={handleSubmit(onSearch)}
+      onSearch={handleSubmit(onFindCoordinates)}
       places={sortedPlaces}
       register={register}
+      searchError={error}
     />
   )
 }
 
-function mapPlace(browserLatitude, browserLongitude) {
+function mapPlace({ latitude, longitude }) {
   return function _(place) {
     const {
       geometry: {
@@ -111,7 +160,7 @@ function mapPlace(browserLatitude, browserLongitude) {
     const { openNow } = openingHours || {}
 
     const distance = getDistance(
-      { latitude: browserLatitude, longitude: browserLongitude },
+      { latitude, longitude },
       { latitude: lat, longitude: lng },
       100,
     )

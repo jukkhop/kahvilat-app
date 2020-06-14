@@ -52,7 +52,7 @@ const Icon = styled.div`
 const Details = styled.div`
   border-top: 1px solid #f0f0f0;
   display: flex;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   justify-content: center;
   margin-top: 0.65rem;
   padding: 0.425rem 0rem;
@@ -68,7 +68,7 @@ const Details = styled.div`
 
 const Detail = styled.div`
   color: ${props => props.color || 'inherit'};
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   margin: 0rem 0.15rem;
 
   svg {
@@ -79,7 +79,7 @@ const Detail = styled.div`
 const Name = styled.div`
   color: rgba(0, 0, 0, 0.85);
   font-family: Montserrat;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   font-weight: 600;
   margin: 0.35rem 0.75rem 0rem 0.75rem;
   overflow: hidden;
@@ -89,7 +89,7 @@ const Name = styled.div`
 `
 
 const Address = styled.div`
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   margin: 0.25rem 0.75rem 0rem 0.75rem;
   overflow: hidden;
   text-align: center;
@@ -132,11 +132,13 @@ PlaceComponent.propTypes = {
   distance: number.isRequired,
   icon: string.isRequired,
   name: string.isRequired,
-  openNow: bool.isRequired,
+  openNow: bool,
   rating: number.isRequired,
   vicinity: string.isRequired,
 }
 
-PlaceComponent.defaultProps = {}
+PlaceComponent.defaultProps = {
+  openNow: false,
+}
 
 export default PlaceComponent

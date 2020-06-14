@@ -20,11 +20,16 @@ async function get(client: RedisClient, key: string): Promise<string | undefined
   return value !== null ? value : undefined
 }
 
-async function set(client: RedisClient, key: string, value: string): Promise<void> {
+async function set(
+  client: RedisClient,
+  key: string,
+  value: string,
+  durationSecs: number = DAY_IN_SECONDS,
+): Promise<void> {
   const set = promisify(client.set).bind(client)
   const expire = promisify(client.expire).bind(client)
   await set(key, value)
-  await expire(key, DAY_IN_SECONDS)
+  await expire(key, durationSecs)
 }
 
 async function del(client: RedisClient, key: string): Promise<void> {

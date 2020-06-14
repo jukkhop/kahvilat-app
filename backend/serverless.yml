@@ -35,6 +35,41 @@ functions:
           radius: true
           types: true
 
+  find-address:
+    handler: src/lambdas/find-address.handler
+    vpc:
+      securityGroupIds:
+        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+      subnetIds:
+        - Ref: PrivateSubnetA
+    events:
+      - http:
+          path: /find-address
+          method: get
+          cors: true
+    request:
+      parameters:
+        querystrings:
+          latitude: true
+          longitude: true
+
+  find-coordinates:
+    handler: src/lambdas/find-coordinates.handler
+    vpc:
+      securityGroupIds:
+        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+      subnetIds:
+        - Ref: PrivateSubnetA
+    events:
+      - http:
+          path: /find-coordinates
+          method: get
+          cors: true
+    request:
+      parameters:
+        querystrings:
+          address: true
+
 resources:
   Resources:
     GatewayResponseDefault4XX:

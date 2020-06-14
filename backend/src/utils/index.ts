@@ -8,3 +8,11 @@ export function getCorsHeaders(): Headers {
     'Access-Control-Allow-Credentials': true,
   }
 }
+
+export function checkQueryStringParameters(actualParams: string[], expectedParams: string[]): void {
+  expectedParams.forEach((expectedParam) => {
+    if (!actualParams.includes(expectedParam)) {
+      throw new Error(`Missing query string parameter: ${expectedParam}`)
+    }
+  })
+}
