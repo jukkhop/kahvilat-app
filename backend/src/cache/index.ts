@@ -14,10 +14,10 @@ function createClient(): RedisClient {
   return client
 }
 
-async function get(client: RedisClient, key: string): Promise<string | undefined> {
+async function get(client: RedisClient, key: string): Promise<string | null> {
   const get = promisify(client.get).bind(client)
-  const value: string | null = await get(key)
-  return value !== null ? value : undefined
+  const value = await get(key)
+  return value
 }
 
 async function set(
