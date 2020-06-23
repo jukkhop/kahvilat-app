@@ -193,6 +193,14 @@ function PlacesPage({
               </div>
             )
           }
+          if (coords && places.length === 0) {
+            return (
+              <Message>
+                Valitettavasti kahviloita ei löytynyt. Voit kokeilla kasvattaa
+                etäisyyttä.
+              </Message>
+            )
+          }
           return (
             <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaksesi.</Message>
           )

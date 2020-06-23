@@ -35,7 +35,15 @@ function PlacesPageContainer() {
   const places = get(searchPlacesData, 'data.searchPlaces.places', [])
   const cursor = get(searchPlacesData, 'data.searchPlaces.cursor')
 
-  const { loading, error, fetchMore } = searchPlacesData
+  const loading =
+    searchPlacesData.loading ||
+    findCoordinatesData.loading ||
+    findAddressData.loading
+
+  const error =
+    searchPlacesData.error || findCoordinatesData.error || findAddressData.error
+
+  const { fetchMore } = searchPlacesData
 
   const onFindCoordinates = ({ address }) => {
     if (prevAddress === address) return
