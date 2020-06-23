@@ -1,8 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-use-before-define */
 
-import get from 'lodash.get'
 import { getDistance } from 'geolib'
+import get from 'lodash.get'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLazyQuery } from '@apollo/react-hooks'
@@ -11,8 +11,8 @@ import {
   buildPath,
   FIND_ADDRESS,
   FIND_COORDINATES,
-  SEARCH_MORE_PLACES,
   SEARCH_PLACES,
+  SEARCH_MORE_PLACES,
 } from '../../graphql'
 import { sleep } from '../../utils'
 

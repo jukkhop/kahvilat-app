@@ -51,7 +51,6 @@ function PlacesMap({ coords, places }) {
           </InfoWindow> */}
         </Marker>
       ))}
-      <></>
     </GoogleMap>
   )
 }
