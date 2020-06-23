@@ -92,6 +92,11 @@ jobs:
         type: env_var_name
       stage:
         type: string
+    environment:
+      FRONTEND_URL: ${<< parameters.frontend-url >>}
+      GOOGLE_API_KEY: ${<< parameters.google-api-key >>}
+      REDIS_HOST: ${<< parameters.redis-host >>}
+      REDIS_PORT: ${<< parameters.redis-port >>}
     docker:
       - image: circleci/node:12.16.2
     working_directory: ~/repo/backend
@@ -131,11 +136,6 @@ jobs:
           command: |
             serverless deploy \
               --config serverless-<< parameters.stage >>.yml \
-              --frontend-url ${<< parameters.frontend-url >>} \
-              --google-api-key ${<< parameters.google-api-key >>} \
-              --redis-host ${<< parameters.redis-host >>} \
-              --redis-port ${<< parameters.redis-port >>} \
-              --region $AWS_DEFAULT_REGION \
               --stage << parameters.stage >> \
               --verbose
 

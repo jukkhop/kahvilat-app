@@ -3,13 +3,13 @@ service: kahvilat-api
 provider:
   name: aws
   runtime: nodejs12.x
-  region: ${opt:region, 'eu-west-1'}
+  region: ${env:AWS_DEFAULT_REGION, 'eu-west-1'}
   stage: ${opt:stage, 'local'}
   environment:
-    FRONTEND_URL: ${opt:frontend-url, 'http://localhost:3000'}
-    GOOGLE_API_KEY: ${opt:google-api-key, ''}
-    REDIS_HOST: ${opt:redis-host, 'localhost'}
-    REDIS_PORT: ${opt:redis-port, '6380'}
+    FRONTEND_URL: ${env:FRONTEND_URL, 'http://localhost:3000'}
+    GOOGLE_API_KEY: ${env:GOOGLE_API_KEY, ''}
+    REDIS_HOST: ${env:REDIS_HOST, 'localhost'}
+    REDIS_PORT: ${env:REDIS_PORT, '6380'}
     STAGE: ${self:provider.stage}
 
 package:
@@ -20,7 +20,7 @@ functions:
     handler: src/lambdas/search-places.handler
     vpc:
       securityGroupIds:
-        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+        - 'Fn::GetAtt': ServerlessSecurityGroup.GroupId
       subnetIds:
         - Ref: PrivateSubnetA
     events:
@@ -39,7 +39,7 @@ functions:
     handler: src/lambdas/find-address.handler
     vpc:
       securityGroupIds:
-        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+        - 'Fn::GetAtt': ServerlessSecurityGroup.GroupId
       subnetIds:
         - Ref: PrivateSubnetA
     events:
@@ -57,7 +57,7 @@ functions:
     handler: src/lambdas/find-coordinates.handler
     vpc:
       securityGroupIds:
-        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+        - 'Fn::GetAtt': ServerlessSecurityGroup.GroupId
       subnetIds:
         - Ref: PrivateSubnetA
     events:
@@ -95,7 +95,7 @@ resources:
     VPC:
       Type: AWS::EC2::VPC
       Properties:
-        CidrBlock: "10.0.0.0/16"
+        CidrBlock: '10.0.0.0/16'
     IP:
       Type: AWS::EC2::EIP
       Properties:
@@ -125,7 +125,7 @@ resources:
         VpcId:
           Ref: VPC
         AvailabilityZone: ${self:provider.region}a
-        CidrBlock: "10.0.1.0/24"
+        CidrBlock: '10.0.1.0/24'
     PublicSubnetA:
       DependsOn: VPC
       Type: AWS::EC2::Subnet
@@ -133,7 +133,7 @@ resources:
         VpcId:
           Ref: VPC
         AvailabilityZone: ${self:provider.region}a
-        CidrBlock: "10.0.2.0/24"
+        CidrBlock: '10.0.2.0/24'
     PrivateRouteTable:
       Type: AWS::EC2::RouteTable
       Properties:
@@ -189,17 +189,17 @@ resources:
         VpcId:
           Ref: VPC
         SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: '6379'
-          ToPort: '6379'
-          SourceSecurityGroupId:
-            Ref: ServerlessSecurityGroup
+          - IpProtocol: tcp
+            FromPort: '6379'
+            ToPort: '6379'
+            SourceSecurityGroupId:
+              Ref: ServerlessSecurityGroup
     ServerlessCacheSubnetGroup:
       Type: AWS::ElastiCache::SubnetGroup
       Properties:
-        Description: "Cache Subnet Group"
+        Description: 'Cache Subnet Group'
         SubnetIds:
-        - Ref: PrivateSubnetA
+          - Ref: PrivateSubnetA
     ElasticCacheCluster:
       DependsOn: ServerlessStorageSecurityGroup
       Type: AWS::ElastiCache::CacheCluster
@@ -209,7 +209,7 @@ resources:
         CacheNodeType: ${self:custom.config.CACHE_INSTANCE_SIZE}
         NumCacheNodes: 1
         VpcSecurityGroupIds:
-        - "Fn::GetAtt": ServerlessStorageSecurityGroup.GroupId
+          - 'Fn::GetAtt': ServerlessStorageSecurityGroup.GroupId
         CacheSubnetGroupName:
           Ref: ServerlessCacheSubnetGroup
 
