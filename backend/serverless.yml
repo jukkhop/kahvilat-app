@@ -3,13 +3,13 @@ service: kahvilat-api
 provider:
   name: aws
   runtime: nodejs12.x
-  region: ${env:AWS_DEFAULT_REGION, 'eu-west-1'}
+  region: ${opt:region, 'eu-west-1'}
   stage: ${opt:stage, 'local'}
   environment:
-    FRONTEND_URL: ${env:FRONTEND_URL, 'http://localhost:3000'}
-    GOOGLE_API_KEY: ${env:GOOGLE_API_KEY, ''}
-    REDIS_HOST: ${env:REDIS_HOST, 'localhost'}
-    REDIS_PORT: ${env:REDIS_PORT, '6380'}
+    FRONTEND_URL: ${opt:frontend-url, 'http://localhost:3000'}
+    GOOGLE_API_KEY: ${opt:google-api-key, ''}
+    REDIS_HOST: ${opt:redis-host, 'localhost'}
+    REDIS_PORT: ${opt:redis-port, '6380'}
     STAGE: ${self:provider.stage}
 
 package:
