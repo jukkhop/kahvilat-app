@@ -28,7 +28,7 @@ export const SEARCH_PLACES = gql`
     searchPlaces(location: $location, radius: $radius, type: $type)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
-      places @type(name: "[Place]") {
+      places @type(name: "Place") {
         ...placeFragment
       }
     }
@@ -41,7 +41,7 @@ export const SEARCH_MORE_PLACES = gql`
     searchMorePlaces(cursor: $cursor)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
-      places @type(name: "[Place]") {
+      places @type(name: "Place") {
         ...placeFragment
       }
     }
