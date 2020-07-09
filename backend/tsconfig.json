@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "declaration": true,
     "esModuleInterop": true,
     "lib": ["es2015"],
+    "module": "commonjs",
     "moduleResolution": "node",
     "outDir": ".build",
     "preserveConstEnums": true,
@@ -11,5 +13,6 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "es5"
-  }
+  },
+  "exclude": ["node_modules"]
 }
