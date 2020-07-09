@@ -16,8 +16,8 @@ package:
   excludeDevDependencies: false
 
 functions:
-  search-places:
-    handler: src/lambdas/search-places.handler
+  find-places:
+    handler: src/lambdas/find-places.handler
     vpc:
       securityGroupIds:
         - 'Fn::GetAtt': ServerlessSecurityGroup.GroupId
@@ -25,12 +25,13 @@ functions:
         - Ref: PrivateSubnetA
     events:
       - http:
-          path: /search-places
+          path: /find-places
           method: get
           cors: true
     request:
       parameters:
         querystrings:
+          keyword: true
           location: true
           radius: true
           types: true

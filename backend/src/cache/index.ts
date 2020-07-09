@@ -1,41 +1,35 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 
-import redis, { RedisClient } from 'redis'
+import redis from 'redis'
 import { promisify } from 'util'
+import { DAY_IN_SECONDS } from '../utils'
 
-const DAY_IN_SECONDS = 86400
+class Cache {
+  private getPromisified: (arg1: string) => Promise<string>
+  private setPromisified: (arg1: string, arg2: string) => Promise<unknown>
+  private expirePromisified: (arg1: string, arg2: number) => Promise<number>
+  private deletePromisified: (arg1: string) => Promise<unknown>
 
-function createClient(): RedisClient {
-  const { REDIS_HOST = '', REDIS_PORT = '' } = process.env
-  const client = redis.createClient({
-    host: REDIS_HOST,
-    port: Number(REDIS_PORT),
-  })
-  return client
+  constructor(host: string, port: number) {
+    const client = redis.createClient({ host, port })
+    this.getPromisified = promisify(client.get).bind(client)
+    this.setPromisified = promisify(client.set).bind(client)
+    this.expirePromisified = promisify(client.expire).bind(client)
+    this.deletePromisified = promisify(client.del).bind(client)
+  }
+
+  async get(key: string): Promise<string | null> {
+    return await this.getPromisified(key)
+  }
+
+  async set(key: string, value: string, durationSecs: number = DAY_IN_SECONDS): Promise<void> {
+    await this.setPromisified(key, value)
+    await this.expirePromisified(key, durationSecs)
+  }
+
+  async delete(key: string): Promise<void> {
+    await this.deletePromisified(key)
+  }
 }
 
-async function get(client: RedisClient, key: string): Promise<string | null> {
-  const get = promisify(client.get).bind(client)
-  const value = await get(key)
-  return value
-}
-
-async function set(
-  client: RedisClient,
-  key: string,
-  value: string,
-  durationSecs: number = DAY_IN_SECONDS,
-): Promise<void> {
-  const set = promisify(client.set).bind(client)
-  const expire = promisify(client.expire).bind(client)
-  await set(key, value)
-  await expire(key, durationSecs)
-}
-
-async function del(client: RedisClient, key: string): Promise<void> {
-  const del = promisify(client.del).bind(client)
-  // @ts-ignore
-  await del(key)
-}
-
-export { createClient, del, get, set }
+export default Cache

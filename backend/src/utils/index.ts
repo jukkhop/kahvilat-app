@@ -1,3 +1,5 @@
+import qs from 'qs'
+import Cache from '../cache'
 import { Headers } from '../types'
 
 export function getCorsHeaders(): Headers {
@@ -16,3 +18,30 @@ export function checkQueryStringParameters(actualParams: string[], expectedParam
     }
   })
 }
+
+export async function cachedFetch(
+  cache: Cache,
+  endpoint: string,
+  params: { [key: string]: string },
+  fetchFn: () => Promise<[number, any, null | string]>,
+  cacheExpireSecs: number = DAY_IN_SECONDS,
+): Promise<[number, string]> {
+  const cacheKey = endpoint + '?' + qs.stringify(params, { encode: false })
+  const cachedResponse = await cache.get(cacheKey)
+
+  if (cachedResponse) {
+    return [200, cachedResponse]
+  }
+
+  const [status, result, error] = await fetchFn()
+  const response = !error ? result : { error }
+  const responseJson = JSON.stringify(response)
+
+  if (status === 200) {
+    await cache.set(cacheKey, responseJson, cacheExpireSecs)
+  }
+
+  return [status, responseJson]
+}
+
+export const DAY_IN_SECONDS = 86400

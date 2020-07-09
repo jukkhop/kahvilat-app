@@ -6,18 +6,21 @@ import { cachedFetch, checkQueryStringParameters, getCorsHeaders } from '../util
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const { GOOGLE_API_KEY = '', REDIS_HOST = '', REDIS_PORT = '' } = process.env
   const queryParams = event.queryStringParameters || {}
-  checkQueryStringParameters(Object.keys(queryParams), ['latitude', 'longitude'])
 
-  const { latitude, longitude } = queryParams
+  if (!queryParams.cursor) {
+    checkQueryStringParameters(Object.keys(queryParams), ['keyword', 'location', 'radius', 'type'])
+  }
+
+  const { cursor = null, keyword, location, radius, type } = queryParams
   const cache = new Cache(REDIS_HOST, Number(REDIS_PORT))
   const client = new GoogleClient(GOOGLE_API_KEY, 'fi')
 
   const [status, response] = await cachedFetch(
     cache,
-    'find-address',
-    { latitude, longitude },
-    () => client.findAddress(latitude, longitude),
-    //
+    'find-places',
+    queryParams,
+    () => client.findPlaces(cursor, keyword, location, Number(radius), type),
+    60,
   )
 
   return {

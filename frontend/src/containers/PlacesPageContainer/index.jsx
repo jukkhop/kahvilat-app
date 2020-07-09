@@ -26,13 +26,13 @@ function PlacesPageContainer() {
 
   const foundAddress = get(
     findAddressData,
-    'data.findAddress.addresses[0].address',
+    'data.findAddress.results[0].address',
   )
   const foundCoords = get(
     findCoordinatesData,
-    'data.findCoordinates.addresses[0].geometry.location',
+    'data.findCoordinates.results[0].geometry.location',
   )
-  const places = get(searchPlacesData, 'data.searchPlaces.places', [])
+  const places = get(searchPlacesData, 'data.searchPlaces.results', [])
   const cursor = get(searchPlacesData, 'data.searchPlaces.cursor')
 
   const loading =
@@ -62,8 +62,9 @@ function PlacesPageContainer() {
     if (!userCoords) return
     const options = {
       variables: {
+        keyword: 'coffee',
         location: [latitude.toString(), longitude.toString()].join(','),
-        pathFunction: buildPath('/search-places'),
+        pathFunction: buildPath('/find-places'),
         radius: distance,
         type: 'cafe',
       },
@@ -78,18 +79,18 @@ function PlacesPageContainer() {
       query: SEARCH_MORE_PLACES,
       variables: {
         cursor,
-        pathFunction: buildPath('/search-places'),
+        pathFunction: buildPath('/find-places'),
       },
       updateQuery: (previousResult, { fetchMoreResult }) => {
         const previousEntry = previousResult.searchPlaces
         const {
           cursor: newCursor,
-          places: newPlaces,
+          results: newResults,
         } = fetchMoreResult.searchMorePlaces
         return {
           searchPlaces: {
             cursor: newCursor,
-            places: [...newPlaces, ...previousEntry.places],
+            results: [...newResults, ...previousEntry.results],
             __typename: previousEntry.__typename,
           },
         }

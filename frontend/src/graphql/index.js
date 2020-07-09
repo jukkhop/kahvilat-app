@@ -24,11 +24,21 @@ const placeFragment = gql`
 `
 
 export const SEARCH_PLACES = gql`
-  query($location: String, $pathFunction: any, $radius: Int, $type: String) {
-    searchPlaces(location: $location, radius: $radius, type: $type)
-      @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+  query(
+    $keyword: String
+    $location: String
+    $pathFunction: any
+    $radius: Int
+    $type: String
+  ) {
+    searchPlaces(
+      keyword: $keyword
+      location: $location
+      radius: $radius
+      type: $type
+    ) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
-      places @type(name: "Place") {
+      results @type(name: "Place") {
         ...placeFragment
       }
     }
@@ -41,7 +51,7 @@ export const SEARCH_MORE_PLACES = gql`
     searchMorePlaces(cursor: $cursor)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
-      places @type(name: "Place") {
+      results @type(name: "Place") {
         ...placeFragment
       }
     }
@@ -53,9 +63,9 @@ export const FIND_ADDRESS = gql`
   query($latitude: String, $longitude: String, $pathFunction: any) {
     findAddress(latitude: $latitude, longitude: $longitude, type: $type)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
-      addresses @type(name: "[Address]") {
+      results @type(name: "Address") {
         address: formatted_address
-        components: address_components @type(name: "[Object]") {
+        components: address_components @type(name: "Object") {
           name: long_name
           types @type(name: "[String]")
         }
@@ -68,7 +78,7 @@ export const FIND_COORDINATES = gql`
   query($address: String, $pathFunction: any) {
     findCoordinates(address: $address, type: $type)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
-      addresses @type(name: "[Address]") {
+      results @type(name: "Address") {
         geometry @type(name: "Object") {
           location @type(name: "Object") {
             lat
@@ -80,9 +90,7 @@ export const FIND_COORDINATES = gql`
   }
 `
 
-export function buildPath(endpoint) {
-  return function _({ args }) {
-    const queryString = qs.stringify(args, { encode: false })
-    return `${endpoint}?${queryString}`
-  }
+export const buildPath = endpoint => ({ args }) => {
+  const queryString = qs.stringify(args, { encode: false })
+  return `${endpoint}?${queryString}`
 }
