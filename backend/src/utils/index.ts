@@ -23,7 +23,7 @@ export async function cachedFetch(
   cache: Cache,
   endpoint: string,
   params: { [key: string]: string },
-  fetchFn: () => Promise<[number, any, null | string]>,
+  fetchFn: () => Promise<[number, any, string?]>,
   cacheExpireSecs: number = DAY_IN_SECONDS,
 ): Promise<[number, string]> {
   const cacheKey = endpoint + '?' + qs.stringify(params, { encode: false })

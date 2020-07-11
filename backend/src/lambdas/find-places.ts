@@ -11,7 +11,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     checkQueryStringParameters(Object.keys(queryParams), ['keyword', 'location', 'radius', 'type'])
   }
 
-  const { cursor = null, keyword, location, radius, type } = queryParams
+  const { cursor, keyword, location, radius, type } = queryParams
   const cache = new Cache(REDIS_HOST, Number(REDIS_PORT))
   const client = new GoogleClient(GOOGLE_API_KEY, 'fi')
 

@@ -12,7 +12,7 @@ class GoogleClient {
     this.language = language
   }
 
-  async findAddress(latitude: string, longitude: string): Promise<[number, any, null | string]> {
+  async findAddress(latitude: string, longitude: string): Promise<[number, any, string?]> {
     const { apiKey, language } = this
     const params = {
       key: apiKey,
@@ -22,7 +22,7 @@ class GoogleClient {
     return await request('geocode', params)
   }
 
-  async findCoordinates(address: string): Promise<[number, any, null | string]> {
+  async findCoordinates(address: string): Promise<[number, any, string?]> {
     const { apiKey, language } = this
     const params = {
       address,
@@ -33,12 +33,12 @@ class GoogleClient {
   }
 
   async findPlaces(
-    cursor: string | null,
-    keyword: string,
-    location: string,
-    radius: number,
-    type: string,
-  ): Promise<[number, any, null | string]> {
+    cursor?: string,
+    keyword?: string,
+    location?: string,
+    radius?: number,
+    type?: string,
+  ): Promise<[number, any, string?]> {
     const { apiKey } = this
     const params = cursor
       ? {
@@ -61,7 +61,7 @@ async function request(
   endpoint: string,
   params: any,
   encodeParams = false,
-): Promise<[number, any, null | string]> {
+): Promise<[number, any, string?]> {
   const queryString = qs.stringify(params, { encode: encodeParams })
   const url = `${BASE_URL}/${endpoint}/json?${queryString}`
 
@@ -69,16 +69,16 @@ async function request(
     const response = await fetch(url)
 
     if (!response.ok) {
-      return [mkErrorStatus(response.status), null, mkErrorMessage(response.status)]
+      return [mkErrorStatus(response.status), undefined, mkErrorMessage(response.status)]
     }
 
     const responseData = await response.json()
     const { results, next_page_token: cursor = undefined } = responseData
 
-    return [200, { results, cursor }, null]
+    return [200, { results, cursor }, undefined]
   } catch (ex) {
     const err: FetchError = ex
-    return [502, null, `Third party API call failed with error: ${err.message}`]
+    return [502, undefined, `Third party API call failed with error: ${err.message}`]
   }
 }
 

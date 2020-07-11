@@ -18,7 +18,7 @@ class Cache {
     this.deletePromisified = promisify(client.del).bind(client)
   }
 
-  async get(key: string): Promise<string | null> {
+  async get(key: string): Promise<string | undefined> {
     return await this.getPromisified(key)
   }
 
