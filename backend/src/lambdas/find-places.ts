@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import Cache from '../cache/cache'
-import GoogleClient from '../client/google-client'
+import GoogleClient from '../clients/google-client'
 import { cachedFetch, checkQueryStringParameters, getCorsHeaders } from '../utils'
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {

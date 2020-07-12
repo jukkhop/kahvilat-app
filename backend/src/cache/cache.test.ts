@@ -2,7 +2,7 @@
 
 import redis from 'redis-mock'
 import Cache from './cache'
-import AsyncRedisClient from '../client/async-redis-client'
+import AsyncRedisClient from '../clients/async-redis-client'
 
 let cache: Cache
 let getSpy: jest.SpyInstance<Promise<string | null>, [string]>

@@ -1,4 +1,4 @@
-import AsyncRedisClient from '../client/async-redis-client'
+import AsyncRedisClient from '../clients/async-redis-client'
 import { DAY_IN_SECONDS } from '../utils'
 
 class Cache {
