@@ -26,14 +26,16 @@ const placeFragment = gql`
 export const SEARCH_PLACES = gql`
   query(
     $keyword: String
-    $location: String
+    $latitude: String
+    $longitude: String
     $pathFunction: any
     $radius: Int
     $type: String
   ) {
     searchPlaces(
       keyword: $keyword
-      location: $location
+      latitude: $latitude
+      longitude: $longitude
       radius: $radius
       type: $type
     ) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {

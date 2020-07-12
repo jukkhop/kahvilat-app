@@ -35,7 +35,8 @@ class GoogleClient {
   async findPlaces(
     cursor?: string,
     keyword?: string,
-    location?: string,
+    latitude?: string,
+    longitude?: string,
     radius?: number,
     type?: string,
   ): Promise<[number, any, string?]> {
@@ -48,7 +49,7 @@ class GoogleClient {
       : {
           key: apiKey,
           keyword,
-          location,
+          location: `${latitude},${longitude}`,
           radius,
           types: type,
         }

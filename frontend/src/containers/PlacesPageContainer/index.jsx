@@ -63,7 +63,8 @@ function PlacesPageContainer() {
     const options = {
       variables: {
         keyword: 'coffee',
-        location: [latitude.toString(), longitude.toString()].join(','),
+        latitude,
+        longitude,
         pathFunction: buildPath('/find-places'),
         radius: distance,
         type: 'cafe',

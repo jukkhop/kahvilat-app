@@ -8,10 +8,16 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const queryParams = event.queryStringParameters || {}
 
   if (!queryParams.cursor) {
-    checkQueryStringParameters(Object.keys(queryParams), ['keyword', 'location', 'radius', 'type'])
+    checkQueryStringParameters(Object.keys(queryParams), [
+      'keyword',
+      'latitude',
+      'longitude',
+      'radius',
+      'type',
+    ])
   }
 
-  const { cursor, keyword, location, radius, type } = queryParams
+  const { cursor, keyword, latitude, longitude, radius, type } = queryParams
   const cache = new Cache(REDIS_HOST, Number(REDIS_PORT))
   const client = new GoogleClient(GOOGLE_API_KEY, 'fi')
 
@@ -19,7 +25,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     cache,
     'find-places',
     queryParams,
-    () => client.findPlaces(cursor, keyword, location, Number(radius), type),
+    () => client.findPlaces(cursor, keyword, latitude, longitude, Number(radius), type),
     60,
   )
 
