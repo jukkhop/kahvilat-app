@@ -64,7 +64,7 @@ jobs:
       - run:
           command: |
             ssh-keyscan github.com >> ~/.ssh/known_hosts
-            go get -u -v github.com/bep/s3deploy
+            go get -a -u -v github.com/bep/s3deploy
       - save_cache:
           key: v1-pkg-cache
           paths:
