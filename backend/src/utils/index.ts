@@ -1,5 +1,5 @@
 import qs from 'qs'
-import Cache from '../cache'
+import Cache from '../cache/cache'
 import { Headers } from '../types'
 
 export function getCorsHeaders(): Headers {

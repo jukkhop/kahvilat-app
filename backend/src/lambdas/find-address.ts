@@ -1,11 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import Cache from '../cache'
+import Cache from '../cache/cache'
 import GoogleClient from '../client/google-client'
 import { cachedFetch, checkQueryStringParameters, getCorsHeaders } from '../utils'
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const { GOOGLE_API_KEY = '', REDIS_HOST = '', REDIS_PORT = '' } = process.env
   const queryParams = event.queryStringParameters || {}
+
   checkQueryStringParameters(Object.keys(queryParams), ['latitude', 'longitude'])
 
   const { latitude, longitude } = queryParams

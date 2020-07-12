@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import GoogleClient from '../google-client'
+import GoogleClient from './google-client'
 
 const { Response, FetchError } = jest.requireActual('node-fetch')
 jest.mock('node-fetch', jest.fn)
