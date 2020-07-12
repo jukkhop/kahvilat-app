@@ -32,7 +32,8 @@ functions:
       parameters:
         querystrings:
           keyword: true
-          location: true
+          latitude: true
+          longitude: true
           radius: true
           types: true
 
