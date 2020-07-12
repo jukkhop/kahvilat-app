@@ -18,7 +18,7 @@ class AsyncRedisClient {
   }
 
   async get(key: string): Promise<string | null> {
-    return await this.getPromisified(key)
+    return (await this.getPromisified(key)) || null
   }
 
   async set(key: string, value: string): Promise<unknown> {
