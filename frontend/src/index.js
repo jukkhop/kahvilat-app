@@ -3,7 +3,7 @@ import { render } from 'react-dom'
 import WebFont from 'webfontloader'
 
 import './index.css'
-import withStore from './store'
+import withStore from './store/with-store'
 
 render(createElement(withStore), document.getElementById('root'))
 

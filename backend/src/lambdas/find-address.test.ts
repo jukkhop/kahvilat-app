@@ -99,6 +99,6 @@ it('should return an error if Google API call fails', async () => {
   const { statusCode, body } = await handler(validEvent, cache, googleClient)
   expect(fetchFn).toHaveBeenCalled()
   expect(cacheSet).not.toHaveBeenCalled()
-  expect(body).toBe(expectedBody)
   expect(statusCode).toBe(502)
+  expect(body).toBe(expectedBody)
 })
