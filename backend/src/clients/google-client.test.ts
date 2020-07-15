@@ -25,21 +25,21 @@ describe('find address', () => {
   })
 
   it('returns HTTP 502 Bad Gateway when Google API responds with HTTP 5xx', async () => {
-    fetchFn.mockResolvedValueOnce(new Response('', { status: 500 }))
+    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 500 }))
     const [status, body, error] = await client.findAddress('some-lat', 'some-lng')
     expect(fetchFn).toHaveBeenCalled()
     expect(status).toBe(502)
     expect(body).toBeUndefined()
-    expect(error).toBe('Third party API call failed with HTTP status 500')
+    expect(error).toBe('Third party API call failed with HTTP status 500 and content some-error')
   })
 
   it('returns HTTP 500 Internal Server Error when Google API responds with HTTP 4xx', async () => {
-    fetchFn.mockResolvedValueOnce(new Response('', { status: 400 }))
+    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 400 }))
     const [status, body, error] = await client.findAddress('some-lat', 'some-lng')
     expect(fetchFn).toHaveBeenCalled()
     expect(status).toBe(500)
     expect(body).toBeUndefined()
-    expect(error).toBe('Third party API call failed with HTTP status 400')
+    expect(error).toBe('Third party API call failed with HTTP status 400 and content some-error')
   })
 
   it('returns HTTP 502 Bad Gateway when Google API cannot be connected to', async () => {
@@ -65,21 +65,21 @@ describe('find coordinates', () => {
   })
 
   it('returns HTTP 502 Bad Gateway when Google API responds with HTTP 5xx', async () => {
-    fetchFn.mockResolvedValueOnce(new Response('', { status: 500 }))
+    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 500 }))
     const [status, body, error] = await client.findCoordinates('some-address')
     expect(fetchFn).toHaveBeenCalled()
     expect(status).toBe(502)
     expect(body).toBeUndefined()
-    expect(error).toBe('Third party API call failed with HTTP status 500')
+    expect(error).toBe('Third party API call failed with HTTP status 500 and content some-error')
   })
 
   it('returns HTTP 500 Internal Server Error when Google API responds with HTTP 4xx', async () => {
-    fetchFn.mockResolvedValueOnce(new Response('', { status: 400 }))
+    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 400 }))
     const [status, body, error] = await client.findCoordinates('some-address')
     expect(fetchFn).toHaveBeenCalled()
     expect(status).toBe(500)
     expect(body).toBeUndefined()
-    expect(error).toBe('Third party API call failed with HTTP status 400')
+    expect(error).toBe('Third party API call failed with HTTP status 400 and content some-error')
   })
 
   it('returns HTTP 502 Bad Gateway when Google API cannot be connected to', async () => {
@@ -123,21 +123,21 @@ describe('find places', () => {
   })
 
   it('returns HTTP 502 Bad Gateway when Google API responds with HTTP 5xx', async () => {
-    fetchFn.mockResolvedValueOnce(new Response('', { status: 500 }))
+    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 500 }))
     const [status, body, error] = await client.findPlaces('some-cursor')
     expect(fetchFn).toHaveBeenCalled()
     expect(status).toBe(502)
     expect(body).toBeUndefined()
-    expect(error).toBe('Third party API call failed with HTTP status 500')
+    expect(error).toBe('Third party API call failed with HTTP status 500 and content some-error')
   })
 
   it('returns HTTP 500 Internal Server Error when Google API responds with HTTP 4xx', async () => {
-    fetchFn.mockResolvedValueOnce(new Response('', { status: 400 }))
+    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 400 }))
     const [status, body, error] = await client.findPlaces('some-cursor')
     expect(fetchFn).toHaveBeenCalled()
     expect(status).toBe(500)
     expect(body).toBeUndefined()
-    expect(error).toBe('Third party API call failed with HTTP status 400')
+    expect(error).toBe('Third party API call failed with HTTP status 400 and content some-error')
   })
 
   it('returns HTTP 502 Bad Gateway when Google API cannot be connected to', async () => {

@@ -68,14 +68,13 @@ async function request(
 
   try {
     const response = await fetch(url)
+    const body = await response.json()
 
-    if (!response.ok) {
-      return [mkErrorStatus(response.status), undefined, mkErrorMessage(response.status)]
+    if (response.status !== 200) {
+      return [mkErrorStatus(response.status), undefined, mkErrorMessage(response.status, body)]
     }
 
-    const responseData = await response.json()
-    const { results, next_page_token: cursor = undefined } = responseData
-
+    const { results, next_page_token: cursor = undefined } = body
     return [200, { results, cursor }, undefined]
   } catch (ex) {
     const err: FetchError = ex
@@ -88,7 +87,7 @@ const mkErrorStatus = (status: number): number => {
   return 500
 }
 
-const mkErrorMessage = (status: number): string =>
-  `Third party API call failed with HTTP status ${status}`
+const mkErrorMessage = (status: number, content: string): string =>
+  `Third party API call failed with HTTP status ${status} and content ${content}`
 
 export default GoogleClient

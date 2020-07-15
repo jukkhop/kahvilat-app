@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 
 import redis from 'redis-mock'
-import Cache from './cache'
+import Cache from '.'
 import AsyncRedisClient from '../clients/async-redis-client'
 
 let cache: Cache
@@ -12,9 +12,9 @@ let deleteSpy: jest.SpyInstance<Promise<unknown>, [string]>
 
 beforeEach(() => {
   // @ts-ignore
-  const asyncClient = new AsyncRedisClient('some-host', 1000, redis.createClient())
+  const client = new AsyncRedisClient(undefined, undefined, redis.createClient())
 
-  cache = new Cache(undefined, undefined, asyncClient)
+  cache = new Cache(undefined, undefined, client)
   getSpy = jest.spyOn(AsyncRedisClient.prototype, 'get')
   setSpy = jest.spyOn(AsyncRedisClient.prototype, 'set')
   expireSpy = jest.spyOn(AsyncRedisClient.prototype, 'expire')
