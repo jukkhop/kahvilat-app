@@ -13,7 +13,6 @@ import GoogleClient from '../clients/google-client'
 jest.mock('node-fetch', jest.fn)
 
 const { Response } = jest.requireActual('node-fetch')
-const baseUrl = 'https://maps.googleapis.com/maps/api'
 
 // @ts-ignore
 const validEvent: APIGatewayProxyEvent = {
@@ -72,6 +71,9 @@ const validBody = JSON.stringify({
   ],
 })
 
+const baseUrl = 'https://maps.googleapis.com/maps/api'
+const cacheKey = 'find-address?latitude=foo&longitude=bar'
+
 let cache: Cache
 let googleClient: GoogleClient
 let fetchFn: jest.MockedFunction<typeof fetch>
@@ -90,7 +92,7 @@ beforeEach(() => {
   cacheSet = jest.spyOn(Cache.prototype, 'set')
   findAddress = jest.spyOn(GoogleClient.prototype, 'findAddress')
 
-  cache.delete('find-address?latitude=foo&longitude=bar')
+  cache.delete(cacheKey)
   fetchFn.mockClear()
   cacheGet.mockClear()
   cacheSet.mockClear()
@@ -98,7 +100,6 @@ beforeEach(() => {
 })
 
 it('should call Google API with the provided parameters and return valid data', async () => {
-  const expectedCacheKey = 'find-address?latitude=foo&longitude=bar'
   const expectedUrl = `${baseUrl}/geocode/json?key=some-api-key&language=some-lang&latlng=foo,bar`
   const expectedHeaders = {
     'Access-Control-Allow-Origin': '',
@@ -107,20 +108,19 @@ it('should call Google API with the provided parameters and return valid data', 
   fetchFn.mockResolvedValueOnce(new Response(validBody, { status: 200 }))
   const { statusCode, headers = {}, body } = await handler(validEvent, cache, googleClient)
   expect(findAddress).toHaveBeenCalledWith('foo', 'bar')
-  expect(cacheGet).toHaveBeenCalledWith(expectedCacheKey)
+  expect(cacheGet).toHaveBeenCalledWith(cacheKey)
   expect(cacheGet).toHaveReturnedWith(Promise.resolve(undefined))
   expect(fetchFn).toHaveBeenCalledWith(expectedUrl)
-  expect(cacheSet).toHaveBeenCalledWith(expectedCacheKey, validBody, 86400)
+  expect(cacheSet).toHaveBeenCalledWith(cacheKey, validBody, 86400)
   expect(statusCode).toBe(200)
   expect(headers).toEqual(expectedHeaders)
   expect(body).toBe(validBody)
 })
 
 it('should return a cached response, if present', async () => {
-  const expectedCacheKey = 'find-address?latitude=foo&longitude=bar'
-  await cache.set(expectedCacheKey, validBody)
+  await cache.set(cacheKey, validBody)
   const { statusCode, body } = await handler(validEvent, cache, googleClient)
-  expect(cacheGet).toHaveBeenCalledWith(expectedCacheKey)
+  expect(cacheGet).toHaveBeenCalledWith(cacheKey)
   expect(cacheGet).toHaveReturnedWith(Promise.resolve(validBody))
   expect(fetchFn).not.toHaveBeenCalled()
   expect(statusCode).toBe(200)
