@@ -45,7 +45,7 @@ it('should cache a given value with the given expiration time', async () => {
 it('should expire a value after the specified amount of time', async () => {
   await cache.set('some-key', 'some-value', 1)
   expect(expireSpy).toHaveBeenCalledWith('some-key', 1)
-  await new Promise((r) => setTimeout(r, 1100))
+  await new Promise(r => setTimeout(r, 1100))
   const valueFromCache = await cache.get('some-key')
   expect(valueFromCache).toBeUndefined()
 })

@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import Cache from '../cache'
 import GoogleClient from '../clients/google-client'
-import { cachedFetch, checkQueryStringParameters, getCorsHeaders } from '../utils'
+import { cachedFetch, checkQueryStringParameters, mkErrorResponse, mkResponse } from '../utils'
 
 async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const { GOOGLE_API_KEY = '', REDIS_HOST = '', REDIS_PORT = '' } = process.env
@@ -16,10 +16,17 @@ async function helper(
   client: GoogleClient,
 ): Promise<APIGatewayProxyResult> {
   const queryParams = event.queryStringParameters || {}
-  checkQueryStringParameters(Object.keys(queryParams), ['latitude', 'longitude'])
+  const validationErrors = checkQueryStringParameters(Object.keys(queryParams), [
+    'latitude',
+    'longitude',
+  ])
+
+  if (validationErrors.length > 0) {
+    return mkErrorResponse(400, validationErrors)
+  }
 
   const { latitude, longitude } = queryParams
-  const [status, response] = await cachedFetch(
+  const [status, body] = await cachedFetch(
     cache,
     'find-address',
     { latitude, longitude },
@@ -27,11 +34,7 @@ async function helper(
     //
   )
 
-  return {
-    statusCode: status,
-    headers: getCorsHeaders(),
-    body: response,
-  }
+  return mkResponse(status, body)
 }
 
 export { handler, helper }

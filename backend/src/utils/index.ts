@@ -1,8 +1,9 @@
+import { APIGatewayProxyResult } from 'aws-lambda'
 import qs from 'qs'
 import Cache from '../cache'
 import { Headers } from '../types'
 
-export function getCorsHeaders(): Headers {
+function getCorsHeaders(): Headers {
   const { STAGE = '', FRONTEND_URL = '' } = process.env
   const origin = STAGE === 'local' ? '*' : FRONTEND_URL
   return {
@@ -11,15 +12,20 @@ export function getCorsHeaders(): Headers {
   }
 }
 
-export function checkQueryStringParameters(actualParams: string[], expectedParams: string[]): void {
-  expectedParams.forEach((expectedParam) => {
-    if (!actualParams.includes(expectedParam)) {
-      throw new Error(`Missing query string parameter: ${expectedParam}`)
-    }
-  })
+function checkQueryStringParameters(actualParams: string[], expectedParams: string[]): Error[] {
+  return expectedParams.reduce(
+    (acc, expectedParam) => {
+      if (!actualParams.includes(expectedParam)) {
+        acc.push(new Error(`Missing query string parameter: ${expectedParam}`))
+      }
+      return acc
+    },
+    [] as Error[],
+    //
+  )
 }
 
-export async function cachedFetch(
+async function cachedFetch(
   cache: Cache,
   endpoint: string,
   params: { [key: string]: string },
@@ -44,4 +50,26 @@ export async function cachedFetch(
   return [status, responseJson]
 }
 
-export const DAY_IN_SECONDS = 86400
+function mkResponse(status: number, body: string): APIGatewayProxyResult {
+  return {
+    statusCode: status,
+    headers: getCorsHeaders(),
+    body,
+  }
+}
+
+function mkErrorResponse(status: number, errors: Error[]): APIGatewayProxyResult {
+  const error = errors.map(x => x.message).join(', ')
+  return mkResponse(status, JSON.stringify({ error }))
+}
+
+const DAY_IN_SECONDS = 86400
+
+export {
+  cachedFetch,
+  checkQueryStringParameters,
+  getCorsHeaders,
+  mkErrorResponse,
+  mkResponse,
+  DAY_IN_SECONDS,
+}

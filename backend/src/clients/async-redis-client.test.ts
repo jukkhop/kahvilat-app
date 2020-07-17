@@ -42,7 +42,7 @@ it('should delete a given value', async () => {
 it('should expire a value after the specified amount of seconds', async () => {
   await asyncClient.set('some-key', 'some-value')
   await asyncClient.expire('some-key', 1)
-  await new Promise((r) => setTimeout(r, 1100))
+  await new Promise(r => setTimeout(r, 1100))
   const valueFromCache = await asyncClient.get('some-key')
   expect(client.expire).toHaveBeenCalledWith('some-key', 1, expect.any(Function))
   expect(valueFromCache).toBeNull()

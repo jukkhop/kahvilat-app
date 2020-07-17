@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
+/* eslint-disable @typescript-eslint/camelcase */
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import fetch from 'node-fetch'
@@ -9,15 +10,9 @@ import Cache from '../cache'
 import AsyncRedisClient from '../clients/async-redis-client'
 import GoogleClient from '../clients/google-client'
 
-const { Response } = jest.requireActual('node-fetch')
 jest.mock('node-fetch', jest.fn)
 
-let cache: Cache
-let googleClient: GoogleClient
-let fetchFn: jest.MockedFunction<typeof fetch>
-let cacheGet: jest.SpyInstance<Promise<string | undefined>, [string]>
-let cacheSet: jest.SpyInstance<Promise<void>, [string, string, (number | undefined)?]>
-
+const { Response } = jest.requireActual('node-fetch')
 const baseUrl = 'https://maps.googleapis.com/maps/api'
 
 // @ts-ignore
@@ -28,6 +23,62 @@ const validEvent: APIGatewayProxyEvent = {
   },
 }
 
+const validBody = JSON.stringify({
+  results: [
+    {
+      address_components: [
+        {
+          long_name: '6',
+          short_name: '6',
+          types: ['street_number'],
+        },
+        {
+          long_name: 'Telakkakatu',
+          short_name: 'Telakkakatu',
+          types: ['route'],
+        },
+        {
+          long_name: 'Helsinki',
+          short_name: 'HKI',
+          types: ['locality', 'political'],
+        },
+        {
+          long_name: 'Suomi',
+          short_name: 'FI',
+          types: ['country', 'political'],
+        },
+        {
+          long_name: '00150',
+          short_name: '00150',
+          types: ['postal_code'],
+        },
+      ],
+      formatted_address: 'Telakkakatu 6, 00150 Helsinki, Suomi',
+      geometry: {
+        location: { lat: 60.15855180000001, lng: 24.9323386 },
+        location_type: 'ROOFTOP',
+        viewport: {
+          northeast: { lat: 60.15990078029151, lng: 24.9336875802915 },
+          southwest: { lat: 60.15720281970849, lng: 24.93098961970849 },
+        },
+      },
+      place_id: 'ChIJeU3PtysKkkYR948uyfnAMX4',
+      plus_code: {
+        compound_code: '5W5J+CW Helsinki, Suomi',
+        global_code: '9GG65W5J+CW',
+      },
+      types: ['establishment', 'point_of_interest'],
+    },
+  ],
+})
+
+let cache: Cache
+let googleClient: GoogleClient
+let fetchFn: jest.MockedFunction<typeof fetch>
+let cacheGet: jest.SpyInstance<Promise<string | undefined>, [string]>
+let cacheSet: jest.SpyInstance<Promise<void>, [string, string, (number | undefined)?]>
+let findAddress: jest.SpyInstance<Promise<[number, any, (string | undefined)?]>, [string, string]>
+
 beforeEach(() => {
   // @ts-ignore
   const redisClient = new AsyncRedisClient(undefined, undefined, redis.createClient())
@@ -37,61 +88,58 @@ beforeEach(() => {
   fetchFn = fetch as jest.MockedFunction<typeof fetch>
   cacheGet = jest.spyOn(Cache.prototype, 'get')
   cacheSet = jest.spyOn(Cache.prototype, 'set')
+  findAddress = jest.spyOn(GoogleClient.prototype, 'findAddress')
 
   cache.delete('find-address?latitude=foo&longitude=bar')
   fetchFn.mockClear()
   cacheGet.mockClear()
   cacheSet.mockClear()
+  findAddress.mockClear()
 })
 
 it('should call Google API with the provided parameters and return valid data', async () => {
   const expectedCacheKey = 'find-address?latitude=foo&longitude=bar'
   const expectedUrl = `${baseUrl}/geocode/json?key=some-api-key&language=some-lang&latlng=foo,bar`
-  const expectedBody = JSON.stringify({
-    results: [{ name: 'some-cafeteria' }],
-  })
   const expectedHeaders = {
     'Access-Control-Allow-Origin': '',
     'Access-Control-Allow-Credentials': true,
   }
-  fetchFn.mockResolvedValueOnce(new Response(expectedBody, { status: 200 }))
+  fetchFn.mockResolvedValueOnce(new Response(validBody, { status: 200 }))
   const { statusCode, headers = {}, body } = await handler(validEvent, cache, googleClient)
+  expect(findAddress).toHaveBeenCalledWith('foo', 'bar')
   expect(cacheGet).toHaveBeenCalledWith(expectedCacheKey)
   expect(cacheGet).toHaveReturnedWith(Promise.resolve(undefined))
-  expect(cacheSet).toHaveBeenCalledWith(expectedCacheKey, expectedBody, 86400)
   expect(fetchFn).toHaveBeenCalledWith(expectedUrl)
+  expect(cacheSet).toHaveBeenCalledWith(expectedCacheKey, validBody, 86400)
   expect(statusCode).toBe(200)
   expect(headers).toEqual(expectedHeaders)
-  expect(body).toBe(expectedBody)
+  expect(body).toBe(validBody)
 })
 
 it('should return a cached response, if present', async () => {
   const expectedCacheKey = 'find-address?latitude=foo&longitude=bar'
-  const expectedBody = JSON.stringify({
-    results: [{ name: 'some-cafeteria' }],
-  })
-  await cache.set(expectedCacheKey, expectedBody)
+  await cache.set(expectedCacheKey, validBody)
   const { statusCode, body } = await handler(validEvent, cache, googleClient)
   expect(cacheGet).toHaveBeenCalledWith(expectedCacheKey)
-  expect(cacheGet).toHaveReturnedWith(Promise.resolve(expectedBody))
+  expect(cacheGet).toHaveReturnedWith(Promise.resolve(validBody))
   expect(fetchFn).not.toHaveBeenCalled()
   expect(statusCode).toBe(200)
+  expect(body).toBe(validBody)
+})
+
+it('should return 400 Bad Request if not given all required parameters', async () => {
+  // @ts-ignore
+  const invalidEvent: APIGatewayProxyEvent = {
+    queryStringParameters: { latitude: 'foo' },
+  }
+  const expectedBody = JSON.stringify({ error: 'Missing query string parameter: longitude' })
+  const { statusCode, body } = await handler(invalidEvent, cache, googleClient)
+  expect(findAddress).not.toHaveBeenCalled()
+  expect(statusCode).toBe(400)
   expect(body).toBe(expectedBody)
 })
 
-it('should throw if not given all required parameters', async () => {
-  // @ts-ignore
-  const invalidEvent: APIGatewayProxyEvent = {
-    queryStringParameters: {
-      latitude: 'foo',
-    },
-  }
-  const promise = handler(invalidEvent, cache, googleClient)
-  expect(promise).toEqual(Promise.reject('Missing query string parameter: longitude'))
-  expect(fetchFn).not.toHaveBeenCalled()
-})
-
-it('should return an error if Google API call fails', async () => {
+it('should return 502 Bad Gateway Error if Google API call fails with HTTP 5xx', async () => {
   const expectedBody = JSON.stringify({
     error: 'Third party API call failed with HTTP status 500 and content some-error',
   })
