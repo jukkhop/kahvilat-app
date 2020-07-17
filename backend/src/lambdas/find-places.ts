@@ -1,27 +1,32 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import Cache from '../cache'
 import GoogleClient from '../clients/google-client'
-import { cachedFetch, checkQueryStringParameters, getCorsHeaders } from '../utils'
+import { cachedFetch, checkQueryStringParameters, mkErrorResponse, mkResponse } from '../utils'
 
-export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const { GOOGLE_API_KEY = '', REDIS_HOST = '', REDIS_PORT = '' } = process.env
-  const queryParams = event.queryStringParameters || {}
+  const cache = new Cache(REDIS_HOST, Number(REDIS_PORT))
+  const client = new GoogleClient(GOOGLE_API_KEY, 'fi')
+  return await helper(event, cache, client)
+}
 
-  if (!queryParams.cursor) {
-    checkQueryStringParameters(Object.keys(queryParams), [
-      'keyword',
-      'latitude',
-      'longitude',
-      'radius',
-      'type',
-    ])
+async function helper(
+  event: APIGatewayProxyEvent,
+  cache: Cache,
+  client: GoogleClient,
+): Promise<APIGatewayProxyResult> {
+  const queryParams = event.queryStringParameters || {}
+  const parametersToCheck = !queryParams.cursor
+    ? ['keyword', 'latitude', 'longitude', 'radius', 'type']
+    : ['cursor']
+  const validationErrors = checkQueryStringParameters(Object.keys(queryParams), parametersToCheck)
+
+  if (validationErrors.length > 0) {
+    return mkErrorResponse(400, validationErrors)
   }
 
   const { cursor, keyword, latitude, longitude, radius, type } = queryParams
-  const cache = new Cache(REDIS_HOST, Number(REDIS_PORT))
-  const client = new GoogleClient(GOOGLE_API_KEY, 'fi')
-
-  const [status, response] = await cachedFetch(
+  const [status, body] = await cachedFetch(
     cache,
     'find-places',
     queryParams,
@@ -29,9 +34,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     60,
   )
 
-  return {
-    statusCode: status,
-    headers: getCorsHeaders(),
-    body: response,
-  }
+  return mkResponse(status, body)
 }
+
+export { handler, helper }
