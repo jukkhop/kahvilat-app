@@ -30,7 +30,7 @@ const Form = styled.form`
   max-width: 350px;
   min-width: 350px;
 
-  @media (max-width: 350px) {
+  @media (max-width: 375px) {
     min-width: unset;
   }
 `
@@ -43,7 +43,9 @@ const Fields = styled.div`
   max-width: 450px;
 
   @media (max-width: 450px) {
-    max-width: calc(100% - 1.5rem);
+    max-width: 100%;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 `
 
@@ -123,6 +125,7 @@ function PlacesPage({
             </Field>
             <Field>
               <TextField
+                autoFocus
                 color="primary"
                 defaultValue={address}
                 fullWidth

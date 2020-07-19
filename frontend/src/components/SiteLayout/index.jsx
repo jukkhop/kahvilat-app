@@ -20,7 +20,7 @@ const Container = styled.div`
 const Main = styled.main`
   max-width: 1000px;
   padding-bottom: 5rem;
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
   margin-left: auto;
   margin-right: auto;
 

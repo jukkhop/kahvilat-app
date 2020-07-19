@@ -9,7 +9,7 @@ const Container = styled.header`
   text-align: center;
   margin: 2rem auto 0 auto;
   border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 2rem;
+  padding-bottom: 1.85rem;
   min-width: 650px;
   max-width: 1000px;
 
