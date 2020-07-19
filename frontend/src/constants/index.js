@@ -1,0 +1,3 @@
+const DEFAULT_DISTANCE = 500
+
+export { DEFAULT_DISTANCE }

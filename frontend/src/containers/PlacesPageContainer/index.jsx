@@ -15,9 +15,10 @@ import {
   SEARCH_MORE_PLACES,
 } from '../../graphql'
 import { sleep } from '../../utils'
+import { DEFAULT_DISTANCE } from '../../constants'
 
 function PlacesPageContainer() {
-  const { errors, getValues, handleSubmit, register } = useForm()
+  const { errors, getValues, handleSubmit, register, setValue } = useForm()
   const [userCoords, setUserCoords] = useState(null)
   const [prevAddress, setPrevAddress] = useState(null)
   const [findAddress, findAddressData] = useLazyQuery(FIND_ADDRESS)
@@ -66,7 +67,7 @@ function PlacesPageContainer() {
         latitude,
         longitude,
         pathFunction: buildPath('/find-places'),
-        radius: distance,
+        radius: distance || DEFAULT_DISTANCE,
         type: 'cafe',
       },
     }
@@ -138,17 +139,27 @@ function PlacesPageContainer() {
     memoizedOnSearchMorePlaces()
   }, [cursor, memoizedOnSearchMorePlaces])
 
+  useEffect(() => {
+    register('distance')
+  }, [register])
+
   const sortedPlaces = places
     .filter(place => place.businessStatus === 'OPERATIONAL')
     .map(userCoords ? mapPlace(userCoords) : x => x)
     .sort(sortPlaces)
 
+  const onDistanceChange = (_, value) => {
+    setValue('distance', value)
+  }
+
   return (
     <PlacesPage
       address={foundAddress}
       coords={userCoords}
+      defaultDistance={DEFAULT_DISTANCE}
       inputErrors={errors}
       loading={loading}
+      onDistanceChange={onDistanceChange}
       onSearch={handleSubmit(onFindCoordinates)}
       places={sortedPlaces}
       register={register}
