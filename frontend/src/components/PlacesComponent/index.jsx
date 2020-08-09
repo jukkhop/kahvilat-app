@@ -17,11 +17,11 @@ const Places = styled.ul`
 function PlacesComponent({ places }) {
   return (
     <Places>
-      {places.map(({ distance, icon, id, name, openNow, rating, vicinity }) => (
+      {places.map(({ distance, icon, name, openNow, rating, vicinity }) => (
         <PlaceComponent
           distance={distance}
           icon={icon}
-          key={id}
+          key={name}
           name={name}
           openNow={openNow}
           rating={rating}

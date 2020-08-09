@@ -17,6 +17,8 @@ import {
 import { sleep } from '../../utils'
 import { DEFAULT_DISTANCE } from '../../constants'
 
+import '../../utils/extensions'
+
 function PlacesPageContainer() {
   const { errors, getValues, handleSubmit, register, setValue } = useForm()
   const [userCoords, setUserCoords] = useState(null)
@@ -144,7 +146,9 @@ function PlacesPageContainer() {
   }, [register])
 
   const sortedPlaces = places
-    .filter(place => place.businessStatus === 'OPERATIONAL')
+    .groupBy(x => x.name)
+    .map(({ values }) => values[0])
+    .filter(x => x.businessStatus === 'OPERATIONAL')
     .map(userCoords ? mapPlace(userCoords) : x => x)
     .sort(sortPlaces)
 

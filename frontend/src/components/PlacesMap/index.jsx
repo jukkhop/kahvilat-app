@@ -44,8 +44,8 @@ function PlacesMap({ coords, places }) {
       options={options}
       zoom={2}
     >
-      {places.map(({ id, lat, lng /* name */ }) => (
-        <Marker key={id} position={{ lat, lng }}>
+      {places.map(({ name, lat, lng }) => (
+        <Marker key={name} position={{ lat, lng }}>
           {/* <InfoWindow>
             <InfoWindowText>{name}</InfoWindowText>
           </InfoWindow> */}
