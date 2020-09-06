@@ -1,3 +1,6 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-unused-expressions */
+
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
 import { RestLink } from 'apollo-link-rest'
@@ -19,7 +22,11 @@ function getClient() {
 
   const client = new ApolloClient({
     link: restLink,
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      dataIdFromObject: o => {
+        o.id ? `${o.__typename}-${o.id}` : `${o.__typename}-${o.cursor}`
+      },
+    }),
   })
 
   return client
