@@ -35,6 +35,7 @@ function PlacesPageContainer() {
     findCoordinatesData,
     'data.findCoordinates.results[0].geometry.location',
   )
+
   const places = get(searchPlacesData, 'data.searchPlaces.results', [])
   const cursor = get(searchPlacesData, 'data.searchPlaces.cursor')
 
@@ -45,8 +46,6 @@ function PlacesPageContainer() {
 
   const error =
     searchPlacesData.error || findCoordinatesData.error || findAddressData.error
-
-  const { fetchMore } = searchPlacesData
 
   const onFindCoordinates = ({ address }) => {
     if (prevAddress === address) return
@@ -79,7 +78,7 @@ function PlacesPageContainer() {
   const onSearchMorePlaces = async () => {
     if (!cursor) return Promise.resolve()
     await sleep(2000)
-    return fetchMore({
+    return searchPlacesData.fetchMore({
       query: SEARCH_MORE_PLACES,
       variables: {
         cursor,
