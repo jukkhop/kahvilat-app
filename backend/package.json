@@ -5,6 +5,7 @@
   "author": "Jukka Hopeavuori <jukka.hopea@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "test": "jest",
     "start": "sls offline --httpPort 3001 start"
   },
   "devDependencies": {

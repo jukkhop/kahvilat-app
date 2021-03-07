@@ -20,7 +20,9 @@ functions:
     handler: src/lambdas/find-places.handler
     vpc:
       securityGroupIds:
-        - 'Fn::GetAtt': ServerlessSecurityGroup.GroupId
+        - Fn::GetAtt:
+          - ServerlessSecurityGroup
+          - GroupId
       subnetIds:
         - Ref: PrivateSubnetA
     events:
@@ -28,20 +30,22 @@ functions:
           path: /find-places
           method: get
           cors: true
-    request:
-      parameters:
-        querystrings:
-          keyword: true
-          latitude: true
-          longitude: true
-          radius: true
-          types: true
+          request:
+            parameters:
+              querystrings:
+                keyword: true
+                latitude: true
+                longitude: true
+                radius: true
+                types: true
 
   find-address:
     handler: src/lambdas/find-address.handler
     vpc:
       securityGroupIds:
-        - 'Fn::GetAtt': ServerlessSecurityGroup.GroupId
+        - Fn::GetAtt:
+          - ServerlessSecurityGroup
+          - GroupId
       subnetIds:
         - Ref: PrivateSubnetA
     events:
@@ -49,17 +53,19 @@ functions:
           path: /find-address
           method: get
           cors: true
-    request:
-      parameters:
-        querystrings:
-          latitude: true
-          longitude: true
+          request:
+            parameters:
+              querystrings:
+                latitude: true
+                longitude: true
 
   find-coordinates:
     handler: src/lambdas/find-coordinates.handler
     vpc:
       securityGroupIds:
-        - 'Fn::GetAtt': ServerlessSecurityGroup.GroupId
+        - Fn::GetAtt:
+          - ServerlessSecurityGroup
+          - GroupId
       subnetIds:
         - Ref: PrivateSubnetA
     events:
@@ -67,10 +73,10 @@ functions:
           path: /find-coordinates
           method: get
           cors: true
-    request:
-      parameters:
-        querystrings:
-          address: true
+          request:
+            parameters:
+              querystrings:
+                address: true
 
 resources:
   Resources:
@@ -211,7 +217,9 @@ resources:
         CacheNodeType: ${self:custom.config.CACHE_INSTANCE_SIZE}
         NumCacheNodes: 1
         VpcSecurityGroupIds:
-          - 'Fn::GetAtt': ServerlessStorageSecurityGroup.GroupId
+          - Fn::GetAtt:
+            - ServerlessStorageSecurityGroup
+            - GroupId
         CacheSubnetGroupName:
           Ref: ServerlessCacheSubnetGroup
 
