@@ -139,7 +139,6 @@ function PlacesPageContainer() {
   useEffect(() => {
     memoizedOnSearchMorePlaces()
   }, [cursor, memoizedOnSearchMorePlaces])
-
   useEffect(() => {
     register('distance')
   }, [register])
@@ -172,7 +171,7 @@ function PlacesPageContainer() {
 }
 
 function mapPlace({ latitude, longitude }) {
-  return function _(place) {
+  return place => {
     const {
       geometry: {
         location: { lat, lng },

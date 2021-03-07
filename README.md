@@ -1,10 +1,33 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/jukkhop/kahvilat-app/master/frontend/public/logo192.png" />
   <h3 align="center">Discover nearby cafeterias</h3>
-  <h4 align="center">https://kahvilat.app - under construction</h4>
+  <h4 align="center">https://kahvilat.app</h4>
 </p>
 
-## Local setup
+## Tools and libraries used
+
+Miscellaneous
+- AWS as cloud provider (API Gateway, CloudFront, ElastiCache, Lambda, Route53, S3, VPC)
+- Terraform for infrastructure-as-code
+- CircleCI for CI/CD automation
+
+Backend
+- TypeScript, ESLint, Prettier
+- Serverless framework
+- Docker (for local development only)
+- Jest with `ts-jest` as a testing solution
+
+Frontend
+- React, ESLint, Prettier
+- `apollo-client` as a REST client for its reactive capabilities
+- `material-ui` as an UI framework
+- `prop-types` for runtime type-checking for React props
+- `react-fontawesome` for icons
+- `react-hook-form` as form library
+- `react-router-dom` for routing
+- `styled-components` for CSS-in-JS
+
+## Local development
 
 Clone the repo
 
@@ -17,7 +40,7 @@ cd kahvilat-app
 
 - Install [Node](https://nodejs.org/en/), [Docker](https://www.docker.com/get-started) and [Serverless](https://github.com/serverless/serverless#quick-start)
 - Change directory `cd backend`
-- Up the database `docker-compose up -d`
+- Up the cache `docker-compose up -d`
 - Install deps `npm install`
 - Run `npm run start`
 - Run `curl http://localhost:3001/local/places` to verify that the API works as expected
@@ -30,9 +53,9 @@ cd kahvilat-app
 
 Your browser should automatically open at http://localhost:3000/
 
-## Cloud setup
+## Cloud deployment
 
-#### Infrastructure
+#### Manual deployment (infrastructure)
 
 - Install [Terraform](https://www.terraform.io/)
 - Change directory `cd infrastructure`
@@ -50,49 +73,69 @@ export AWS_DEFAULT_REGION=some_region
 - Create a plan `terraform plan`
 - If the plan looks okay, apply it `terraform apply`
 
-#### Manual deployment
+#### Manual deployment (backend)
 
 - Change directory `cd backend`
-- Deploy to dev environment
+- Deploy to `env` environment:
 
 ```
 serverless deploy \
-  --stage dev \
-  --frontend-url some_url \
-  --pg-database some_db \
-  --pg-user some_user \
-  --pg-password some_password
+  --frontend-url <frontend-url> \
+  --google-api-key <google-api-key> \
+  --region $AWS_DEFAULT_REGION \
+  --stage <env>
 ```
 
-- The first deployment creates the RDS instance, which will give you host and port for the database. For consequent manual deployments, you have to pass `--pg-host` and `--pg-port` for the deploy command.
+Notes:
 
-#### Automatic deployment
+- Get `frontend-url` by first deploying the infrastructure via Terraform.
+- Get `google-api-key` from Google Cloud Console.
+- The first deployment creates the Redis instance, which will give you host and port to the instance. For consequent manual deployments, you have to pass ` --redis-host` and `--redis-port` as arguments as well.
+
+#### Manual deployment (frontend)
+
+- Install s3deploy `brew install bep/tap/s3deploy`
+- Change directory `cd frontend`
+- Copy config file `cp .env.<env> .env` and adjust as needed
+- Build `yarn build`
+
+```
+s3deploy \
+  -source=build/ \
+  -region=$AWS_DEFAULT_REGION \
+  -key=$AWS_ACCESS_KEY_ID \
+  -secret=$AWS_SECRET_ACCESS_KEY \
+  -distribution-id=<cloudfront-distribution-id> \
+  -bucket=<s3-bucket-name>
+```
+
+Get `cloudfront-distribution-id` and `s3-bucket-name` by first deploying the infrastructure via Terraform.
+
+#### Automated deployment
 
 - Add your project to CircleCI.
-- Add the following environment variables for the project (run manual deployment once to get some of these)
+- Add the following environment variables for the project (run manual deployments first to get some of these)
 
 ```
-AWS_ACCESS_KEY_ID                   # recommend to use separate AWS credentials for CircleCI
+AWS_ACCESS_KEY_ID                   # recommended to use a separate IAM user for CircleCI
+AWS_SECRET_ACCESS_KEY
 AWS_DEFAULT_REGION
-AWS_SECRET_ACCESS_KEY               # recommend to use separate AWS credentials for CircleCI
 
-DEV_AWS_CLOUDFRONT_DISTRIBUTION_ID  # you get this after terraform setup
-DEV_AWS_S3_BUCKET_NAME              # you get this after terraform setup
-DEV_FRONTEND_URL                    # you get this after terraform setup
-DEV_POSTGRES_DB
-DEV_POSTGRES_HOST                   # you get this after serverless deploy
-DEV_POSTGRES_PASSWORD
-DEV_POSTGRES_PORT                   # you get this after serverless deploy
-DEV_POSTGRES_USER
+DEV_AWS_CLOUDFRONT_DISTRIBUTION_ID  # get this by deploying the infrastructure
+DEV_AWS_S3_BUCKET_NAME              # get this by deploying the infrastructure
+DEV_BACKEND_GOOGLE_API_KEY          # get this from Google Cloud
+DEV_FRONTEND_GOOGLE_API_KEY         # get this from Google Cloud
+DEV_FRONTEND_URL                    # get this by deploying the infrastructure
+DEV_REDIS_HOST                      # get this by deploying the backend
+DEV_REDIS_PORT                      # get this by deploying the backend
 
-PRD_AWS_CLOUDFRONT_DISTRIBUTION_ID  # you get this after terraform setup
-PRD_AWS_S3_BUCKET_NAME              # you get this after terraform setup
-PRD_FRONTEND_URL                    # you get this after terraform setup
-PRD_POSTGRES_DB
-PRD_POSTGRES_HOST                   # you get this after serverless deploy
-PRD_POSTGRES_PASSWORD
-PRD_POSTGRES_PORT                   # you get this after serverless deploy
-PRD_POSTGRES_USER
+PRD_AWS_CLOUDFRONT_DISTRIBUTION_ID  # get this by deploying the infrastructure
+PRD_AWS_S3_BUCKET_NAME              # get this by deploying the infrastructure
+PRD_BACKEND_GOOGLE_API_KEY          # get this from Google Cloud
+PRD_FRONTEND_GOOGLE_API_KEY         # get this from Google Cloud
+PRD_FRONTEND_URL                    # get this by deploying the infrastructure
+PRD_REDIS_HOST                      # get this by deploying the backend
+PRD_REDIS_PORT                      # get this by deploying the backend
 ```
 
 - Push a new commit to trigger a new deployment, `master` branch deploys to dev environment, and `production` deploys to prd environment.
