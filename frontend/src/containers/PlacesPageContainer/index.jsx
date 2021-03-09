@@ -23,6 +23,7 @@ function PlacesPageContainer() {
   const { errors, getValues, handleSubmit, register, setValue } = useForm()
   const [userCoords, setUserCoords] = useState(null)
   const [prevAddress, setPrevAddress] = useState(null)
+  const [prevDistance, setPrevDistance] = useState(null)
   const [findAddress, findAddressData] = useLazyQuery(FIND_ADDRESS)
   const [findCoordinates, findCoordinatesData] = useLazyQuery(FIND_COORDINATES)
   const [searchPlaces, searchPlacesData] = useLazyQuery(SEARCH_PLACES)
@@ -47,16 +48,28 @@ function PlacesPageContainer() {
   const error =
     searchPlacesData.error || findCoordinatesData.error || findAddressData.error
 
-  const onFindCoordinates = ({ address }) => {
-    if (prevAddress === address) return
+  const onFindCoordinates = ({ address, distance, latitude, longitude }) => {
+    const addressChanged = address !== prevAddress
+    const distanceChanged = distance !== prevDistance
+
+    if (!addressChanged && !distanceChanged) {
+      return
+    }
+
+    if (!addressChanged && distanceChanged) {
+      return onSearchPlaces({ distance, latitude, longitude })
+    }
+
     const options = {
       variables: {
         address,
         pathFunction: buildPath('/find-coordinates'),
       },
     }
+
     setUserCoords(null)
     setPrevAddress(address)
+    setPrevDistance(distance)
     findCoordinates(options)
   }
 
@@ -139,9 +152,11 @@ function PlacesPageContainer() {
   useEffect(() => {
     memoizedOnSearchMorePlaces()
   }, [cursor, memoizedOnSearchMorePlaces])
+
   useEffect(() => {
     register('distance')
-  }, [register])
+    setValue('distance', DEFAULT_DISTANCE)
+  }, [register, setValue])
 
   const sortedPlaces = places
     .groupBy(x => x.name)
@@ -209,6 +224,12 @@ function sortPlaces(a, b) {
     return -1
   }
   if (a.rating < b.rating) {
+    return 1
+  }
+  if (a.distance < b.distance) {
+    return -1
+  }
+  if (a.distance > b.distance) {
     return 1
   }
   return 0
