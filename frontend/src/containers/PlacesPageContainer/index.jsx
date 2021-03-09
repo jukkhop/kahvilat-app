@@ -28,25 +28,14 @@ function PlacesPageContainer() {
   const [findCoordinates, findCoordinatesData] = useLazyQuery(FIND_COORDINATES)
   const [searchPlaces, searchPlacesData] = useLazyQuery(SEARCH_PLACES)
 
-  const foundAddress = get(
-    findAddressData,
-    'data.findAddress.results[0].address',
-  )
-  const foundCoords = get(
-    findCoordinatesData,
-    'data.findCoordinates.results[0].geometry.location',
-  )
+  const foundAddress = get(findAddressData, 'data.findAddress.results[0].address')
+  const foundCoords = get(findCoordinatesData, 'data.findCoordinates.results[0].geometry.location')
 
   const places = get(searchPlacesData, 'data.searchPlaces.results', [])
   const cursor = get(searchPlacesData, 'data.searchPlaces.cursor')
 
-  const loading =
-    searchPlacesData.loading ||
-    findCoordinatesData.loading ||
-    findAddressData.loading
-
-  const error =
-    searchPlacesData.error || findCoordinatesData.error || findAddressData.error
+  const loading = searchPlacesData.loading || findCoordinatesData.loading || findAddressData.loading
+  const error = searchPlacesData.error || findCoordinatesData.error || findAddressData.error
 
   const onFindCoordinates = ({ address, distance, latitude, longitude }) => {
     const addressChanged = address !== prevAddress
@@ -99,10 +88,7 @@ function PlacesPageContainer() {
       },
       updateQuery: (previousResult, { fetchMoreResult }) => {
         const previousEntry = previousResult.searchPlaces
-        const {
-          cursor: newCursor,
-          results: newResults,
-        } = fetchMoreResult.searchMorePlaces
+        const { cursor: newCursor, results: newResults } = fetchMoreResult.searchMorePlaces
         return {
           searchPlaces: {
             cursor: newCursor,
@@ -197,11 +183,7 @@ function mapPlace({ latitude, longitude }) {
 
     const { openNow } = openingHours || {}
 
-    const distance = getDistance(
-      { latitude, longitude },
-      { latitude: lat, longitude: lng },
-      100,
-    )
+    const distance = getDistance({ latitude, longitude }, { latitude: lat, longitude: lng }, 100)
 
     return {
       distance,

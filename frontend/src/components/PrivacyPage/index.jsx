@@ -23,8 +23,8 @@ function PrivacyPage() {
     <Layout>
       <Heading2>Privacy statement</Heading2>
       <Paragraph>
-        This service does not collect any personally identifiable information
-        about you, or about any of its users.
+        This service does not collect any personally identifiable information about you, or about
+        any of its users.
       </Paragraph>
     </Layout>
   )

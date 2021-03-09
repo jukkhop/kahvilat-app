@@ -51,7 +51,7 @@ export const SEARCH_PLACES = gql`
 export const SEARCH_MORE_PLACES = gql`
   query($cursor: String, $pathFunction: any) {
     searchMorePlaces(cursor: $cursor)
-      @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+    @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
       results @type(name: "Place") {
         ...placeFragment
@@ -64,7 +64,7 @@ export const SEARCH_MORE_PLACES = gql`
 export const FIND_ADDRESS = gql`
   query($latitude: String, $longitude: String, $pathFunction: any) {
     findAddress(latitude: $latitude, longitude: $longitude, type: $type)
-      @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+    @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       results @type(name: "Address") {
         address: formatted_address
         components: address_components @type(name: "Object") {
@@ -79,7 +79,7 @@ export const FIND_ADDRESS = gql`
 export const FIND_COORDINATES = gql`
   query($address: String, $pathFunction: any) {
     findCoordinates(address: $address, type: $type)
-      @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+    @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       results @type(name: "Address") {
         geometry @type(name: "Object") {
           location @type(name: "Object") {

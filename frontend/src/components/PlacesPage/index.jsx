@@ -1,22 +1,7 @@
-import {
-  arrayOf,
-  bool,
-  func,
-  object,
-  oneOfType,
-  shape,
-  string,
-  number,
-} from 'prop-types'
+import { arrayOf, bool, func, object, oneOfType, shape, string, number } from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
-import {
-  Button,
-  Slider,
-  TextField,
-  ThemeProvider,
-  Typography,
-} from '@material-ui/core'
+import { Button, Slider, TextField, ThemeProvider, Typography } from '@material-ui/core'
 import { LoadScript } from '@react-google-maps/api'
 
 import PlacesComponent from '../PlacesComponent'
@@ -192,14 +177,11 @@ function PlacesPage({
           if (coords && places.length === 0) {
             return (
               <Message>
-                Valitettavasti kahviloita ei löytynyt. Voit kokeilla kasvattaa
-                etäisyyttä.
+                Valitettavasti kahviloita ei löytynyt. Voit kokeilla kasvattaa etäisyyttä.
               </Message>
             )
           }
-          return (
-            <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaksesi.</Message>
-          )
+          return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaksesi.</Message>
         })()}
       </LoadScript>
     </Layout>
