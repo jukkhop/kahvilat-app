@@ -15,7 +15,7 @@ async function helper(
   cache: Cache,
   client: GoogleClient,
 ): Promise<APIGatewayProxyResult> {
-  const queryParams = event.queryStringParameters || {}
+  const queryParams = (event.queryStringParameters || {}) as Record<string, string>
   const parametersToCheck = !queryParams.cursor
     ? ['keyword', 'latitude', 'longitude', 'radius', 'type']
     : ['cursor']

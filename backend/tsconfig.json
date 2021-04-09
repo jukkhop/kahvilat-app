@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "declaration": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "lib": ["es2015"],
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": ".build",
-    "preserveConstEnums": true,
     "rootDir": "./",
-    "sourceMap": true,
+    "skipLibCheck": true,
     "strict": true,
-    "strictNullChecks": true,
     "target": "es5"
   },
   "exclude": ["node_modules"]

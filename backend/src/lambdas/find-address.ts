@@ -25,7 +25,7 @@ async function helper(
     return mkErrorResponse(400, validationErrors)
   }
 
-  const { latitude, longitude } = queryParams
+  const { latitude = '', longitude = '' } = queryParams
   const [status, body] = await cachedFetch(
     cache,
     'find-address',

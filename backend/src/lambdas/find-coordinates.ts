@@ -22,7 +22,7 @@ async function helper(
     return mkErrorResponse(400, validationErrors)
   }
 
-  const { address } = queryParams
+  const { address = '' } = queryParams
   const [status, body] = await cachedFetch(
     cache,
     'find-coordinates',

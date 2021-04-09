@@ -4,7 +4,7 @@ import { promisify } from 'util'
 class AsyncRedisClient {
   public client: RedisClient
 
-  private getPromisified: (arg1: string) => Promise<string>
+  private getPromisified: (arg1: string) => Promise<string | null>
   private setPromisified: (arg1: string, arg2: string) => Promise<unknown>
   private expirePromisified: (arg1: string, arg2: number) => Promise<number>
   private deletePromisified: (arg1: string) => Promise<unknown>
