@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import PlaceComponent from '../PlaceComponent'
+import PlaceCard from '../PlaceCard'
 import { Place } from '../../types'
 
 const Places = styled.ul`
@@ -19,11 +19,11 @@ interface Props {
   places: Place[]
 }
 
-function PlacesComponent(props: Props): JSX.Element {
+function PlacesGrid(props: Props): JSX.Element {
   return (
     <Places>
       {props.places.map(({ distance, icon, name, openNow, rating, vicinity }) => (
-        <PlaceComponent
+        <PlaceCard
           distance={distance}
           icon={icon}
           key={name}
@@ -37,4 +37,4 @@ function PlacesComponent(props: Props): JSX.Element {
   )
 }
 
-export default PlacesComponent
+export default PlacesGrid

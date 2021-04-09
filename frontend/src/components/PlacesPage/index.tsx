@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Button, Slider, TextField, ThemeProvider, Typography } from '@material-ui/core'
 import { LoadScript } from '@react-google-maps/api'
 
-import PlacesComponent from '../PlacesComponent'
+import PlacesGrid from '../PlacesGrid'
 import PlacesMap from '../PlacesMap'
 import Layout from '../Layout'
 
@@ -179,7 +179,7 @@ function PlacesPage(props: Props): JSX.Element {
                 <PlacesMapWrapper>
                   <PlacesMap coords={coords} places={places} />
                 </PlacesMapWrapper>
-                <PlacesComponent places={places} />
+                <PlacesGrid places={places} />
               </div>
             )
           }
