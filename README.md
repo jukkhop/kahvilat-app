@@ -7,21 +7,23 @@
 ## Tools and libraries used
 
 Miscellaneous
+
 - AWS as cloud provider (API Gateway, CloudFront, ElastiCache, Lambda, Route53, S3, VPC)
 - Terraform for infrastructure-as-code
 - CircleCI for CI/CD automation
 
 Backend
-- TypeScript, ESLint, Prettier
+
+- Node, TypeScript, ESLint, Prettier
 - Serverless framework
 - Docker (for local development only)
 - Jest with `ts-jest` as a testing solution
 
 Frontend
-- React, ESLint, Prettier
+
+- React, TypeScript, ESLint, Prettier
 - `apollo-client` as a REST client for its reactive capabilities
 - `material-ui` as an UI framework
-- `prop-types` for runtime type-checking for React props
 - `react-fontawesome` for icons
 - `react-hook-form` as form library
 - `react-router-dom` for routing
