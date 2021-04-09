@@ -7,7 +7,7 @@ import PlacesPageContainer from './PlacesPageContainer'
 import PrivacyPage from '../components/PrivacyPage'
 import TermsPage from '../components/TermsPage'
 
-function App() {
+function App(): JSX.Element {
   return (
     <Router>
       <Switch>

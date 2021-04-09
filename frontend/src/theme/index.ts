@@ -13,7 +13,7 @@ const theme = createMuiTheme({
     fontFamily: 'Source Sans Pro',
     button: {
       fontFamily: 'Montserrat',
-      fontWeight: '600',
+      fontWeight: 600,
       letterSpacing: '1.5px',
     },
   },

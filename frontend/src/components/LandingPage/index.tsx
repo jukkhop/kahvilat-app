@@ -59,7 +59,7 @@ const Button = styled.button`
   }
 `
 
-function LandingPage() {
+function LandingPage(): JSX.Element {
   return (
     <Container>
       <Header>

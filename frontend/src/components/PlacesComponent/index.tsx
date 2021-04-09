@@ -1,7 +1,8 @@
-import { arrayOf, shape } from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
+
 import PlaceComponent from '../PlaceComponent'
+import { Place } from '../../types'
 
 const Places = styled.ul`
   align-items: flex-start;
@@ -14,10 +15,14 @@ const Places = styled.ul`
   width: 100%;
 `
 
-function PlacesComponent({ places }) {
+interface Props {
+  places: Place[]
+}
+
+function PlacesComponent(props: Props): JSX.Element {
   return (
     <Places>
-      {places.map(({ distance, icon, name, openNow, rating, vicinity }) => (
+      {props.places.map(({ distance, icon, name, openNow, rating, vicinity }) => (
         <PlaceComponent
           distance={distance}
           icon={icon}
@@ -30,14 +35,6 @@ function PlacesComponent({ places }) {
       ))}
     </Places>
   )
-}
-
-PlacesComponent.propTypes = {
-  places: arrayOf(shape({})),
-}
-
-PlacesComponent.defaultProps = {
-  places: [],
 }
 
 export default PlacesComponent
