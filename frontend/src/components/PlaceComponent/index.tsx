@@ -1,10 +1,11 @@
-import { bool, number, string } from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClock, faSmile } from '@fortawesome/free-regular-svg-icons'
 import { faWalking } from '@fortawesome/free-solid-svg-icons'
+
+import { COLORS } from '../../constants'
 
 const Outer = styled.li`
   display: block;
@@ -97,10 +98,17 @@ const Address = styled.div`
   white-space: nowrap;
 `
 
-const green = 'rgb(0, 156, 0)'
-const red = 'rgb(220, 20, 60)'
+interface Props {
+  distance: number
+  icon: string
+  name: string
+  openNow?: boolean
+  rating: number
+  vicinity: string
+}
 
-function PlaceComponent({ distance, icon, name, openNow, rating, vicinity }) {
+function PlaceComponent(props: Props): JSX.Element {
+  const { distance, icon, name, openNow, rating, vicinity } = props
   return (
     <Outer>
       <Inner>
@@ -110,7 +118,7 @@ function PlaceComponent({ distance, icon, name, openNow, rating, vicinity }) {
         <Name>{name}</Name>
         <Address>{vicinity}</Address>
         <Details>
-          <Detail color={openNow ? green : red}>
+          <Detail color={openNow ? COLORS.green : COLORS.red}>
             <FontAwesomeIcon icon={faClock} />
             {openNow ? 'open' : 'closed'}
           </Detail>
@@ -126,19 +134,6 @@ function PlaceComponent({ distance, icon, name, openNow, rating, vicinity }) {
       </Inner>
     </Outer>
   )
-}
-
-PlaceComponent.propTypes = {
-  distance: number.isRequired,
-  icon: string.isRequired,
-  name: string.isRequired,
-  openNow: bool,
-  rating: number.isRequired,
-  vicinity: string.isRequired,
-}
-
-PlaceComponent.defaultProps = {
-  openNow: false,
 }
 
 export default PlaceComponent

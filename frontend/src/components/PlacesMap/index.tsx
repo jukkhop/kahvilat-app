@@ -1,7 +1,7 @@
-import { arrayOf, number, shape } from 'prop-types'
 import React from 'react'
-// import styled from 'styled-components'
-import { GoogleMap, /* InfoWindow, */ Marker } from '@react-google-maps/api'
+import { GoogleMap, Marker } from '@react-google-maps/api'
+
+import { Place } from '../../types'
 
 const containerStyle = {
   width: '100%',
@@ -18,18 +18,25 @@ const options = {
   streetViewControl: false,
 }
 
-// const InfoWindowText = styled.span`
-//   font-family: Montserrat;
-//   font-size: 0.65rem;
-//   font-weight: 600;
-//   user-select: none;
-// `
+interface Props {
+  coords: {
+    latitude: string
+    longitude: string
+  }
+  places: Place[]
+}
 
-function PlacesMap({ coords, places }) {
+function PlacesMap(props: Props): JSX.Element {
+  const { coords, places } = props
+  const latitude = Number(coords.latitude)
+  const longitude = Number(coords.longitude)
+
   const onLoad = React.useCallback(
     map => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const bounds = new window.google.maps.LatLngBounds()
-      bounds.extend({ lat: coords.latitude, lng: coords.longitude })
+      bounds.extend({ lat: latitude, lng: longitude })
       places.forEach(place => bounds.extend(place))
       map.fitBounds(bounds)
     },
@@ -38,7 +45,7 @@ function PlacesMap({ coords, places }) {
 
   return (
     <GoogleMap
-      center={{ lat: coords.latitude, lng: coords.longitude }}
+      center={{ lat: latitude, lng: longitude }}
       mapContainerStyle={containerStyle}
       onLoad={onLoad}
       options={options}
@@ -53,18 +60,6 @@ function PlacesMap({ coords, places }) {
       ))}
     </GoogleMap>
   )
-}
-
-PlacesMap.propTypes = {
-  coords: shape({
-    latitude: number.isRequired,
-    longitude: number.isRequired,
-  }).isRequired,
-  places: arrayOf(shape({})),
-}
-
-PlacesMap.defaultProps = {
-  places: [],
 }
 
 export default PlacesMap

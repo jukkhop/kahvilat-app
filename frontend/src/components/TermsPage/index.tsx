@@ -37,7 +37,7 @@ const Paragraph = styled.p`
   font-size: 0.875rem;
 `
 
-function TermsPage() {
+function TermsPage(): JSX.Element {
   return (
     <Container>
       <Header />

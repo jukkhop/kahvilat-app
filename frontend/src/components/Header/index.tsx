@@ -24,7 +24,7 @@ const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   font-size: 6.5rem;
 `
 
-function Header() {
+function Header(): JSX.Element {
   return (
     <Container>
       <StyledFontAwesomeIcon icon={faCoffee} />

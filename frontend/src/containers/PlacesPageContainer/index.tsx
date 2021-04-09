@@ -1,12 +1,11 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-use-before-define */
-
-import { getDistance } from 'geolib'
 import get from 'lodash.get'
+import uniqBy from 'lodash.uniqby'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLazyQuery } from '@apollo/react-hooks'
+
 import PlacesPage from '../../components/PlacesPage'
+import { DEFAULT_DISTANCE } from '../../constants'
 import {
   buildPath,
   FIND_ADDRESS,
@@ -14,30 +13,30 @@ import {
   SEARCH_PLACES,
   SEARCH_MORE_PLACES,
 } from '../../graphql'
-import { sleep } from '../../utils'
-import { DEFAULT_DISTANCE } from '../../constants'
+import { Coords, FormValues, PlaceDto } from '../../types/'
+import { mapPlace, sleep, sortPlaces } from '../../utils'
 
-import '../../utils/extensions'
-
-function PlacesPageContainer() {
-  const { errors, getValues, handleSubmit, register, setValue } = useForm()
-  const [userCoords, setUserCoords] = useState(null)
-  const [prevAddress, setPrevAddress] = useState(null)
-  const [prevDistance, setPrevDistance] = useState(null)
+function PlacesPageContainer(): JSX.Element {
+  const { getValues, handleSubmit, register, setValue } = useForm()
+  const [userCoords, setUserCoords] = useState<Coords | undefined>(undefined)
+  const [prevAddress, setPrevAddress] = useState<string | undefined>(undefined)
+  const [prevDistance, setPrevDistance] = useState<number | undefined>(undefined)
   const [findAddress, findAddressData] = useLazyQuery(FIND_ADDRESS)
   const [findCoordinates, findCoordinatesData] = useLazyQuery(FIND_COORDINATES)
   const [searchPlaces, searchPlacesData] = useLazyQuery(SEARCH_PLACES)
 
   const foundAddress = get(findAddressData, 'data.findAddress.results[0].address')
-  const foundCoords = get(findCoordinatesData, 'data.findCoordinates.results[0].geometry.location')
+  // prettier-ignore
+  const foundCoords = get(findCoordinatesData, 'data.findCoordinates.results[0].geometry.location') as Coords | undefined
 
-  const places = get(searchPlacesData, 'data.searchPlaces.results', [])
-  const cursor = get(searchPlacesData, 'data.searchPlaces.cursor')
+  const places = get(searchPlacesData, 'data.searchPlaces.results', []) as PlaceDto[]
+  const cursor = get(searchPlacesData, 'data.searchPlaces.cursor') as string | undefined
 
   const loading = searchPlacesData.loading || findCoordinatesData.loading || findAddressData.loading
   const error = searchPlacesData.error || findCoordinatesData.error || findAddressData.error
 
-  const onFindCoordinates = ({ address, distance, latitude, longitude }) => {
+  const onFindCoordinates = (values: FormValues) => {
+    const { address, distance, latitude, longitude } = values
     const addressChanged = address !== prevAddress
     const distanceChanged = distance !== prevDistance
 
@@ -46,7 +45,7 @@ function PlacesPageContainer() {
     }
 
     if (!addressChanged && distanceChanged) {
-      return onSearchPlaces({ distance, latitude, longitude })
+      return onSearchPlaces(latitude, longitude, distance)
     }
 
     const options = {
@@ -56,14 +55,15 @@ function PlacesPageContainer() {
       },
     }
 
-    setUserCoords(null)
+    setUserCoords(undefined)
     setPrevAddress(address)
     setPrevDistance(distance)
     findCoordinates(options)
   }
 
-  const onSearchPlaces = ({ longitude, latitude, distance }) => {
+  const onSearchPlaces = (latitude: string, longitude: string, distance?: number) => {
     if (!userCoords) return
+
     const options = {
       variables: {
         keyword: 'coffee',
@@ -74,12 +74,18 @@ function PlacesPageContainer() {
         type: 'cafe',
       },
     }
+
+    setPrevDistance(distance)
     searchPlaces(options)
   }
 
   const onSearchMorePlaces = async () => {
-    if (!cursor) return Promise.resolve()
+    if (!cursor || !searchPlacesData.fetchMore) {
+      return Promise.resolve()
+    }
+
     await sleep(2000)
+
     return searchPlacesData.fetchMore({
       query: SEARCH_MORE_PLACES,
       variables: {
@@ -100,7 +106,7 @@ function PlacesPageContainer() {
     })
   }
 
-  const memoizedOnSearchPlaces = useCallback(onSearchPlaces, [userCoords])
+  const memoizedOnSearchPlaces = useCallback(onSearchPlaces, [userCoords, prevDistance])
   const memoizedOnSearchMorePlaces = useCallback(onSearchMorePlaces, [cursor])
 
   useEffect(() => {
@@ -114,25 +120,21 @@ function PlacesPageContainer() {
           pathFunction: buildPath('/find-address'),
         },
       }
-      setUserCoords({ latitude, longitude })
+      setUserCoords({ latitude: latitude.toString(), longitude: longitude.toString() })
       findAddress(options)
     })
   }, [findAddress])
 
   useEffect(() => {
     if (foundCoords) {
-      setUserCoords({ latitude: foundCoords.lat, longitude: foundCoords.lng })
+      setUserCoords(foundCoords)
     }
   }, [foundCoords])
 
   useEffect(() => {
     if (!userCoords) return
     const { distance } = getValues()
-    memoizedOnSearchPlaces({
-      distance,
-      latitude: userCoords.latitude,
-      longitude: userCoords.longitude,
-    })
+    memoizedOnSearchPlaces(userCoords.latitude, userCoords.longitude, distance)
   }, [getValues, userCoords, memoizedOnSearchPlaces])
 
   useEffect(() => {
@@ -144,14 +146,14 @@ function PlacesPageContainer() {
     setValue('distance', DEFAULT_DISTANCE)
   }, [register, setValue])
 
-  const sortedPlaces = places
-    .groupBy(x => x.name)
-    .map(({ values }) => values[0])
-    .filter(x => x.businessStatus === 'OPERATIONAL')
-    .map(userCoords ? mapPlace(userCoords) : x => x)
-    .sort(sortPlaces)
+  const mappedPlaces = userCoords
+    ? uniqBy(places, x => x.name)
+        .filter((x: PlaceDto) => x.businessStatus === 'OPERATIONAL')
+        .map(mapPlace(userCoords))
+        .sort(sortPlaces)
+    : []
 
-  const onDistanceChange = (_, value) => {
+  const onDistanceChange = (_: unknown, value: number) => {
     setValue('distance', value)
   }
 
@@ -160,61 +162,14 @@ function PlacesPageContainer() {
       address={foundAddress}
       coords={userCoords}
       defaultDistance={DEFAULT_DISTANCE}
-      inputErrors={errors}
       loading={loading}
       onDistanceChange={onDistanceChange}
       onSearch={handleSubmit(onFindCoordinates)}
-      places={sortedPlaces}
+      places={mappedPlaces}
       register={register}
-      searchError={error}
+      searchError={error ? true : false}
     />
   )
-}
-
-function mapPlace({ latitude, longitude }) {
-  return place => {
-    const {
-      geometry: {
-        location: { lat, lng },
-      },
-      openingHours,
-      ...rest
-    } = place
-
-    const { openNow } = openingHours || {}
-
-    const distance = getDistance({ latitude, longitude }, { latitude: lat, longitude: lng }, 100)
-
-    return {
-      distance,
-      lat,
-      lng,
-      openNow,
-      ...rest,
-    }
-  }
-}
-
-function sortPlaces(a, b) {
-  if (a.openNow && !b.openNow) {
-    return -1
-  }
-  if (!a.openNow && b.openNow) {
-    return 1
-  }
-  if (a.rating > b.rating) {
-    return -1
-  }
-  if (a.rating < b.rating) {
-    return 1
-  }
-  if (a.distance < b.distance) {
-    return -1
-  }
-  if (a.distance > b.distance) {
-    return 1
-  }
-  return 0
 }
 
 export default PlacesPageContainer

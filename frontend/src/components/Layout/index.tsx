@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import styled from 'styled-components'
 
 import Header from '../Header'
@@ -31,18 +30,18 @@ const Main = styled.main`
   }
 `
 
-function Layout({ children }) {
+interface Props {
+  children: ReactNode[]
+}
+
+function Layout(props: Props): JSX.Element {
   return (
     <Container>
       <Header />
-      <Main>{children}</Main>
+      <Main>{props.children}</Main>
       <Footer />
     </Container>
   )
-}
-
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
 }
 
 export default Layout

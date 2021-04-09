@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import Layout from '../SiteLayout'
+import Layout from '../Layout'
 
 const Heading2 = styled.h2`
   color: rgba(0, 0, 0, 0.85);
@@ -18,7 +18,7 @@ const Paragraph = styled.p`
   font-size: 0.875rem;
 `
 
-function PrivacyPage() {
+function PrivacyPage(): JSX.Element {
   return (
     <Layout>
       <Heading2>Privacy statement</Heading2>

@@ -47,7 +47,7 @@ const Links = styled.ul`
   }
 `
 
-function Footer() {
+function Footer(): JSX.Element {
   return (
     <Container>
       <Links>

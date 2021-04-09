@@ -1,4 +1,3 @@
-import { arrayOf, bool, func, object, oneOfType, shape, string, number } from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
 import { Button, Slider, TextField, ThemeProvider, Typography } from '@material-ui/core'
@@ -6,8 +5,12 @@ import { LoadScript } from '@react-google-maps/api'
 
 import PlacesComponent from '../PlacesComponent'
 import PlacesMap from '../PlacesMap'
-import Layout from '../SiteLayout'
+import Layout from '../Layout'
+
+import { getConfig } from '../../config'
 import theme from '../../theme'
+import { Coords, Place } from '../../types'
+import { convertDistance } from '../../utils/converters'
 
 const Form = styled.form`
   font-family: Source Sans Pro;
@@ -60,25 +63,33 @@ const Message = styled.p`
   text-align: center;
 `
 
-function PlacesPage({
-  address,
-  coords,
-  defaultDistance,
-  inputErrors,
-  loading,
-  onDistanceChange,
-  onSearch,
-  places,
-  register,
-  searchError,
-}) {
-  const { REACT_APP_GOOGLE_API_KEY } = process.env
-  const hasInputErrors = Object.keys(inputErrors).length > 0
+interface Props {
+  address?: string
+  coords?: Coords
+  defaultDistance: number
+  inputErrors?: Record<string, string>
+  loading: boolean
+  onDistanceChange: (arg1: any, arg2: any) => any
+  onSearch: () => Promise<any>
+  places?: Place[]
+  register: (arg: any) => any
+  searchError?: boolean
+}
 
-  const convertDistance = metres => {
-    if (metres !== 1000) return `${metres} m`
-    return `${metres / 1000} km`
-  }
+function PlacesPage(props: Props): JSX.Element {
+  const {
+    address,
+    coords,
+    defaultDistance,
+    loading,
+    onDistanceChange,
+    onSearch,
+    places = [],
+    register,
+    searchError,
+  } = props
+
+  const config = getConfig()
 
   const marks = [250, 500, 750, 1000, 1250, 1500].map(metres => ({
     value: metres,
@@ -95,8 +106,8 @@ function PlacesPage({
                 defaultValue={coords ? coords.latitude : undefined}
                 id="latitude"
                 name="latitude"
-                ref={register}
                 type="hidden"
+                {...register('latitude')}
               />
             </Field>
             <Field style={{ display: 'none' }}>
@@ -104,8 +115,8 @@ function PlacesPage({
                 defaultValue={coords ? coords.longitude : undefined}
                 id="longitude"
                 name="longitude"
-                ref={register}
                 type="hidden"
+                {...register('longitude')}
               />
             </Field>
             <Field>
@@ -115,12 +126,12 @@ function PlacesPage({
                 defaultValue={address}
                 fullWidth
                 id="address"
-                inputRef={register({ required: true })}
                 key={`textfield-address-${address}`}
                 label="Osoite"
                 name="address"
                 placeholder="Syötä katuosoite"
                 required
+                {...register('address')}
               />
             </Field>
             <Field>
@@ -132,21 +143,19 @@ function PlacesPage({
                 color="primary"
                 defaultValue={defaultDistance}
                 id="distance"
-                label="Etäisyys"
                 marks={marks}
                 max={1600}
                 min={150}
                 name="distance"
                 onChange={onDistanceChange}
                 step={50}
-                type="number"
                 valueLabelDisplay="on"
               />
             </Field>
           </Fields>
           <Button
             color="primary"
-            disabled={hasInputErrors || loading}
+            disabled={loading}
             fullWidth
             style={{ margin: '1rem 0' }}
             type="submit"
@@ -156,7 +165,7 @@ function PlacesPage({
           </Button>
         </Form>
       </ThemeProvider>
-      <LoadScript googleMapsApiKey={REACT_APP_GOOGLE_API_KEY}>
+      <LoadScript googleMapsApiKey={config.google.apiKey}>
         {(() => {
           if (loading) {
             return <Message>Ladataan...</Message>
@@ -186,27 +195,6 @@ function PlacesPage({
       </LoadScript>
     </Layout>
   )
-}
-
-PlacesPage.propTypes = {
-  address: string,
-  coords: shape({}),
-  defaultDistance: number.isRequired,
-  inputErrors: shape({}),
-  loading: bool.isRequired,
-  onDistanceChange: func.isRequired,
-  onSearch: func.isRequired,
-  places: arrayOf(shape({})),
-  register: func.isRequired,
-  searchError: oneOfType([shape({}), object, string]),
-}
-
-PlacesPage.defaultProps = {
-  address: null,
-  coords: null,
-  inputErrors: {},
-  places: [],
-  searchError: null,
 }
 
 export default PlacesPage
