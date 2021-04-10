@@ -213,6 +213,7 @@ resources:
       Type: AWS::ElastiCache::CacheCluster
       Properties:
         AutoMinorVersionUpgrade: true
+        ClusterName: kahvilat-redis-${self:provider.stage}
         Engine: redis
         CacheNodeType: ${self:custom.config.CACHE_INSTANCE_SIZE}
         NumCacheNodes: 1

@@ -1,21 +1,22 @@
-provider "aws" {}
-
-resource "aws_route53_zone" "zone" {
-  name = "kahvilat.app"
+provider "aws" {
+  version    = "~> 2.70"
+  access_key = "${var.aws_access_key}"
+  secret_key = "${var.aws_secret_key}"
+  region     = "${var.aws_region}"
 }
 
-module "frontend-prd" {
-  source = "./modules/frontend"
-
-  application_subdomain = "kahvilat.app"
-  certificate_arn = "arn:aws:acm:us-east-1:262897496864:certificate/e84be4d8-467a-4df1-9bad-39a6a0b4f68b"
-  zone_id = "${aws_route53_zone.zone.zone_id}"
+terraform {
+  backend "s3" {
+    bucket = "kahvilat-app-infrastructure"
+    key    = "kahvilat-app.tfstate"
+    region = "eu-west-1"
+  }
 }
 
-module "frontend-dev" {
+module "frontend" {
   source = "./modules/frontend"
 
-  application_subdomain = "dev.kahvilat.app"
-  certificate_arn = "arn:aws:acm:us-east-1:262897496864:certificate/03aaf2d8-b160-4f44-a780-600fefc10cfe"
-  zone_id = "${aws_route53_zone.zone.zone_id}"
+  app_subdomain_name  = "${var.app_subdomain_name}"
+  acm_certificate_arn = "${var.frontend_certificate_arn}"
+  route53_zone_id     = "${var.frontend_zone_id}"
 }

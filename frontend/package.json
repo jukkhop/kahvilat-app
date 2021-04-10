@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "react-scripts build",
-    "format": "prettier src/**/*.ts --write",
-    "lint": "eslint src --ext .ts",
+    "format": "prettier \"src/**/*.{ts,tsx}\" --check",
+    "lint": "eslint src --ext .ts --ext .tsx",
     "start": "react-scripts start",
     "test": "react-scripts test"
   },

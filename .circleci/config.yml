@@ -7,12 +7,8 @@ orbs:
 jobs:
   build-frontend:
     parameters:
-      google-api-key:
-        type: env_var_name
       stage:
         type: string
-    environment:
-      REACT_APP_GOOGLE_API_KEY: ${<< parameters.google-api-key >>}
     docker:
       - image: circleci/node:12.16.2
     parallelism: 1
@@ -29,9 +25,15 @@ jobs:
             fi
       - attach_workspace:
           at: ~/repo/frontend
-      - run: mv .env.<< parameters.stage >> .env
-      - run: yarn install
-      - run: yarn build
+      - run:
+          name: Set up git-crypt
+          command: |
+            sudo apt-get install -y git-crypt
+            echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
+            git-crypt unlock ./git-crypt.key
+      - run:
+          name: Run build script
+          command: ./build.sh << parameters.stage >>
       - persist_to_workspace:
           root: ~/repo/frontend
           paths:
@@ -39,10 +41,8 @@ jobs:
 
   deploy-frontend:
     parameters:
-      distribution-id:
-        type: env_var_name
-      bucket-name:
-        type: env_var_name
+      stage:
+        type: string
     docker:
       - image: circleci/golang:1.9.6
     parallelism: 1
@@ -70,26 +70,17 @@ jobs:
           paths:
             - /go/pkg
       - run:
-          name: Deploy to S3
+          name: Set up git-crypt
           command: |
-            s3deploy \
-              -source=build/ \
-              -region=$AWS_DEFAULT_REGION \
-              -key=$AWS_ACCESS_KEY_ID \
-              -secret=$AWS_SECRET_ACCESS_KEY \
-              -distribution-id=${<< parameters.distribution-id >>} \
-              -bucket=${<< parameters.bucket-name >>}
+            sudo apt-get install -y git-crypt
+            echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
+            git-crypt unlock ./git-crypt.key
+      - run:
+          name: Run deploy script
+          command: ./deploy.sh << parameters.stage >>
 
   build-and-deploy-backend:
     parameters:
-      frontend-url:
-        type: env_var_name
-      google-api-key:
-        type: env_var_name
-      redis-host:
-        type: env_var_name
-      redis-port:
-        type: env_var_name
       stage:
         type: string
     docker:
@@ -112,8 +103,8 @@ jobs:
       - run:
           name: Install Serverless CLI and dependencies
           command: |
-            sudo npm i -g serverless
-            npm install
+            sudo yarn global add serverless
+            yarn install
       - save_cache:
           key: v1-deps-cache
           paths:
@@ -124,20 +115,14 @@ jobs:
             mkdir -p nodejs/node_modules
             cp -r node_modules/* nodejs/node_modules/
       - run:
-          name: Create serverless production config
-          command: head -n -1 serverless.yml >> serverless-<< parameters.stage >>.yml
-      - run:
-          name: Deploy
+          name: Set up git-crypt
           command: |
-            serverless deploy \
-              --config serverless-<< parameters.stage >>.yml \
-              --frontend-url ${<< parameters.frontend-url >>} \
-              --google-api-key ${<< parameters.google-api-key >>} \
-              --redis-host ${<< parameters.redis-host >>} \
-              --redis-port ${<< parameters.redis-port >>} \
-              --region $AWS_DEFAULT_REGION \
-              --stage << parameters.stage >> \
-              --verbose
+            sudo apt-get install -y git-crypt
+            echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
+            git-crypt unlock ./git-crypt.key
+      - run:
+          name: Run deploy script
+          command: ./deploy.sh << parameters.stage >>
 
 workflows:
   version: 2
@@ -145,14 +130,12 @@ workflows:
     jobs:
       - build-frontend:
           stage: dev
-          google-api-key: DEV_FRONTEND_GOOGLE_API_KEY
           filters:
             branches:
               only:
                 - master
       - deploy-frontend:
-          distribution-id: DEV_AWS_CLOUDFRONT_DISTRIBUTION_ID
-          bucket-name: DEV_AWS_S3_BUCKET_NAME
+          stage: dev
           requires:
             - build-frontend
           filters:
@@ -164,14 +147,12 @@ workflows:
     jobs:
       - build-frontend:
           stage: prd
-          google-api-key: PRD_FRONTEND_GOOGLE_API_KEY
           filters:
             branches:
               only:
                 - production
       - deploy-frontend:
-          distribution-id: PRD_AWS_CLOUDFRONT_DISTRIBUTION_ID
-          bucket-name: PRD_AWS_S3_BUCKET_NAME
+          stage: prd
           requires:
             - build-frontend
           filters:
@@ -182,10 +163,6 @@ workflows:
   build-and-deploy-backend-dev:
     jobs:
       - build-and-deploy-backend:
-          frontend-url: DEV_FRONTEND_URL
-          google-api-key: DEV_BACKEND_GOOGLE_API_KEY
-          redis-host: DEV_REDIS_HOST
-          redis-port: DEV_REDIS_PORT
           stage: dev
           filters:
             branches:
@@ -195,10 +172,6 @@ workflows:
   build-and-deploy-backend-prd:
     jobs:
       - build-and-deploy-backend:
-          frontend-url: PRD_FRONTEND_URL
-          google-api-key: PRD_BACKEND_GOOGLE_API_KEY
-          redis-host: PRD_REDIS_HOST
-          redis-port: PRD_REDIS_PORT
           stage: prd
           filters:
             branches:
