@@ -18,14 +18,11 @@ source "../environment/${env}-variables.env"
 
 set +o allexport
 
-backend_url="https://${TF_VAR_env}.api.${TF_VAR_app_domain_name}"
-google_api_key="${TF_VAR_frontend_google_api_key}"
-
 yarn install
 yarn format
 yarn lint
 
 ENV=$env \
-REACT_APP_BACKEND_URL=$backend_url \
-REACT_APP_GOOGLE_API_KEY=$google_api_key \
+REACT_APP_BACKEND_URL=${TF_VAR_backend_backend_url} \
+REACT_APP_GOOGLE_API_KEY=${TF_VAR_frontend_google_api_key} \
 yarn build
