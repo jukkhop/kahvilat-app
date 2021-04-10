@@ -3,7 +3,7 @@ import { render } from 'react-dom'
 import WebFont from 'webfontloader'
 
 import './index.css'
-import App from './containers/App'
+import App from './containers/AppContainer'
 import withApollo from './store/with-apollo'
 
 render(withApollo(<App />), document.getElementById('root'))

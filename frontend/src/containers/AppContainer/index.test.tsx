@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import App from './App'
+import App from '.'
 
 it('should render the landing page title', () => {
   const { getByText } = render(<App />)
