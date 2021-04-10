@@ -11,6 +11,7 @@ Miscellaneous
 - AWS as cloud provider (API Gateway, CloudFront, ElastiCache, Lambda, Route53, S3, VPC)
 - Terraform for infrastructure-as-code
 - CircleCI for CI/CD automation
+- [git-crypt](https://github.com/AGWA/git-crypt) for encryption
 
 Backend
 
@@ -31,113 +32,59 @@ Frontend
 
 ## Local development
 
-Clone the repo
-
-```
-git clone https://github.com/jukkhop/kahvilat-app.git
-cd kahvilat-app
-```
-
 #### Backend
 
 - Install [Node](https://nodejs.org/en/), [Docker](https://www.docker.com/get-started) and [Serverless](https://github.com/serverless/serverless#quick-start)
 - Change directory `cd backend`
 - Up the cache `docker-compose up -d`
-- Install deps `npm install`
-- Run `npm run start`
+- Install deps `yarn install`
+- Run `yarn start`
 - Run `curl http://localhost:3001/local/places` to verify that the API works as expected
 
 #### Frontend
 
 - Change directory `cd frontend`
-- Install deps `npm install`
-- Run `npm run start`
+- Install deps `yarn install`
+- Create env file `cp .env.template .env` and adjust variables as needed
+- Run `yarn start`
 
 Your browser should automatically open at http://localhost:3000/
 
 ## Cloud deployment
 
+Environment-specific variables and secrets are kept in the `environment` folder. Secrets are encrypted, make sure to run `git-crypt unlock` to decrypt them.
+
 #### Manual deployment (infrastructure)
 
 - Install [Terraform](https://www.terraform.io/)
 - Change directory `cd infrastructure`
-
-- Set environment variables for AWS
-
-```
-export AWS_ACCESS_KEY_ID=some_access_key_id
-export AWS_SECRET_ACCESS_KEY=some_secret_access_key
-export AWS_DEFAULT_REGION=some_region
-```
-
-- Adjust domain names and certificate ARNs in `main.tf` to suit your setup
-- Initialize terraform `terraform init`
-- Create a plan `terraform plan`
-- If the plan looks okay, apply it `terraform apply`
+- Deploy `./deploy.sh <env>`
 
 #### Manual deployment (backend)
 
+- Install [Serverless](https://www.serverless.com/)
 - Change directory `cd backend`
-- Deploy to `env` environment:
-
-```
-serverless deploy \
-  --frontend-url <frontend-url> \
-  --google-api-key <google-api-key> \
-  --region $AWS_DEFAULT_REGION \
-  --stage <env>
-```
-
-Notes:
-
-- Get `frontend-url` by first deploying the infrastructure via Terraform.
-- Get `google-api-key` from Google Cloud Console.
-- The first deployment creates the Redis instance, which will give you host and port to the instance. For consequent manual deployments, you have to pass ` --redis-host` and `--redis-port` as arguments as well.
+- Deploy `./deploy.sh <env>`
 
 #### Manual deployment (frontend)
 
-- Install s3deploy `brew install bep/tap/s3deploy`
+- Install [s3deploy](https://github.com/bep/s3deploy)
 - Change directory `cd frontend`
-- Copy config file `cp .env.<env> .env` and adjust as needed
-- Build `yarn build`
-
-```
-s3deploy \
-  -source=build/ \
-  -region=$AWS_DEFAULT_REGION \
-  -key=$AWS_ACCESS_KEY_ID \
-  -secret=$AWS_SECRET_ACCESS_KEY \
-  -distribution-id=<cloudfront-distribution-id> \
-  -bucket=<s3-bucket-name>
-```
-
-Get `cloudfront-distribution-id` and `s3-bucket-name` by first deploying the infrastructure via Terraform.
+- Build `./build.sh <env>`
+- Deploy `./deploy.sh <env>`
 
 #### Automated deployment
 
+- Create a symmetric private key for git-crypt `git-crypt export-key ./crypt.key`
+- Convert the key to base64 `base64 ./crypt.key` and use it as value for `GIT_CRYPT_KEY`
 - Add your project to CircleCI.
-- Add the following environment variables for the project (run manual deployments first to get some of these)
+- Add the following environment variables for the project:
 
 ```
-AWS_ACCESS_KEY_ID                   # recommended to use a separate IAM user for CircleCI
+AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 AWS_DEFAULT_REGION
-
-DEV_AWS_CLOUDFRONT_DISTRIBUTION_ID  # get this by deploying the infrastructure
-DEV_AWS_S3_BUCKET_NAME              # get this by deploying the infrastructure
-DEV_BACKEND_GOOGLE_API_KEY          # get this from Google Cloud
-DEV_FRONTEND_GOOGLE_API_KEY         # get this from Google Cloud
-DEV_FRONTEND_URL                    # get this by deploying the infrastructure
-DEV_REDIS_HOST                      # get this by deploying the backend
-DEV_REDIS_PORT                      # get this by deploying the backend
-
-PRD_AWS_CLOUDFRONT_DISTRIBUTION_ID  # get this by deploying the infrastructure
-PRD_AWS_S3_BUCKET_NAME              # get this by deploying the infrastructure
-PRD_BACKEND_GOOGLE_API_KEY          # get this from Google Cloud
-PRD_FRONTEND_GOOGLE_API_KEY         # get this from Google Cloud
-PRD_FRONTEND_URL                    # get this by deploying the infrastructure
-PRD_REDIS_HOST                      # get this by deploying the backend
-PRD_REDIS_PORT                      # get this by deploying the backend
+GIT_CRYPT_KEY
 ```
 
 - Push a new commit to trigger a new deployment, `master` branch deploys to dev environment, and `production` deploys to prd environment.
