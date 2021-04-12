@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ChangeEventHandler } from 'react'
 import styled from 'styled-components'
 import { Button, Slider, TextField, ThemeProvider, Typography } from '@material-ui/core'
 import { LoadScript } from '@react-google-maps/api'
@@ -69,10 +69,10 @@ interface Props {
   defaultDistance: number
   inputErrors?: Record<string, string>
   loading: boolean
-  onDistanceChange: (arg1: any, arg2: any) => any
+  onAddressChange: ChangeEventHandler<HTMLInputElement>
+  onDistanceChange: (event: React.ChangeEvent<any>, value: number | number[]) => void
   onSearch: () => Promise<any>
   places?: Place[]
-  register: (arg: any) => any
   searchError?: boolean
 }
 
@@ -82,10 +82,10 @@ function PlacesPage(props: Props): JSX.Element {
     coords,
     defaultDistance,
     loading,
+    onAddressChange,
     onDistanceChange,
     onSearch,
     places = [],
-    register,
     searchError,
   } = props
 
@@ -101,24 +101,6 @@ function PlacesPage(props: Props): JSX.Element {
       <ThemeProvider theme={theme}>
         <Form onSubmit={onSearch}>
           <Fields>
-            <Field style={{ display: 'none' }}>
-              <input
-                defaultValue={coords ? coords.latitude : undefined}
-                id="latitude"
-                name="latitude"
-                type="hidden"
-                {...register('latitude')}
-              />
-            </Field>
-            <Field style={{ display: 'none' }}>
-              <input
-                defaultValue={coords ? coords.longitude : undefined}
-                id="longitude"
-                name="longitude"
-                type="hidden"
-                {...register('longitude')}
-              />
-            </Field>
             <Field>
               <TextField
                 autoFocus
@@ -129,9 +111,9 @@ function PlacesPage(props: Props): JSX.Element {
                 key={`textfield-address-${address}`}
                 label="Osoite"
                 name="address"
+                onChange={onAddressChange}
                 placeholder="Syötä katuosoite"
                 required
-                {...register('address')}
               />
             </Field>
             <Field>
@@ -184,13 +166,9 @@ function PlacesPage(props: Props): JSX.Element {
             )
           }
           if (coords && places.length === 0) {
-            return (
-              <Message>
-                Valitettavasti kahviloita ei löytynyt. Voit kokeilla kasvattaa etäisyyttä.
-              </Message>
-            )
+            return <Message>Valitettavasti kahviloita ei löytynyt. Voit kokeilla kasvattaa etäisyyttä.</Message>
           }
-          return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaksesi.</Message>
+          return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaaksesi.</Message>
         })()}
       </LoadScript>
     </Layout>

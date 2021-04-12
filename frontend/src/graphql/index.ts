@@ -1,6 +1,22 @@
 import { gql } from 'apollo-boost'
 import qs from 'qs'
 
+const addressFragment = gql`
+  fragment addressFragment on Address {
+    address: formatted_address
+    components: address_components @type(name: "AddressComponents") {
+      name: long_name
+      types
+    }
+    geometry @type(name: "AddressGeometry") {
+      location @type(name: "AddressGeometryLocation") {
+        lat
+        lng
+      }
+    }
+  }
+`
+
 const placeFragment = gql`
   fragment placeFragment on Place {
     businessStatus: business_status
@@ -24,21 +40,9 @@ const placeFragment = gql`
 `
 
 export const SEARCH_PLACES = gql`
-  query(
-    $keyword: String
-    $latitude: String
-    $longitude: String
-    $pathFunction: any
-    $radius: Int
-    $type: String
-  ) {
-    searchPlaces(
-      keyword: $keyword
-      latitude: $latitude
-      longitude: $longitude
-      radius: $radius
-      type: $type
-    ) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+  query($keyword: String, $latitude: String, $longitude: String, $pathFunction: any, $radius: Int, $type: String) {
+    searchPlaces(keyword: $keyword, latitude: $latitude, longitude: $longitude, radius: $radius, type: $type)
+      @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
       results @type(name: "Place") {
         ...placeFragment
@@ -50,8 +54,7 @@ export const SEARCH_PLACES = gql`
 
 export const SEARCH_MORE_PLACES = gql`
   query($cursor: String, $pathFunction: any) {
-    searchMorePlaces(cursor: $cursor)
-      @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+    searchMorePlaces(cursor: $cursor) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
       results @type(name: "Place") {
         ...placeFragment
@@ -66,30 +69,22 @@ export const FIND_ADDRESS = gql`
     findAddress(latitude: $latitude, longitude: $longitude, type: $type)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       results @type(name: "Address") {
-        address: formatted_address
-        components: address_components @type(name: "AddressComponents") {
-          name: long_name
-          types
-        }
+        ...addressFragment
       }
     }
   }
+  ${addressFragment}
 `
 
 export const FIND_COORDINATES = gql`
   query($address: String, $pathFunction: any) {
-    findCoordinates(address: $address, type: $type)
-      @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+    findCoordinates(address: $address, type: $type) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       results @type(name: "Address") {
-        geometry @type(name: "AddressGeometry") {
-          location @type(name: "AddressGeometryLocation") {
-            lat
-            lng
-          }
-        }
+        ...addressFragment
       }
     }
   }
+  ${addressFragment}
 `
 
 interface GraphQlPath {

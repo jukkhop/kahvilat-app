@@ -43,13 +43,10 @@ function TermsPage(): JSX.Element {
       <Header />
       <Main>
         <Heading2>Terms of service</Heading2>
+        <Paragraph>This service is provided solely for the benefit of people who enjoy going to cafeterias.</Paragraph>
         <Paragraph>
-          This service is provided solely for the benefit of people who enjoy going to cafeterias.
-        </Paragraph>
-        <Paragraph>
-          This service is the intellectual property of Purelogic Softworks (legal name), who retains
-          all rights to modify the service in any way it sees fit, or remove the service at any
-          point in time without prior notice.
+          This service is the intellectual property of Purelogic Softworks (legal name), who retains all rights to
+          modify the service in any way it sees fit, or remove the service at any point in time without prior notice.
         </Paragraph>
       </Main>
       <Footer />
