@@ -7,8 +7,8 @@ import { useLazyQuery } from '@apollo/react-hooks'
 
 import PlacesPage from '../../components/PlacesPage'
 import { DEFAULT_DISTANCE } from '../../constants'
-import { buildPath, FIND_ADDRESS, FIND_COORDINATES, SEARCH_PLACES, SEARCH_MORE_PLACES } from '../../graphql'
-import { Coords, FindAddressData, FindCoordsData, FormValues, PlaceDto, SearchPlacesData } from '../../types/'
+import { FIND_ADDRESS, FIND_COORDINATES, FIND_PLACES, FIND_MORE_PLACES, buildPath } from '../../graphql'
+import { Coords, FindAddressData, FindCoordsData, FindPlacesData, FormValues, PlaceDto } from '../../types/'
 import { mapPlace, sleep, sortPlaces } from '../../utils'
 
 function PlacesPageContainer(): JSX.Element {
@@ -18,14 +18,15 @@ function PlacesPageContainer(): JSX.Element {
   const [prevDistance, setPrevDistance] = useState<number | undefined>(undefined)
   const [findAddress, findAddressData] = useLazyQuery<FindAddressData>(FIND_ADDRESS)
   const [findCoordinates, findCoordsData] = useLazyQuery<FindCoordsData>(FIND_COORDINATES)
-  const [searchPlaces, searchPlacesData] = useLazyQuery<SearchPlacesData>(SEARCH_PLACES)
+  const [findPlaces, findPlacesData] = useLazyQuery<FindPlacesData>(FIND_PLACES)
 
   const foundAddressByAddress = findAddressData.data?.findAddress.results?.[0]
   const foundAddressByCoords = findCoordsData.data?.findCoordinates.results?.[0]
-  const foundPlaces = searchPlacesData.data?.searchPlaces.results || []
-  const cursor = searchPlacesData.data?.searchPlaces.cursor
-  const loading = searchPlacesData.loading || findCoordsData.loading || findAddressData.loading
-  const error = searchPlacesData.error || findCoordsData.error || findAddressData.error
+  const foundPlaces = findPlacesData.data?.findPlaces.results || []
+
+  const cursor = findPlacesData.data?.findPlaces.cursor
+  const loading = findPlacesData.loading || findCoordsData.loading || findAddressData.loading
+  const error = findPlacesData.error || findCoordsData.error || findAddressData.error
 
   function onFindCoordinates(values: FormValues) {
     const { address, distance } = values
@@ -37,7 +38,7 @@ function PlacesPageContainer(): JSX.Element {
     }
 
     if (userCoords && distanceChanged) {
-      return onSearchPlaces(distance)
+      return onFindPlaces(distance)
     }
 
     const options = {
@@ -53,7 +54,7 @@ function PlacesPageContainer(): JSX.Element {
     findCoordinates(options)
   }
 
-  function onSearchPlaces(distance?: number) {
+  function onFindPlaces(distance?: number) {
     if (!userCoords) return
 
     const options = {
@@ -68,29 +69,29 @@ function PlacesPageContainer(): JSX.Element {
     }
 
     setPrevDistance(distance)
-    searchPlaces(options)
+    findPlaces(options)
   }
 
   async function onSearchMorePlaces() {
-    if (!cursor || !searchPlacesData.fetchMore) {
+    if (!cursor || !findPlacesData.fetchMore) {
       return Promise.resolve()
     }
 
     await sleep(2000)
 
-    return searchPlacesData.fetchMore({
-      query: SEARCH_MORE_PLACES,
+    return findPlacesData.fetchMore({
+      query: FIND_MORE_PLACES,
       variables: {
         cursor,
         pathFunction: buildPath('/find-places'),
       },
       // @ts-ignore
       updateQuery: (previousResult, { fetchMoreResult }) => {
-        const previousEntry = previousResult.searchPlaces
-        const newCursor = fetchMoreResult?.searchMorePlaces?.cursor
-        const newResults = fetchMoreResult?.searchMorePlaces?.results || []
+        const previousEntry = previousResult.findPlaces
+        const newCursor = fetchMoreResult?.findMorePlaces?.cursor
+        const newResults = fetchMoreResult?.findMorePlaces?.results || []
         return {
-          searchPlaces: {
+          findPlaces: {
             cursor: newCursor,
             results: [...newResults, ...previousEntry.results],
             __typename: previousEntry.__typename,
@@ -100,7 +101,7 @@ function PlacesPageContainer(): JSX.Element {
     })
   }
 
-  const memoizedOnSearchPlaces = useCallback(onSearchPlaces, [userCoords, prevDistance])
+  const memoizedOnSearchPlaces = useCallback(onFindPlaces, [userCoords, prevDistance])
   const memoizedOnSearchMorePlaces = useCallback(onSearchMorePlaces, [cursor])
 
   useEffect(() => {

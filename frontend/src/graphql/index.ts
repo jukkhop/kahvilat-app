@@ -39,9 +39,9 @@ const placeFragment = gql`
   }
 `
 
-export const SEARCH_PLACES = gql`
+export const FIND_PLACES = gql`
   query($keyword: String, $latitude: String, $longitude: String, $pathFunction: any, $radius: Int, $type: String) {
-    searchPlaces(keyword: $keyword, latitude: $latitude, longitude: $longitude, radius: $radius, type: $type)
+    findPlaces(keyword: $keyword, latitude: $latitude, longitude: $longitude, radius: $radius, type: $type)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
       results @type(name: "Place") {
@@ -52,9 +52,9 @@ export const SEARCH_PLACES = gql`
   ${placeFragment}
 `
 
-export const SEARCH_MORE_PLACES = gql`
+export const FIND_MORE_PLACES = gql`
   query($cursor: String, $pathFunction: any) {
-    searchMorePlaces(cursor: $cursor) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+    findMorePlaces(cursor: $cursor) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
       results @type(name: "Place") {
         ...placeFragment

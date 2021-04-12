@@ -42,16 +42,16 @@ interface FindCoordsData {
   }
 }
 
-interface SearchPlacesData {
-  searchPlaces: {
+interface FindPlacesData {
+  findPlaces: {
     cursor?: string
     results: PlaceDto[]
     __typename: string
   }
-  searchMorePlaces: {
+  findMorePlaces: {
     cursor?: string
     results: PlaceDto[]
   }
 }
 
-export type { AddressDto, FindAddressData, FindCoordsData, PlaceDto, SearchPlacesData }
+export type { AddressDto, FindAddressData, FindCoordsData, FindPlacesData, PlaceDto }
