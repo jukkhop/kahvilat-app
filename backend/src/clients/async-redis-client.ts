@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import redis, { RedisClient } from 'redis'
 import { promisify } from 'util'
 
@@ -18,19 +20,19 @@ class AsyncRedisClient {
   }
 
   async get(key: string): Promise<string | null> {
-    return (await this.getPromisified(key)) || null
+    return this.getPromisified(key)
   }
 
   async set(key: string, value: string): Promise<unknown> {
-    return await this.setPromisified(key, value)
+    return this.setPromisified(key, value)
   }
 
   async expire(key: string, seconds: number): Promise<number> {
-    return await this.expirePromisified(key, seconds)
+    return this.expirePromisified(key, seconds)
   }
 
   async delete(key: string): Promise<unknown> {
-    return await this.deletePromisified(key)
+    return this.deletePromisified(key)
   }
 }
 

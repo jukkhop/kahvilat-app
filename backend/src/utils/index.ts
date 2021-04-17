@@ -3,6 +3,10 @@ import qs from 'qs'
 import Cache from '../cache'
 import { Headers } from '../types'
 
+const constants = {
+  DAY_IN_SECONDS: 86400,
+}
+
 function getCorsHeaders(): Headers {
   const { STAGE = '', FRONTEND_URL = '' } = process.env
   const origin = STAGE === 'local' ? '*' : FRONTEND_URL
@@ -30,9 +34,9 @@ async function cachedFetch(
   endpoint: string,
   params: { [key: string]: string },
   fetchFn: () => Promise<[number, any, string?]>,
-  cacheExpireSecs: number = DAY_IN_SECONDS,
+  cacheExpireSecs: number = constants.DAY_IN_SECONDS,
 ): Promise<[number, string]> {
-  const cacheKey = endpoint + '?' + qs.stringify(params, { encode: false })
+  const cacheKey = `${endpoint}?${qs.stringify(params, { encode: false })}`
   const cachedResponse = await cache.get(cacheKey)
 
   if (cachedResponse) {
@@ -63,13 +67,12 @@ function mkErrorResponse(status: number, errors: Error[]): APIGatewayProxyResult
   return mkResponse(status, JSON.stringify({ error }))
 }
 
-const DAY_IN_SECONDS = 86400
-
 export {
+  // prettier-ignore
   cachedFetch,
   checkQueryStringParameters,
+  constants,
   getCorsHeaders,
   mkErrorResponse,
   mkResponse,
-  DAY_IN_SECONDS,
 }

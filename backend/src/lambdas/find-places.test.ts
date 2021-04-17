@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
-/* eslint-disable @typescript-eslint/camelcase */
-
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import fetch from 'node-fetch'
 import redis from 'redis-mock'
 
-import { helper as handler } from './find-places'
+import { impl as handler } from './find-places'
 import Cache from '../cache'
 import AsyncRedisClient from '../clients/async-redis-client'
 import GoogleClient from '../clients/google-client'
@@ -58,8 +55,7 @@ const validBody = JSON.stringify({
 })
 
 const baseUrl = 'https://maps.googleapis.com/maps/api'
-const cacheKey =
-  'find-places?keyword=coffee&latitude=60.165324&longitude=24.939724&radius=500&type=cafe'
+const cacheKey = 'find-places?keyword=coffee&latitude=60.165324&longitude=24.939724&radius=500&type=cafe'
 
 let cache: Cache
 let googleClient: GoogleClient

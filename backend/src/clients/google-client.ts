@@ -19,7 +19,7 @@ class GoogleClient {
       language,
       latlng: `${latitude},${longitude}`,
     }
-    return await request('geocode', params)
+    return request('geocode', params)
   }
 
   async findCoordinates(address: string): Promise<[number, any, string?]> {
@@ -29,7 +29,7 @@ class GoogleClient {
       key: apiKey,
       language,
     }
-    return await request('geocode', params, true)
+    return request('geocode', params, true)
   }
 
   async findPlaces(
@@ -54,15 +54,11 @@ class GoogleClient {
           types: type,
         }
 
-    return await request('place/nearbysearch', params)
+    return request('place/nearbysearch', params)
   }
 }
 
-async function request(
-  endpoint: string,
-  params: any,
-  encodeParams = false,
-): Promise<[number, any, string?]> {
+async function request(endpoint: string, params: any, encodeParams = false): Promise<[number, any, string?]> {
   const queryString = qs.stringify(params, { encode: encodeParams })
   const url = `${BASE_URL}/${endpoint}/json?${queryString}`
 

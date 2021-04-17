@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
-
 import redis, { RedisClient } from 'redis-mock'
 import AsyncRedisClient from './async-redis-client'
 

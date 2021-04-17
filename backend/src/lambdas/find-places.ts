@@ -7,18 +7,12 @@ async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResu
   const { GOOGLE_API_KEY = '', REDIS_HOST = '', REDIS_PORT = '' } = process.env
   const cache = new Cache(REDIS_HOST, Number(REDIS_PORT))
   const client = new GoogleClient(GOOGLE_API_KEY, 'fi')
-  return await helper(event, cache, client)
+  return impl(event, cache, client)
 }
 
-async function helper(
-  event: APIGatewayProxyEvent,
-  cache: Cache,
-  client: GoogleClient,
-): Promise<APIGatewayProxyResult> {
+async function impl(event: APIGatewayProxyEvent, cache: Cache, client: GoogleClient): Promise<APIGatewayProxyResult> {
   const queryParams = (event.queryStringParameters || {}) as Record<string, string>
-  const parametersToCheck = !queryParams.cursor
-    ? ['keyword', 'latitude', 'longitude', 'radius', 'type']
-    : ['cursor']
+  const parametersToCheck = !queryParams.cursor ? ['keyword', 'latitude', 'longitude', 'radius', 'type'] : ['cursor']
   const validationErrors = checkQueryStringParameters(Object.keys(queryParams), parametersToCheck)
 
   if (validationErrors.length > 0) {
@@ -37,4 +31,4 @@ async function helper(
   return mkResponse(status, body)
 }
 
-export { handler, helper }
+export { handler, impl }

@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+
 export interface Place {
   id: number
   external_id: string

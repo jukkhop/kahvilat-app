@@ -97,14 +97,7 @@ describe('find places', () => {
     const expectedUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=some-api-key&keyword=coffee&location=some-lat,some-lng&radius=500&types=cafe`
     const expectedBody = { results: [{ name: 'some-cafeteria' }] }
     fetchFn.mockResolvedValueOnce(new Response(JSON.stringify(expectedBody), { status: 200 }))
-    const [status, body, error] = await client.findPlaces(
-      undefined,
-      'coffee',
-      'some-lat',
-      'some-lng',
-      500,
-      'cafe',
-    )
+    const [status, body, error] = await client.findPlaces(undefined, 'coffee', 'some-lat', 'some-lng', 500, 'cafe')
     expect(fetchFn).toHaveBeenCalledWith(expectedUrl)
     expect(status).toBe(200)
     expect(body).toEqual(expectedBody)

@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
-/* eslint-disable @typescript-eslint/camelcase */
-
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import fetch from 'node-fetch'
 import redis from 'redis-mock'
 
-import { helper as handler } from './find-coordinates'
+import { impl as handler } from './find-coordinates'
 import Cache from '../cache'
 import AsyncRedisClient from '../clients/async-redis-client'
 import GoogleClient from '../clients/google-client'

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
-
 import redis from 'redis-mock'
 
 import { cachedFetch } from '.'
@@ -21,6 +19,7 @@ describe('cachedFetch', () => {
   it('should return valid data', async () => {
     const expectedResult = { results: [] }
     fetchFn.mockImplementationOnce(() => Promise.resolve([200, expectedResult]))
+    // prettier-ignore
     const [status, responseJson] = await cachedFetch(
       cache,
       'some-endpoint',
