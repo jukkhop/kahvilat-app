@@ -17,17 +17,16 @@ beforeEach(() => {
 
 describe('cachedFetch', () => {
   it('should return valid data', async () => {
-    const expectedResult = { results: [] }
-    fetchFn.mockImplementationOnce(() => Promise.resolve([200, expectedResult]))
+    const expectedBody = JSON.stringify({ results: [] })
+    fetchFn.mockImplementationOnce(() => Promise.resolve([200, expectedBody]))
     // prettier-ignore
-    const [status, responseJson] = await cachedFetch(
+    const [status, responseBody] = await cachedFetch(
       cache,
       'some-endpoint',
       { arg1: 'foo', arg2: 'bar' },
       () => fetchFn(),
     )
-    const response = JSON.parse(responseJson)
     expect(status).toBe(200)
-    expect(response).toEqual(expectedResult)
+    expect(responseBody).toEqual(expectedBody)
   })
 })

@@ -6,6 +6,8 @@ import { impl as handler } from './find-places'
 import Cache from '../cache'
 import AsyncRedisClient from '../clients/async-redis-client'
 import GoogleClient from '../clients/google-client'
+import testPlace from '../fixtures/test-address'
+import { GoogleResponse, Place } from '../types'
 
 jest.mock('node-fetch', jest.fn)
 
@@ -22,38 +24,7 @@ const validEvent: APIGatewayProxyEvent = {
   },
 }
 
-const validBody = JSON.stringify({
-  results: [
-    {
-      business_status: 'OPERATIONAL',
-      geometry: {
-        location: { lat: 60.1611124, lng: 24.9417875 },
-        viewport: {
-          northeast: { lat: 60.16243152989271, lng: 24.94304767989272 },
-          southwest: { lat: 60.15973187010727, lng: 24.94034802010728 },
-        },
-      },
-      icon: 'https://maps.gstatic.com/mapfiles/place_api/icons/cafe-71.png',
-      id: '4ed1c053cd3806efbba2786cc74e20af94df9d4c',
-      name: 'Brooklyn Cafe',
-      opening_hours: { open_now: false },
-      photos: [],
-      place_id: 'ChIJgUCiJ7YLkkYRj6mOfjUbO5c',
-      plus_code: {
-        compound_code: '5W6R+CP Helsinki',
-        global_code: '9GG65W6R+CP',
-      },
-      price_level: 2,
-      rating: 4.5,
-      reference: 'ChIJgUCiJ7YLkkYRj6mOfjUbO5c',
-      scope: 'GOOGLE',
-      types: ['cafe', 'food', 'point_of_interest', 'establishment'],
-      user_ratings_total: 477,
-      vicinity: 'Fredrikinkatu 19, Helsinki',
-    },
-  ],
-})
-
+const validBody = JSON.stringify({ results: [testPlace] })
 const baseUrl = 'https://maps.googleapis.com/maps/api'
 const cacheKey = 'find-places?keyword=coffee&latitude=60.165324&longitude=24.939724&radius=500&type=cafe'
 
@@ -63,7 +34,7 @@ let fetchFn: jest.MockedFunction<typeof fetch>
 let cacheGet: jest.SpyInstance<Promise<string | undefined>, [string]>
 let cacheSet: jest.SpyInstance<Promise<void>, [string, string, (number | undefined)?]>
 let findPlaces: jest.SpyInstance<
-  Promise<[number, any, (string | undefined)?]>,
+  Promise<GoogleResponse<Place>>,
   [
     (string | undefined)?,
     (string | undefined)?,
@@ -168,9 +139,9 @@ it('should return 400 Bad Request if not given all required parameters', async (
   expect(body).toBe(expectedBody)
 })
 
-it('should return 502 Bad Gateway Error if Google API call fails with HTTP 5xx', async () => {
+it('should return 502 Bad Gateway Error if Google API call fails', async () => {
   const expectedBody = JSON.stringify({
-    error: 'Third party API call failed with HTTP status 500 and content some-error',
+    error: 'Third party API call failed with HTTP status 500 and error: some-error',
   })
   fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 500 }))
   const { statusCode, body } = await handler(validEvent, cache, googleClient)

@@ -6,6 +6,8 @@ import { impl as handler } from './find-coordinates'
 import Cache from '../cache'
 import AsyncRedisClient from '../clients/async-redis-client'
 import GoogleClient from '../clients/google-client'
+import testAddress from '../fixtures/test-address'
+import { Address, GoogleResponse } from '../types'
 
 jest.mock('node-fetch', jest.fn)
 
@@ -18,51 +20,7 @@ const validEvent: APIGatewayProxyEvent = {
   },
 }
 
-const validBody = JSON.stringify({
-  results: [
-    {
-      address_components: [
-        { long_name: '7', short_name: '7', types: ['street_number'] },
-        {
-          long_name: 'Perämiehenkatu',
-          short_name: 'Perämiehenkatu',
-          types: ['route'],
-        },
-        {
-          long_name: 'Helsinki',
-          short_name: 'HKI',
-          types: ['locality', 'political'],
-        },
-        {
-          long_name: 'Suomi',
-          short_name: 'FI',
-          types: ['country', 'political'],
-        },
-        {
-          long_name: '00150',
-          short_name: '00150',
-          types: ['postal_code'],
-        },
-      ],
-      formatted_address: 'Perämiehenkatu 7, 00150 Helsinki, Suomi',
-      geometry: {
-        location: { lat: 60.1586976, lng: 24.9348757 },
-        location_type: 'ROOFTOP',
-        viewport: {
-          northeast: { lat: 60.16004658029151, lng: 24.9362246802915 },
-          southwest: { lat: 60.15734861970849, lng: 24.9335267197085 },
-        },
-      },
-      place_id: 'ChIJ0duknbYLkkYRtYvMJcPqxmQ',
-      plus_code: {
-        compound_code: '5W5M+FX Helsinki, Suomi',
-        global_code: '9GG65W5M+FX',
-      },
-      types: ['street_address'],
-    },
-  ],
-})
-
+const validBody = JSON.stringify({ results: [testAddress] })
 const baseUrl = 'https://maps.googleapis.com/maps/api'
 const cacheKey = 'find-coordinates?address=foobar-12'
 
@@ -71,7 +29,7 @@ let googleClient: GoogleClient
 let fetchFn: jest.MockedFunction<typeof fetch>
 let cacheGet: jest.SpyInstance<Promise<string | undefined>, [string]>
 let cacheSet: jest.SpyInstance<Promise<void>, [string, string, (number | undefined)?]>
-let findCoordinates: jest.SpyInstance<Promise<[number, any, string?]>, [string]>
+let findCoordinates: jest.SpyInstance<Promise<GoogleResponse<Address>>, [string]>
 
 beforeEach(() => {
   // @ts-ignore
@@ -79,6 +37,7 @@ beforeEach(() => {
 
   cache = new Cache(undefined, undefined, redisClient)
   googleClient = new GoogleClient('some-api-key', 'some-lang')
+
   fetchFn = fetch as jest.MockedFunction<typeof fetch>
   cacheGet = jest.spyOn(Cache.prototype, 'get')
   cacheSet = jest.spyOn(Cache.prototype, 'set')
@@ -129,9 +88,9 @@ it('should return 400 Bad Request if not given all required parameters', async (
   expect(body).toBe(expectedBody)
 })
 
-it('should return 502 Bad Gateway Error if Google API call fails with HTTP 5xx', async () => {
+it('should return 502 Bad Gateway Error if Google API call fails', async () => {
   const expectedBody = JSON.stringify({
-    error: 'Third party API call failed with HTTP status 500 and content some-error',
+    error: 'Third party API call failed with HTTP status 500 and error: some-error',
   })
   fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 500 }))
   const { statusCode, body } = await handler(validEvent, cache, googleClient)

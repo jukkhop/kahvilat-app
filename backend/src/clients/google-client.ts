@@ -1,5 +1,6 @@
 import fetch, { FetchError } from 'node-fetch'
 import qs from 'qs'
+import { Address, GoogleResponse, Place } from '../types'
 
 const BASE_URL = 'https://maps.googleapis.com/maps/api'
 
@@ -12,23 +13,25 @@ class GoogleClient {
     this.language = language
   }
 
-  async findAddress(latitude: string, longitude: string): Promise<[number, any, string?]> {
+  async findAddress(latitude: string, longitude: string): Promise<GoogleResponse<Address>> {
     const { apiKey, language } = this
     const params = {
       key: apiKey,
       language,
       latlng: `${latitude},${longitude}`,
     }
+
     return request('geocode', params)
   }
 
-  async findCoordinates(address: string): Promise<[number, any, string?]> {
+  async findCoordinates(address: string): Promise<GoogleResponse<Address>> {
     const { apiKey, language } = this
     const params = {
       address,
       key: apiKey,
       language,
     }
+
     return request('geocode', params, true)
   }
 
@@ -39,7 +42,7 @@ class GoogleClient {
     longitude?: string,
     radius?: number,
     type?: string,
-  ): Promise<[number, any, string?]> {
+  ): Promise<GoogleResponse<Place>> {
     const { apiKey } = this
     const params = cursor
       ? {
@@ -58,7 +61,7 @@ class GoogleClient {
   }
 }
 
-async function request(endpoint: string, params: any, encodeParams = false): Promise<[number, any, string?]> {
+async function request<T>(endpoint: string, params: any, encodeParams = false): Promise<GoogleResponse<T>> {
   const queryString = qs.stringify(params, { encode: encodeParams })
   const url = `${BASE_URL}/${endpoint}/json?${queryString}`
 
@@ -67,23 +70,15 @@ async function request(endpoint: string, params: any, encodeParams = false): Pro
     const body = await response.json()
 
     if (response.status !== 200) {
-      return [mkErrorStatus(response.status), undefined, mkErrorMessage(response.status, body)]
+      return { state: 'error', status: response.status, error: body }
     }
 
     const { results, next_page_token: cursor = undefined } = body
-    return [200, { results, cursor }, undefined]
+    return { state: 'success', results, cursor }
   } catch (ex) {
     const err: FetchError = ex
-    return [502, undefined, `Third party API call failed with error: ${err.message}`]
+    return { state: 'error', error: err.message }
   }
 }
-
-const mkErrorStatus = (status: number): number => {
-  if (status >= 500) return 502
-  return 500
-}
-
-const mkErrorMessage = (status: number, content: string): string =>
-  `Third party API call failed with HTTP status ${status} and content ${content}`
 
 export default GoogleClient

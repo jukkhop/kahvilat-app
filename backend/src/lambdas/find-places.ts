@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import Cache from '../cache'
 import GoogleClient from '../clients/google-client'
-import { cachedFetch, checkQueryStringParameters, mkErrorResponse, mkResponse } from '../utils'
+import { cachedFetch, checkQueryStringParameters, handleGoogleResponse, mkErrorResponse, mkResponse } from '../utils'
 
 async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const { GOOGLE_API_KEY = '', REDIS_HOST = '', REDIS_PORT = '' } = process.env
@@ -24,7 +24,10 @@ async function impl(event: APIGatewayProxyEvent, cache: Cache, client: GoogleCli
     cache,
     'find-places',
     queryParams,
-    () => client.findPlaces(cursor, keyword, latitude, longitude, Number(radius), type),
+    async () => {
+      const response = await client.findPlaces(cursor, keyword, latitude, longitude, Number(radius), type)
+      return handleGoogleResponse(response)
+    },
     60,
   )
 
