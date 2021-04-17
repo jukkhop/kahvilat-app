@@ -33,11 +33,12 @@ functions:
           request:
             parameters:
               querystrings:
+                cursor: false
                 keyword: true
                 latitude: true
                 longitude: true
                 radius: true
-                types: true
+                type: true
 
   find-address:
     handler: src/lambdas/find-address.handler
