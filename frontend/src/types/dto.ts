@@ -48,10 +48,6 @@ interface FindPlacesData {
     results: PlaceDto[]
     __typename: string
   }
-  findMorePlaces: {
-    cursor?: string
-    results: PlaceDto[]
-  }
 }
 
 export type { AddressDto, FindAddressData, FindCoordsData, FindPlacesData, PlaceDto }

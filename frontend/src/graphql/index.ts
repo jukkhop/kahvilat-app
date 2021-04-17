@@ -54,7 +54,7 @@ export const FIND_PLACES = gql`
 
 export const FIND_MORE_PLACES = gql`
   query($cursor: String, $pathFunction: any) {
-    findMorePlaces(cursor: $cursor) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
+    findPlaces(cursor: $cursor) @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
       results @type(name: "Place") {
         ...placeFragment

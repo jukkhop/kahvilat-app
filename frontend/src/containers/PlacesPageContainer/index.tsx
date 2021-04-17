@@ -88,8 +88,8 @@ function PlacesPageContainer(): JSX.Element {
       // @ts-ignore
       updateQuery: (previousResult, { fetchMoreResult }) => {
         const previousEntry = previousResult.findPlaces
-        const newCursor = fetchMoreResult?.findMorePlaces?.cursor
-        const newResults = fetchMoreResult?.findMorePlaces?.results || []
+        const newCursor = fetchMoreResult?.findPlaces?.cursor
+        const newResults = fetchMoreResult?.findPlaces?.results || []
         return {
           findPlaces: {
             cursor: newCursor,
