@@ -24,8 +24,10 @@ export AWS_DEFAULT_REGION="${TF_VAR_aws_region}"
 
 source "../environment/scripts/aws-utils.sh"
 
-head -$(($(wc -l < serverless.yml) - 1)) serverless.yml > serverless-$env.yml
+yarn format
+yarn lint
 
+head -$(($(wc -l < serverless.yml) - 1)) serverless.yml > serverless-$env.yml
 redis_cluster_id="kahvilat-redis-${env}"
 
 serverless deploy \
