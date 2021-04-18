@@ -20,8 +20,8 @@ function PlacesPageContainer(): JSX.Element {
   const [findCoordinates, findCoordsData] = useLazyQuery<FindCoordsData>(FIND_COORDINATES)
   const [findPlaces, findPlacesData] = useLazyQuery<FindPlacesData>(FIND_PLACES)
 
-  const foundAddressByAddress = findAddressData.data?.findAddress.results?.[0]
-  const foundAddressByCoords = findCoordsData.data?.findCoordinates.results?.[0]
+  const foundAddressByCoords = findAddressData.data?.findAddress.results?.[0]
+  const foundAddressByAddress = findCoordsData.data?.findCoordinates.results?.[0]
   const foundPlaces = findPlacesData.data?.findPlaces.results || []
 
   const cursor = findPlacesData.data?.findPlaces.cursor
@@ -122,11 +122,11 @@ function PlacesPageContainer(): JSX.Element {
   }, [findAddress])
 
   useEffect(() => {
-    if (foundAddressByCoords) {
-      const { lat, lng } = foundAddressByCoords.geometry.location
+    if (foundAddressByAddress) {
+      const { lat, lng } = foundAddressByAddress.geometry.location
       setUserCoords({ latitude: lat, longitude: lng })
     }
-  }, [foundAddressByCoords])
+  }, [foundAddressByAddress])
 
   useEffect(() => {
     const { distance } = getValues()
@@ -161,15 +161,15 @@ function PlacesPageContainer(): JSX.Element {
 
   return (
     <PlacesPage
-      address={foundAddressByAddress?.address}
+      address={foundAddressByCoords?.address}
       coords={userCoords}
       defaultDistance={DEFAULT_DISTANCE}
+      error={error ? true : false}
       loading={loading}
       onAddressChange={onAddressChange}
       onDistanceChange={onDistanceChange}
       onSearch={handleSubmit(onFindCoordinates)}
       places={mappedPlaces}
-      searchError={error ? true : false}
     />
   )
 }

@@ -67,34 +67,34 @@ interface Props {
   address?: string
   coords?: Coords
   defaultDistance: number
+  error?: boolean
   inputErrors?: Record<string, string>
   loading: boolean
   onAddressChange: ChangeEventHandler<HTMLInputElement>
   onDistanceChange: (event: React.ChangeEvent<any>, value: number | number[]) => void
   onSearch: () => Promise<any>
   places?: Place[]
-  searchError?: boolean
 }
+
+const config = getConfig()
+
+const marks = [250, 500, 750, 1000, 1250, 1500].map(metres => ({
+  value: metres,
+  label: `${convertDistance(metres)}`,
+}))
 
 function PlacesPage(props: Props): JSX.Element {
   const {
     address,
     coords,
     defaultDistance,
+    error,
     loading,
     onAddressChange,
     onDistanceChange,
     onSearch,
     places = [],
-    searchError,
   } = props
-
-  const config = getConfig()
-
-  const marks = [250, 500, 750, 1000, 1250, 1500].map(metres => ({
-    value: metres,
-    label: `${convertDistance(metres)}`,
-  }))
 
   return (
     <Layout>
@@ -149,26 +149,26 @@ function PlacesPage(props: Props): JSX.Element {
       </ThemeProvider>
       <LoadScript googleMapsApiKey={config.google.apiKey}>
         {(() => {
+          if (!coords) {
+            return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaaksesi.</Message>
+          }
           if (loading) {
             return <Message>Ladataan...</Message>
           }
-          if (searchError) {
+          if (error) {
             return <Message>Haussa tapahtui virhe.</Message>
           }
-          if (coords && places.length > 0) {
-            return (
-              <div>
-                <PlacesMapWrapper>
-                  <PlacesMap coords={coords} places={places} />
-                </PlacesMapWrapper>
-                <PlacesGrid places={places} />
-              </div>
-            )
-          }
-          if (coords && places.length === 0) {
+          if (places.length === 0) {
             return <Message>Valitettavasti kahviloita ei löytynyt. Voit kokeilla kasvattaa etäisyyttä.</Message>
           }
-          return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaaksesi.</Message>
+          return (
+            <div>
+              <PlacesMapWrapper>
+                <PlacesMap coords={coords} places={places} />
+              </PlacesMapWrapper>
+              <PlacesGrid places={places} />
+            </div>
+          )
         })()}
       </LoadScript>
     </Layout>

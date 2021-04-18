@@ -1,6 +1,6 @@
 interface Config {
   backend: {
-    url: string
+    baseUrl: string
   }
   google: {
     apiKey: string

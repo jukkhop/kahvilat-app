@@ -23,6 +23,6 @@ yarn format
 yarn lint
 
 ENV=$env \
-REACT_APP_BACKEND_URL=${TF_VAR_backend_backend_url} \
+REACT_APP_BACKEND_BASE_URL=${TF_VAR_backend_base_url} \
 REACT_APP_GOOGLE_API_KEY=${TF_VAR_frontend_google_api_key} \
 yarn build

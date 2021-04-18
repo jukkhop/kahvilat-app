@@ -4,7 +4,7 @@ import { Config } from '../types'
 
 function getClient(config: Config): ApolloClient<NormalizedCacheObject> {
   const restLink = new RestLink({
-    uri: config.backend.url,
+    uri: config.backend.baseUrl,
     headers: {
       'Content-Type': 'application/json',
     },

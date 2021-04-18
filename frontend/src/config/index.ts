@@ -1,10 +1,10 @@
 import { Config } from '../types'
 
 function getConfig(): Config {
-  const { REACT_APP_BACKEND_URL, REACT_APP_GOOGLE_API_KEY } = process.env
+  const { REACT_APP_BACKEND_BASE_URL, REACT_APP_GOOGLE_API_KEY } = process.env
 
-  if (!REACT_APP_BACKEND_URL) {
-    throw new Error('Missing environment variable REACT_APP_BACKEND_URL')
+  if (!REACT_APP_BACKEND_BASE_URL) {
+    throw new Error('Missing environment variable REACT_APP_BACKEND_BASE_URL')
   }
 
   if (!REACT_APP_GOOGLE_API_KEY) {
@@ -13,7 +13,7 @@ function getConfig(): Config {
 
   return {
     backend: {
-      url: REACT_APP_BACKEND_URL,
+      baseUrl: REACT_APP_BACKEND_BASE_URL,
     },
     google: {
       apiKey: REACT_APP_GOOGLE_API_KEY,
