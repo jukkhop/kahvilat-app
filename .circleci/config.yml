@@ -57,6 +57,7 @@ jobs:
               echo "No changes to frontend code, skipping job."
               circleci step halt
             fi
+      - aws-cli/setup
       - attach_workspace:
           at: ~/repo/frontend
       - restore_cache:
