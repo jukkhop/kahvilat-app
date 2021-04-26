@@ -8,6 +8,7 @@ import { useLazyQuery } from '@apollo/react-hooks'
 import PlacesPage from '../../components/PlacesPage'
 import { DEFAULT_DISTANCE } from '../../constants'
 import { FIND_ADDRESS, FIND_COORDINATES, FIND_PLACES, FIND_MORE_PLACES, buildPath } from '../../graphql'
+import { useGeoLocation } from '../../hooks'
 import { Coords, FindAddressData, FindCoordsData, FindPlacesData, FormValues, PlaceDto } from '../../types/'
 import { mapPlace, sleep, sortPlaces } from '../../utils'
 
@@ -19,6 +20,7 @@ function PlacesPageContainer(): JSX.Element {
   const [findAddress, findAddressData] = useLazyQuery<FindAddressData>(FIND_ADDRESS)
   const [findCoordinates, findCoordsData] = useLazyQuery<FindCoordsData>(FIND_COORDINATES)
   const [findPlaces, findPlacesData] = useLazyQuery<FindPlacesData>(FIND_PLACES)
+  const geoLocation = useGeoLocation()
 
   const foundAddressByCoords = findAddressData.data?.findAddress.results?.[0]
   const foundAddressByAddress = findCoordsData.data?.findCoordinates.results?.[0]
@@ -105,21 +107,17 @@ function PlacesPageContainer(): JSX.Element {
   const memoizedOnSearchMorePlaces = useCallback(onSearchMorePlaces, [cursor])
 
   useEffect(() => {
-    if (!navigator.geolocation) return
-
-    navigator.geolocation.getCurrentPosition(position => {
-      const { latitude, longitude } = position.coords
-      const options = {
-        variables: {
-          latitude,
-          longitude,
-          pathFunction: buildPath('/find-address'),
-        },
-      }
-      setUserCoords({ latitude: latitude.toString(), longitude: longitude.toString() })
-      findAddress(options)
-    })
-  }, [findAddress])
+    if (!geoLocation) return
+    const options = {
+      variables: {
+        latitude: geoLocation.latitude,
+        longitude: geoLocation.longitude,
+        pathFunction: buildPath('/find-address'),
+      },
+    }
+    setUserCoords(geoLocation)
+    findAddress(options)
+  }, [geoLocation])
 
   useEffect(() => {
     if (foundAddressByAddress) {
