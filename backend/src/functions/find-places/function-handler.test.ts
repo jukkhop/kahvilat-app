@@ -41,7 +41,9 @@ beforeEach(() => {
 
   handler = new FunctionHandler(cache, client)
   cacheFn = jest.spyOn(GoogleCache.prototype, 'findPlaces')
+})
 
+afterEach(() => {
   redisFn.mockClear()
   clientFn.mockClear()
 })

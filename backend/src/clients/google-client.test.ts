@@ -42,6 +42,9 @@ let fetchFn: jest.MockedFunction<typeof fetch>
 beforeEach(() => {
   client = new GoogleClient(testConfig)
   fetchFn = fetch as jest.MockedFunction<typeof fetch>
+})
+
+afterEach(() => {
   fetchFn.mockClear()
 })
 

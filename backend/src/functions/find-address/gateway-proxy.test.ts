@@ -68,8 +68,11 @@ const handler = new FunctionHandler(undefined, undefined)
 let proxy: GatewayProxy
 
 beforeEach(() => {
-  handleFn.mockClear()
   proxy = new GatewayProxy(testConfig, handler)
+})
+
+afterEach(() => {
+  handleFn.mockClear()
 })
 
 it('returns HTTP 400 with error for missing query string parameters', async () => {

@@ -15,6 +15,10 @@ beforeEach(() => {
   asyncClient = new AsyncRedisClient('some-host', 1000, client)
 })
 
+afterEach(async () => {
+  await client.del('some-key')
+})
+
 it('should cache a given value, and return it', async () => {
   await asyncClient.set('some-key', 'some-value')
   const valueFromCache = await asyncClient.get('some-key')
@@ -23,8 +27,8 @@ it('should cache a given value, and return it', async () => {
 })
 
 it('should return null when given a key that has not been set', async () => {
-  const valueFromCache = await asyncClient.get('non-existing-key')
-  expect(client.get).toHaveBeenCalledWith('non-existing-key', expect.any(Function))
+  const valueFromCache = await asyncClient.get('some-key')
+  expect(client.get).toHaveBeenCalledWith('some-key', expect.any(Function))
   expect(valueFromCache).toBeNull()
 })
 

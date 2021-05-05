@@ -20,7 +20,9 @@ jest.mock('../clients', () => ({
 beforeEach(() => {
   client = new AsyncRedisClient()
   cache = new GoogleCache(testConfig, client)
+})
 
+afterEach(() => {
   redisGetFn.mockClear()
   redisSetFn.mockClear()
   fetchFn.mockClear()
