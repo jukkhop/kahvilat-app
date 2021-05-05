@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 
 import GatewayProxyBase from './gateway-proxy-base'
 import { testConfig } from '../fixtures'
-import { ValidationErrorResult, ValidationSuccessResult } from '../types'
+import { ValidationErrorResult, ValidationSchema, ValidationSuccessResult } from '../types'
 
 let proxy: GatewayProxyBase
 
@@ -20,13 +20,13 @@ describe('validate', () => {
       },
     }
 
-    const expectedParams = ['foo', 'bar']
-    const validationResult = proxy.validate(validEvent, expectedParams) as ValidationSuccessResult
+    const schema = { foo: 'string', bar: 'string' } as ValidationSchema
+    const { state } = proxy.validate(validEvent, schema) as ValidationSuccessResult
 
-    expect(validationResult.state).toBe('success')
+    expect(state).toBe('success')
   })
 
-  it('rejects an event with invalid query string parameters', async () => {
+  it('rejects an event with missing query string parameters', async () => {
     // @ts-ignore
     const invalidEvent: APIGatewayProxyEvent = {
       queryStringParameters: {
@@ -35,13 +35,30 @@ describe('validate', () => {
       },
     }
 
-    const expectedParams = ['foo', 'bar']
-    const { response } = proxy.validate(invalidEvent, expectedParams) as ValidationErrorResult
+    const schema = { foo: 'string', bar: 'string' } as ValidationSchema
+    const { response } = proxy.validate(invalidEvent, schema) as ValidationErrorResult
 
     expect(response.statusCode).toEqual(400)
     expect(response.body).toEqual(
       '{"error":"Missing query string parameter: foo, Missing query string parameter: bar"}',
     )
+  })
+
+  it('rejects an event with invalid query string parameters', async () => {
+    // @ts-ignore
+    const invalidEvent: APIGatewayProxyEvent = {
+      queryStringParameters: {
+        foo: 'value',
+      },
+    }
+
+    const schema = { foo: 'number' } as ValidationSchema
+    const result = proxy.validate(invalidEvent, schema) as ValidationErrorResult
+    expect(result.state).toEqual('error')
+
+    const { response } = result
+    expect(response.statusCode).toEqual(400)
+    expect(response.body).toEqual('{"error":"Invalid type for query string parameter: foo"}')
   })
 })
 

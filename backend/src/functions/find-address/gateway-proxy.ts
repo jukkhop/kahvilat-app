@@ -1,7 +1,7 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { APIGatewayProxyEvent, APIGatewayProxyEventQueryStringParameters, APIGatewayProxyResult } from 'aws-lambda'
 
 import { FunctionHandlerBase, GatewayProxyBase } from '../../bases'
-import { FindAddressParams, Config } from '../../types'
+import { FindAddressParams, Config, ValidationSchema } from '../../types'
 
 class GatewayProxy extends GatewayProxyBase {
   private handler: FunctionHandlerBase
@@ -13,8 +13,7 @@ class GatewayProxy extends GatewayProxyBase {
 
   async process(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
     const queryParams = event.queryStringParameters || {}
-    const expectedParams = queryParams.address ? ['address'] : ['latitude', 'longitude']
-    const validationResult = this.validate(event, expectedParams)
+    const validationResult = this.validate(event, GatewayProxy.schema(queryParams))
 
     if (validationResult.state === 'error') {
       return validationResult.response
@@ -26,6 +25,13 @@ class GatewayProxy extends GatewayProxyBase {
     return this.handler
       .handle(fnParams)
       .then(result => this.convert(result))
+  }
+
+  private static schema(queryParams: APIGatewayProxyEventQueryStringParameters): ValidationSchema {
+    // prettier-ignore
+    return queryParams.address
+      ? { 'address': 'string' }
+      : { 'latitude': 'number', 'longitude': 'number' }
   }
 }
 

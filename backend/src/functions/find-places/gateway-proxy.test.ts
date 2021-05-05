@@ -17,10 +17,21 @@ const validEvent: APIGatewayProxyEvent = {
 }
 
 // @ts-ignore
-const invalidEvent: APIGatewayProxyEvent = {
+const invalidEvent1: APIGatewayProxyEvent = {
   queryStringParameters: {
     foo: 'coffee',
     bar: '60.165324',
+    longitude: '24.939724',
+    radius: '500',
+    type: 'cafe',
+  },
+}
+
+// @ts-ignore
+const invalidEvent2: APIGatewayProxyEvent = {
+  queryStringParameters: {
+    keyword: 'coffee',
+    latitude: 'foobar',
     longitude: '24.939724',
     radius: '500',
     type: 'cafe',
@@ -55,10 +66,16 @@ beforeEach(() => {
   proxy = new GatewayProxy(testConfig, handler)
 })
 
-it('returns HTTP 400 with error for invalid query string parameters', async () => {
-  const { statusCode, body } = await proxy.process(invalidEvent)
+it('returns HTTP 400 with error for missing query string parameters', async () => {
+  const { statusCode, body } = await proxy.process(invalidEvent1)
   expect(statusCode).toEqual(400)
   expect(body).toEqual('{"error":"Missing query string parameter: keyword, Missing query string parameter: latitude"}')
+})
+
+it('returns HTTP 400 with error for invalid query string parameters', async () => {
+  const { statusCode, body } = await proxy.process(invalidEvent2)
+  expect(statusCode).toEqual(400)
+  expect(body).toEqual('{"error":"Invalid type for query string parameter: latitude"}')
 })
 
 it('returns HTTP 200 with data when the function is handled successfully', async () => {

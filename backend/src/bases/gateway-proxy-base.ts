@@ -1,5 +1,7 @@
+/* eslint-disable class-methods-use-this */
+
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { Config, FunctionResult, Headers, ValidationResult } from '../types'
+import { Config, FunctionResult, Headers, ValidationResult, ValidationSchema } from '../types'
 
 class GatewayProxyBase {
   protected config: Config
@@ -8,12 +10,32 @@ class GatewayProxyBase {
     this.config = config
   }
 
-  validate(event: APIGatewayProxyEvent, expectedParams: string[]): ValidationResult {
-    const queryParams = (event.queryStringParameters || {}) as Record<string, string>
+  validate(event: APIGatewayProxyEvent, schema: ValidationSchema): ValidationResult {
+    const queryParams = (event.queryStringParameters || {}) as Record<string, string | undefined>
 
-    const errors = expectedParams
-      .filter(x => !Object.keys(queryParams).includes(x))
-      .map(x => new Error(`Missing query string parameter: ${x}`))
+    const missingErrors = Object.keys(schema)
+      .filter(key => !Object.keys(queryParams).includes(key))
+      .map(key => new Error(`Missing query string parameter: ${key}`))
+
+    const typeErrors = Object.entries(schema)
+      .filter(([key, type]) => {
+        const value = queryParams[key]
+        if (value === undefined) return true
+        switch (type) {
+          case 'string':
+            return typeof value !== 'string'
+          case 'number':
+            return Number.isNaN(parseFloat(value))
+          default:
+            return true
+        }
+      })
+      // eslint-disable-next-line no-unused-vars
+      .map(([key, _]) => {
+        return new Error(`Invalid type for query string parameter: ${key}`)
+      })
+
+    const errors = missingErrors.length > 0 ? missingErrors : missingErrors.concat(typeErrors)
 
     switch (errors.length) {
       case 0:

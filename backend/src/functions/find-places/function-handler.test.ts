@@ -8,8 +8,8 @@ import { FindPlacesParams, GoogleResponse, Place } from '../../types'
 
 const fnParams: FindPlacesParams = {
   keyword: 'coffee',
-  latitude: '60.165324',
-  longitude: '24.939724',
+  latitude: 60.1653,
+  longitude: 24.9397,
   radius: 500,
   type: 'cafe',
 }

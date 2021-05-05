@@ -11,4 +11,7 @@ type ValidationErrorResult = {
   response: APIGatewayProxyResult
 }
 
-export type { ValidationResult, ValidationSuccessResult, ValidationErrorResult }
+type ValidationTypes = 'string' | 'number'
+type ValidationSchema = Record<string, ValidationTypes>
+
+export type { ValidationErrorResult, ValidationResult, ValidationSchema, ValidationSuccessResult }

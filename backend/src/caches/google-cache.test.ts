@@ -17,7 +17,7 @@ beforeEach(() => {
 
 describe('findAddress', () => {
   const fnParams1 = { address: 'Mannerheimintie 1' }
-  const fnParams2 = { latitude: '60.165324', longitude: '24.939724' }
+  const fnParams2 = { latitude: 60.1653, longitude: 24.9397 }
   const { address } = fnParams1
   const { latitude, longitude } = fnParams2
   const cacheKey1 = `find-address?address=${address}`
@@ -70,7 +70,7 @@ describe('findAddress', () => {
 })
 
 describe('findPlaces', () => {
-  const fnParams1 = { keyword: 'coffee', latitude: '60.1653', longitude: '24.9397', radius: 500, type: 'cafe' }
+  const fnParams1 = { keyword: 'coffee', latitude: 60.1653, longitude: 24.9397, radius: 500, type: 'cafe' }
   const fnParams2 = { cursor: 'some-cursor' }
   const { keyword, latitude, longitude, radius, type } = fnParams1
   const { cursor } = fnParams2

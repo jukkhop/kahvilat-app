@@ -16,8 +16,8 @@ const { Response, FetchError } = jest.requireActual('node-fetch')
 jest.mock('node-fetch', jest.fn)
 
 const findAddressParams1: FindAddressParams = {
-  latitude: 'some-lat',
-  longitude: 'some-lng',
+  latitude: 60.1,
+  longitude: 24.9,
 }
 
 const findAddressParams2: FindAddressParams = {
@@ -26,8 +26,8 @@ const findAddressParams2: FindAddressParams = {
 
 const findPlacesParams: FindPlacesParams = {
   keyword: 'coffee',
-  latitude: 'some-lat',
-  longitude: 'some-lng',
+  latitude: 60.1,
+  longitude: 24.9,
   radius: 500,
   type: 'cafe',
 }
@@ -47,7 +47,7 @@ beforeEach(() => {
 
 describe('findAddress', () => {
   it('calls Google API and returns valid data (using coordinates)', async () => {
-    const expectedUrl = `https://maps.googleapis.com/maps/api/geocode/json?key=some-api-key&language=some-lang&latlng=some-lat,some-lng`
+    const expectedUrl = `https://maps.googleapis.com/maps/api/geocode/json?key=some-api-key&language=some-lang&latlng=60.1,24.9`
     const expectedBody = { results: [testAddress] }
     fetchFn.mockResolvedValueOnce(new Response(JSON.stringify(expectedBody), { status: 200 }))
     const response = (await client.findAddress(findAddressParams1)) as GoogleSuccessResponse<Address>
@@ -83,7 +83,7 @@ describe('findAddress', () => {
 
 describe('findPlaces', () => {
   it('calls Google API and returns valid data', async () => {
-    const expectedUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=some-api-key&keyword=coffee&location=some-lat,some-lng&radius=500&types=cafe`
+    const expectedUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=some-api-key&keyword=coffee&location=60.1,24.9&radius=500&types=cafe`
     const expectedBody = { results: [testPlace], next_page_token: 'some-cursor' }
     fetchFn.mockResolvedValueOnce(new Response(JSON.stringify(expectedBody), { status: 200 }))
     const response = (await client.findPlaces(findPlacesParams)) as GoogleSuccessResponse<Place>

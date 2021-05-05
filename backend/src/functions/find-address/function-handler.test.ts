@@ -4,7 +4,7 @@ import { AsyncRedisClient, GoogleClient } from '../../clients'
 import { testAddress, testConfig } from '../../fixtures'
 import { Address, FindAddressParams, GoogleResponse } from '../../types'
 
-const fnParams: FindAddressParams = { latitude: '60.165324', longitude: '24.939724' }
+const fnParams: FindAddressParams = { latitude: 60.1653, longitude: 24.9397 }
 const successResponse: GoogleResponse<Address> = { state: 'success', results: [testAddress] }
 const errorResponse: GoogleResponse<Address> = { state: 'error', error: 'Something failed' }
 

@@ -62,11 +62,11 @@ type PlusCode = {
 // prettier-ignore
 type FindAddressParams =
   | { address: string }
-  | { latitude: string; longitude: string }
+  | { latitude: number; longitude: number }
 
 type FindPlacesParams =
   | { cursor: string }
-  | { keyword: string; latitude: string; longitude: string; radius: number; type: string }
+  | { keyword: string; latitude: number; longitude: number; radius: number; type: string }
 
 export type {
   Address,
