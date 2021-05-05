@@ -12,7 +12,6 @@ beforeEach(() => {
   jest.spyOn(client, 'del')
   jest.spyOn(client, 'expire')
 
-  // @ts-ignore
   asyncClient = new AsyncRedisClient('some-host', 1000, client)
 })
 

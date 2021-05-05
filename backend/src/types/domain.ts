@@ -59,4 +59,23 @@ type PlusCode = {
   global_code: string
 }
 
-export type { Address, AddressComponent, Geometry, Headers, LatLng, Place, PlusCode }
+// prettier-ignore
+type FindAddressParams =
+  | { address: string }
+  | { latitude: string; longitude: string }
+
+type FindPlacesParams =
+  | { cursor: string }
+  | { keyword: string; latitude: string; longitude: string; radius: number; type: string }
+
+export type {
+  Address,
+  AddressComponent,
+  FindAddressParams,
+  FindPlacesParams,
+  Geometry,
+  Headers,
+  LatLng,
+  Place,
+  PlusCode,
+}

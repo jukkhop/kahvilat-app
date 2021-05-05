@@ -1,7 +1,7 @@
 import AsyncRedisClient from '../clients/async-redis-client'
-import { DAY_IN_SECONDS } from '../utils'
+import { DAY_IN_SECONDS } from '../constants'
 
-class Cache {
+class CacheBase {
   private client: AsyncRedisClient
 
   constructor(host?: string, port?: number, client?: AsyncRedisClient) {
@@ -22,4 +22,4 @@ class Cache {
   }
 }
 
-export default Cache
+export default CacheBase

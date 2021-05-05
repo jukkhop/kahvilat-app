@@ -1,5 +1,5 @@
 import redis from 'redis-mock'
-import Cache from '.'
+import Cache from './cache-base'
 import AsyncRedisClient from '../clients/async-redis-client'
 
 let cache: Cache
@@ -9,7 +9,6 @@ let expireStub: jest.SpyInstance<Promise<number>, [string, number]>
 let deleteStub: jest.SpyInstance<Promise<unknown>, [string]>
 
 beforeEach(() => {
-  // @ts-ignore
   const client = new AsyncRedisClient(undefined, undefined, redis.createClient())
 
   cache = new Cache(undefined, undefined, client)

@@ -34,6 +34,8 @@ serverless deploy \
   --config serverless-$env.yml \
   --frontend-url "https://${TF_VAR_app_subdomain_name}" \
   --google-api-key ${TF_VAR_backend_google_api_key} \
+  --google-base-url ${TF_VAR_backend_google_base_url} \
+  --google-language ${TF_VAR_backend_google_language} \
   --redis-cluster-id ${redis_cluster_id} \
   --redis-host "$(get_redis_endpoint_address $redis_cluster_id)" \
   --redis-port "$(get_redis_endpoint_port $redis_cluster_id)" \

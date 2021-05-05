@@ -8,6 +8,8 @@ provider:
   environment:
     FRONTEND_URL: ${opt:frontend-url, 'http://localhost:3000'}
     GOOGLE_API_KEY: ${opt:google-api-key, ''}
+    GOOGLE_BASE_URL: ${opt:google-base-url, 'https://maps.googleapis.com/maps/api'}
+    GOOGLE_LANGUAGE: ${opt:google-language, 'fi'}
     REDIS_HOST: ${opt:redis-host, 'localhost'}
     REDIS_PORT: ${opt:redis-port, '6380'}
     STAGE: ${self:provider.stage}
@@ -16,8 +18,29 @@ package:
   excludeDevDependencies: false
 
 functions:
+  find-address:
+    handler: src/functions/find-address/main.invoke
+    vpc:
+      securityGroupIds:
+        - Fn::GetAtt:
+          - ServerlessSecurityGroup
+          - GroupId
+      subnetIds:
+        - Ref: PrivateSubnetA
+    events:
+      - http:
+          path: /find-address
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                address: false
+                latitude: false
+                longitude: false
+
   find-places:
-    handler: src/lambdas/find-places.handler
+    handler: src/functions/find-places/main.invoke
     vpc:
       securityGroupIds:
         - Fn::GetAtt:
@@ -34,50 +57,11 @@ functions:
             parameters:
               querystrings:
                 cursor: false
-                keyword: true
-                latitude: true
-                longitude: true
-                radius: true
-                type: true
-
-  find-address:
-    handler: src/lambdas/find-address.handler
-    vpc:
-      securityGroupIds:
-        - Fn::GetAtt:
-          - ServerlessSecurityGroup
-          - GroupId
-      subnetIds:
-        - Ref: PrivateSubnetA
-    events:
-      - http:
-          path: /find-address
-          method: get
-          cors: true
-          request:
-            parameters:
-              querystrings:
-                latitude: true
-                longitude: true
-
-  find-coordinates:
-    handler: src/lambdas/find-coordinates.handler
-    vpc:
-      securityGroupIds:
-        - Fn::GetAtt:
-          - ServerlessSecurityGroup
-          - GroupId
-      subnetIds:
-        - Ref: PrivateSubnetA
-    events:
-      - http:
-          path: /find-coordinates
-          method: get
-          cors: true
-          request:
-            parameters:
-              querystrings:
-                address: true
+                keyword: false
+                latitude: false
+                longitude: false
+                radius: false
+                type: false
 
 resources:
   Resources:
@@ -214,7 +198,7 @@ resources:
       Type: AWS::ElastiCache::CacheCluster
       Properties:
         AutoMinorVersionUpgrade: true
-        ClusterName: ${opt:redis-cluster-id}
+        ClusterName: ${opt:redis-cluster-id, ''}
         Engine: redis
         CacheNodeType: ${self:custom.config.CACHE_INSTANCE_SIZE}
         NumCacheNodes: 1

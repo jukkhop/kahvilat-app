@@ -1,83 +1,88 @@
 import fetch, { FetchError } from 'node-fetch'
 import qs from 'qs'
-import { Address, GoogleResponse, Place } from '../types'
-
-const BASE_URL = 'https://maps.googleapis.com/maps/api'
+import { Address, Config, GoogleResponse, FindAddressParams, FindPlacesParams, Place } from '../types'
 
 class GoogleClient {
   private apiKey: string
+  private baseUrl: string
   private language: string
 
-  constructor(apiKey: string, language: string) {
-    this.apiKey = apiKey
-    this.language = language
+  constructor(config: Config) {
+    this.apiKey = config.google.apiKey
+    this.baseUrl = config.google.baseUrl
+    this.language = config.google.language
   }
 
-  async findAddress(latitude: string, longitude: string): Promise<GoogleResponse<Address>> {
-    const { apiKey, language } = this
-    const params = {
-      key: apiKey,
-      language,
-      latlng: `${latitude},${longitude}`,
-    }
-
-    return request('geocode', params)
-  }
-
-  async findCoordinates(address: string): Promise<GoogleResponse<Address>> {
-    const { apiKey, language } = this
-    const params = {
-      address,
-      key: apiKey,
-      language,
-    }
-
-    return request('geocode', params, true)
-  }
-
-  async findPlaces(
-    cursor?: string,
-    keyword?: string,
-    latitude?: string,
-    longitude?: string,
-    radius?: number,
-    type?: string,
-  ): Promise<GoogleResponse<Place>> {
-    const { apiKey } = this
-    const params = cursor
-      ? {
-          key: apiKey,
-          pagetoken: cursor,
+  async findAddress(params: FindAddressParams): Promise<GoogleResponse<Address>> {
+    const queryParams = () => {
+      if ('address' in params) {
+        return {
+          address: params.address,
+          key: this.apiKey,
+          language: this.language,
         }
-      : {
-          key: apiKey,
-          keyword,
-          location: `${latitude},${longitude}`,
-          radius,
-          types: type,
+      }
+
+      if ('latitude' in params) {
+        return {
+          key: this.apiKey,
+          language: this.language,
+          latlng: `${params.latitude},${params.longitude}`,
         }
+      }
 
-    return request('place/nearbysearch', params)
-  }
-}
-
-async function request<T>(endpoint: string, params: any, encodeParams = false): Promise<GoogleResponse<T>> {
-  const queryString = qs.stringify(params, { encode: encodeParams })
-  const url = `${BASE_URL}/${endpoint}/json?${queryString}`
-
-  try {
-    const response = await fetch(url)
-    const body = await response.json()
-
-    if (response.status !== 200) {
-      return { state: 'error', status: response.status, error: body }
+      return {}
     }
 
-    const { results, next_page_token: cursor = undefined } = body
-    return { state: 'success', results, cursor }
-  } catch (ex) {
-    const err: FetchError = ex
-    return { state: 'error', error: err.message }
+    const encodeParams = () => {
+      if ('address' in params) return true
+      if ('latitude' in params) return false
+      return false
+    }
+
+    return this.request('geocode', queryParams(), encodeParams())
+  }
+
+  async findPlaces(params: FindPlacesParams): Promise<GoogleResponse<Place>> {
+    const queryParams = () => {
+      if ('cursor' in params) {
+        return { key: this.apiKey, pagetoken: params.cursor }
+      }
+
+      if ('keyword' in params) {
+        return {
+          key: this.apiKey,
+          keyword: params.keyword,
+          location: `${params.latitude},${params.longitude}`,
+          radius: params.radius,
+          types: params.type,
+        }
+      }
+
+      return {}
+    }
+
+    return this.request('place/nearbysearch', queryParams())
+  }
+
+  async request<T>(endpoint: string, queryParams: any, encodeParams = false): Promise<GoogleResponse<T>> {
+    const queryString = qs.stringify(queryParams, { encode: encodeParams })
+    const url = `${this.baseUrl}/${endpoint}/json?${queryString}`
+
+    try {
+      const response = await fetch(url)
+      const body = await response.json()
+
+      if (response.status !== 200) {
+        return { state: 'error', status: response.status, error: body }
+      }
+
+      const { results, next_page_token: cursor = undefined } = body
+      return { state: 'success', results, cursor }
+    } catch (ex) {
+      const err: FetchError = ex
+      return { state: 'error', error: err.message }
+    }
   }
 }
 
