@@ -48,15 +48,13 @@ describe('validate', () => {
     // @ts-ignore
     const invalidEvent: APIGatewayProxyEvent = {
       queryStringParameters: {
-        foo: 'value',
+        foo: 'not-a-number',
       },
     }
 
     const schema = { foo: 'number' } as ValidationSchema
-    const result = proxy.validate(invalidEvent, schema) as ValidationErrorResult
-    expect(result.state).toEqual('error')
+    const { response } = proxy.validate(invalidEvent, schema) as ValidationErrorResult
 
-    const { response } = result
     expect(response.statusCode).toEqual(400)
     expect(response.body).toEqual('{"error":"Invalid type for query string parameter: foo"}')
   })

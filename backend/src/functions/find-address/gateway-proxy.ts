@@ -19,7 +19,12 @@ class GatewayProxy extends GatewayProxyBase {
       return validationResult.response
     }
 
-    const fnParams = (event.queryStringParameters || {}) as FindAddressParams
+    const { address, latitude, longitude } = queryParams as Record<string, string>
+
+    // prettier-ignore
+    const fnParams: FindAddressParams = queryParams.address
+      ? { address }
+      : { latitude: Number(latitude), longitude: Number(longitude) }
 
     // prettier-ignore
     return this.handler

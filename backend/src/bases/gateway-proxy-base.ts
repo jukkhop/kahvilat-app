@@ -11,7 +11,7 @@ class GatewayProxyBase {
   }
 
   validate(event: APIGatewayProxyEvent, schema: ValidationSchema): ValidationResult {
-    const queryParams = (event.queryStringParameters || {}) as Record<string, string | undefined>
+    const queryParams = event.queryStringParameters || {}
 
     const missingErrors = Object.keys(schema)
       .filter(key => !Object.keys(queryParams).includes(key))

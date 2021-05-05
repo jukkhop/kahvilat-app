@@ -3,38 +3,44 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 import FunctionHandler from './function-handler'
 import GatewayProxy from './gateway-proxy'
 import { testConfig, testPlace } from '../../fixtures'
-import { FunctionResult, GoogleResponse, Place } from '../../types'
+import { FindPlacesParams, FunctionResult, GoogleResponse, Place } from '../../types'
+
+const fnParams: FindPlacesParams = {
+  keyword: 'coffee',
+  latitude: 60.16,
+  longitude: 24.93,
+  radius: 500,
+  type: 'cafe',
+}
 
 // @ts-ignore
 const validEvent: APIGatewayProxyEvent = {
   queryStringParameters: {
-    keyword: 'coffee',
-    latitude: '60.165324',
-    longitude: '24.939724',
-    radius: '500',
-    type: 'cafe',
+    keyword: fnParams.keyword,
+    latitude: fnParams.latitude.toString(),
+    longitude: fnParams.longitude.toString(),
+    radius: fnParams.radius.toString(),
+    type: fnParams.type,
   },
 }
 
 // @ts-ignore
 const invalidEvent1: APIGatewayProxyEvent = {
   queryStringParameters: {
-    foo: 'coffee',
-    bar: '60.165324',
-    longitude: '24.939724',
-    radius: '500',
-    type: 'cafe',
+    longitude: fnParams.longitude.toString(),
+    radius: fnParams.radius.toString(),
+    type: fnParams.type,
   },
 }
 
 // @ts-ignore
 const invalidEvent2: APIGatewayProxyEvent = {
   queryStringParameters: {
-    keyword: 'coffee',
-    latitude: 'foobar',
-    longitude: '24.939724',
-    radius: '500',
-    type: 'cafe',
+    keyword: fnParams.keyword,
+    latitude: 'not-a-number',
+    longitude: fnParams.longitude.toString(),
+    radius: fnParams.radius.toString(),
+    type: fnParams.type,
   },
 }
 
@@ -83,6 +89,7 @@ it('returns HTTP 200 with data when the function is handled successfully', async
   const { statusCode, body } = await proxy.process(validEvent)
   expect(statusCode).toEqual(200)
   expect(JSON.parse(body)).toEqual(successResult.data)
+  expect(handleFn).toHaveBeenCalledWith(fnParams)
 })
 
 it('returns HTTP 502 with error when the function is not handled successfully', async () => {
@@ -90,4 +97,5 @@ it('returns HTTP 502 with error when the function is not handled successfully', 
   const { statusCode, body } = await proxy.process(validEvent)
   expect(statusCode).toEqual(502)
   expect(body).toEqual('{"error":"Something failed"}')
+  expect(handleFn).toHaveBeenCalledWith(fnParams)
 })
