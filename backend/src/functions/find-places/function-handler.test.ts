@@ -47,14 +47,13 @@ beforeEach(() => {
 })
 
 it('should fetch data and return a successful result', async () => {
-  redisFn.mockResolvedValueOnce(undefined)
   clientFn.mockResolvedValueOnce(successResponse)
 
   const result = await handler.handle(fnParams)
 
   expect(result).toEqual({ state: 'success', data: successResponse })
   expect(cacheFn).toHaveBeenCalledWith(fnParams, expect.any(Function))
-  expect(cacheFn).toHaveReturnedWith(Promise.resolve(undefined))
+  expect(cacheFn).toHaveReturnedWith(Promise.resolve(successResponse))
   expect(clientFn).toHaveBeenCalledWith(fnParams)
 })
 
@@ -70,7 +69,6 @@ it('should return a cached response, if present', async () => {
 })
 
 it('should return an error result if data cannot be fetched', async () => {
-  redisFn.mockResolvedValueOnce(undefined)
   clientFn.mockResolvedValueOnce(errorResponse)
 
   const result = await handler.handle(fnParams)
@@ -82,9 +80,12 @@ it('should return an error result if data cannot be fetched', async () => {
 })
 
 it('should return the cursor string from the Google Client response', async () => {
-  const cursorResponse: GoogleResponse<Place> = { state: 'success', results: [testPlace], cursor: 'foo' }
+  const cursorResponse: GoogleResponse<Place> = {
+    state: 'success',
+    results: [testPlace],
+    cursor: 'foo',
+  }
 
-  redisFn.mockResolvedValueOnce(undefined)
   clientFn.mockResolvedValueOnce(cursorResponse)
 
   const result = await handler.handle(fnParams)
@@ -92,7 +93,6 @@ it('should return the cursor string from the Google Client response', async () =
 })
 
 it('should call Google Client with the cursor string, if given', async () => {
-  redisFn.mockResolvedValueOnce(undefined)
   clientFn.mockResolvedValueOnce(successResponse)
 
   const cursorParams = { cursor: 'foo' }

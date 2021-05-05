@@ -38,14 +38,13 @@ beforeEach(() => {
 })
 
 it('should fetch data and return a successful result', async () => {
-  redisFn.mockResolvedValueOnce(undefined)
   clientFn.mockResolvedValueOnce(successResponse)
 
   const result = await handler.handle(fnParams)
 
   expect(result).toEqual({ state: 'success', data: successResponse })
   expect(cacheFn).toHaveBeenCalledWith(fnParams, expect.any(Function))
-  expect(cacheFn).toHaveReturnedWith(Promise.resolve(undefined))
+  expect(cacheFn).toHaveReturnedWith(Promise.resolve(successResponse))
   expect(clientFn).toHaveBeenCalledWith(fnParams)
 })
 
@@ -61,7 +60,6 @@ it('should return a cached response, if present', async () => {
 })
 
 it('should return an error result if data cannot be fetched', async () => {
-  redisFn.mockResolvedValueOnce(undefined)
   clientFn.mockResolvedValueOnce(errorResponse)
 
   const result = await handler.handle(fnParams)
@@ -70,8 +68,4 @@ it('should return an error result if data cannot be fetched', async () => {
     state: 'error',
     errors: [new Error('Third party API call failed with error: Something failed')],
   })
-
-  expect(cacheFn).toHaveBeenCalledWith(fnParams, expect.any(Function))
-  expect(cacheFn).toHaveReturnedWith(Promise.resolve(undefined))
-  expect(clientFn).toHaveBeenCalledWith(fnParams)
 })
