@@ -1,17 +1,28 @@
-import redis from 'redis-mock'
-
 import GoogleCache from './google-cache'
 import { AsyncRedisClient } from '../clients'
 import { testAddress, testConfig, testPlace } from '../fixtures'
 
+const redisGetFn = jest.fn()
+const redisSetFn = jest.fn()
 const fetchFn = jest.fn()
 
 let client: AsyncRedisClient
 let cache: GoogleCache
 
+jest.mock('../clients', () => ({
+  AsyncRedisClient: jest.fn(() => ({
+    expire: jest.fn(),
+    get: redisGetFn,
+    set: redisSetFn,
+  })),
+}))
+
 beforeEach(() => {
-  client = new AsyncRedisClient(undefined, undefined, redis.createClient())
+  client = new AsyncRedisClient()
   cache = new GoogleCache(testConfig, client)
+
+  redisGetFn.mockClear()
+  redisSetFn.mockClear()
   fetchFn.mockClear()
 })
 
@@ -25,22 +36,19 @@ describe('findAddress', () => {
   const successResponse = { state: 'success', results: [testAddress] }
   const errorResponse = { state: 'error', error: 'Something failed' }
 
-  afterEach(async () => {
-    await client.delete(cacheKey1)
-    await client.delete(cacheKey2)
-  })
-
   it('should return a cached response, if present (using address)', async () => {
-    await client.set(cacheKey1, JSON.stringify(successResponse))
+    redisGetFn.mockResolvedValueOnce(JSON.stringify(successResponse))
     const response = await cache.findAddress(fnParams1, fetchFn)
     expect(response).toEqual(successResponse)
+    expect(redisGetFn).toHaveBeenCalledWith(cacheKey1)
     expect(fetchFn).not.toHaveBeenCalled()
   })
 
   it('should return a cached response, if present (using coordinates)', async () => {
-    await client.set(cacheKey2, JSON.stringify(successResponse))
+    redisGetFn.mockResolvedValueOnce(JSON.stringify(successResponse))
     const response = await cache.findAddress(fnParams2, fetchFn)
     expect(response).toEqual(successResponse)
+    expect(redisGetFn).toHaveBeenCalledWith(cacheKey2)
     expect(fetchFn).not.toHaveBeenCalled()
   })
 
@@ -54,18 +62,15 @@ describe('findAddress', () => {
   it('should cache a successful fetch response', async () => {
     fetchFn.mockResolvedValueOnce(successResponse)
     await cache.findAddress(fnParams1, fetchFn)
-    const cachedJson = (await cache.get(cacheKey1)) as string
-    const cachedResponse = JSON.parse(cachedJson)
-    expect(cachedResponse).toEqual(successResponse)
     expect(fetchFn).toHaveBeenCalled()
+    expect(redisSetFn).toHaveBeenCalledWith(cacheKey1, JSON.stringify(successResponse))
   })
 
   it('should not cache an erroneous fetch response', async () => {
     fetchFn.mockResolvedValueOnce(errorResponse)
     await cache.findAddress(fnParams1, fetchFn)
-    const cachedJson = await cache.get(cacheKey1)
-    expect(cachedJson).toBeUndefined()
     expect(fetchFn).toHaveBeenCalled()
+    expect(redisSetFn).not.toHaveBeenCalled()
   })
 })
 
@@ -79,22 +84,19 @@ describe('findPlaces', () => {
   const successResponse = { state: 'success', results: [testPlace], cursor: 'some-cursor' }
   const errorResponse = { state: 'error', error: 'Something failed' }
 
-  afterEach(async () => {
-    await client.delete(cacheKey1)
-    await client.delete(cacheKey2)
-  })
-
   it('should return a cached response, if present', async () => {
-    await client.set(cacheKey1, JSON.stringify(successResponse))
+    redisGetFn.mockResolvedValueOnce(JSON.stringify(successResponse))
     const response = await cache.findPlaces(fnParams1, fetchFn)
     expect(response).toEqual(successResponse)
+    expect(redisGetFn).toHaveBeenCalledWith(cacheKey1)
     expect(fetchFn).not.toHaveBeenCalled()
   })
 
   it('should return a cached response, if present (using cursor)', async () => {
-    await client.set(cacheKey2, JSON.stringify(successResponse))
+    redisGetFn.mockResolvedValueOnce(JSON.stringify(successResponse))
     const response = await cache.findPlaces(fnParams2, fetchFn)
     expect(response).toEqual(successResponse)
+    expect(redisGetFn).toHaveBeenCalledWith(cacheKey2)
     expect(fetchFn).not.toHaveBeenCalled()
   })
 
@@ -108,17 +110,14 @@ describe('findPlaces', () => {
   it('should cache a successful fetch response', async () => {
     fetchFn.mockResolvedValueOnce(successResponse)
     await cache.findPlaces(fnParams1, fetchFn)
-    const cachedJson = (await cache.get(cacheKey1)) as string
-    const cachedResponse = JSON.parse(cachedJson)
-    expect(cachedResponse).toEqual(successResponse)
     expect(fetchFn).toHaveBeenCalled()
+    expect(redisSetFn).toHaveBeenCalledWith(cacheKey1, JSON.stringify(successResponse))
   })
 
   it('should not cache an erroneous fetch response', async () => {
     fetchFn.mockResolvedValueOnce(errorResponse)
     await cache.findPlaces(fnParams1, fetchFn)
-    const cachedJson = await cache.get(cacheKey1)
-    expect(cachedJson).toBeUndefined()
     expect(fetchFn).toHaveBeenCalled()
+    expect(redisSetFn).not.toHaveBeenCalled()
   })
 })
