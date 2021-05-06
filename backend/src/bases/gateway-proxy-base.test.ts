@@ -11,13 +11,10 @@ beforeEach(() => {
 })
 
 describe('validate', () => {
-  it('accepts an event with valid query string parameters', async () => {
+  it('accepts an event, given valid query string parameters', async () => {
     // @ts-ignore
     const validEvent: APIGatewayProxyEvent = {
-      queryStringParameters: {
-        foo: 'value',
-        bar: 'value',
-      },
+      queryStringParameters: { foo: 'value', bar: 'value' },
     }
 
     const schema = { foo: 'string', bar: 'string' } as ValidationSchema
@@ -26,25 +23,20 @@ describe('validate', () => {
     expect(state).toBe('success')
   })
 
-  it('rejects an event with missing query string parameters', async () => {
+  it('rejects and returns HTTP 400, given missing query string parameters', async () => {
     // @ts-ignore
     const invalidEvent: APIGatewayProxyEvent = {
-      queryStringParameters: {
-        baz: 'value',
-        bau: 'value',
-      },
+      queryStringParameters: { foo: 'value' },
     }
 
     const schema = { foo: 'string', bar: 'string' } as ValidationSchema
     const { response } = proxy.validate(invalidEvent, schema) as ValidationErrorResult
 
     expect(response.statusCode).toEqual(400)
-    expect(response.body).toEqual(
-      '{"error":"Missing query string parameter: foo, Missing query string parameter: bar"}',
-    )
+    expect(response.body).toEqual('{"error":"Missing query string parameter: bar"}')
   })
 
-  it('rejects an event with invalid query string parameters', async () => {
+  it('rejects and returns HTTP 400, given invalid query string parameters', async () => {
     // @ts-ignore
     const invalidEvent: APIGatewayProxyEvent = {
       queryStringParameters: {
@@ -61,7 +53,7 @@ describe('validate', () => {
 })
 
 describe('convert', () => {
-  it('returns the correct response when given a successful function result', async () => {
+  it('returns HTTP 200 with data, given a successful function result', async () => {
     const result = proxy.convert({
       state: 'success',
       data: { foo: 'bar' },
@@ -71,7 +63,7 @@ describe('convert', () => {
     expect(result.body).toEqual('{"foo":"bar"}')
   })
 
-  it('returns the correct response when given an erroneous function result', async () => {
+  it('returns HTTP 502 with error, given an erroneous function result', async () => {
     const result = proxy.convert({
       state: 'error',
       errors: [new Error('Foo failed'), new Error('Bar failed')],
@@ -83,8 +75,8 @@ describe('convert', () => {
 
   it('includes the proper CORS headers to the response', async () => {
     const result = proxy.convert({
-      state: 'error',
-      errors: [new Error('Something failed')],
+      state: 'success',
+      data: { foo: 'bar' },
     })
 
     expect(result.headers).toEqual({
