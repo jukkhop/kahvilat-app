@@ -48,8 +48,7 @@ Frontend
 - Install deps `yarn install`
 - Create env file `cp .env.template .env` and adjust variables as needed
 - Run `yarn start`
-
-Your browser should automatically open at http://localhost:3000/
+- Your browser should automatically open at http://localhost:3000/
 
 ## Cloud deployment
 
