@@ -20,8 +20,8 @@ const options = {
 
 interface Props {
   coords: {
-    latitude: string
-    longitude: string
+    latitude: number
+    longitude: number
   }
   places: Place[]
 }

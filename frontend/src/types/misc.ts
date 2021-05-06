@@ -1,4 +1,4 @@
-interface Config {
+type Config = {
   backend: {
     baseUrl: string
   }
@@ -7,7 +7,7 @@ interface Config {
   }
 }
 
-interface FormValues {
+type FormValues = {
   address: string
   distance: number
 }

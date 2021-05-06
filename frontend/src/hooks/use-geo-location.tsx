@@ -8,7 +8,7 @@ function useGeoLocation(): Coords | undefined {
     if (navigator?.geolocation) {
       navigator.geolocation.getCurrentPosition(position => {
         const { latitude, longitude } = position.coords
-        setLocation({ latitude: latitude.toString(), longitude: longitude.toString() })
+        setLocation({ latitude, longitude })
       })
     }
   }, [])

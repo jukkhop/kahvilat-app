@@ -40,7 +40,7 @@ const placeFragment = gql`
 `
 
 export const FIND_PLACES = gql`
-  query($keyword: String, $latitude: String, $longitude: String, $pathFunction: any, $radius: Int, $type: String) {
+  query($keyword: String, $latitude: Float, $longitude: Float, $pathFunction: any, $radius: Int, $type: String) {
     findPlaces(keyword: $keyword, latitude: $latitude, longitude: $longitude, radius: $radius, type: $type)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       cursor
@@ -65,7 +65,7 @@ export const FIND_MORE_PLACES = gql`
 `
 
 export const FIND_ADDRESS = gql`
-  query($latitude: String, $longitude: String, $pathFunction: any) {
+  query($latitude: Float, $longitude: Float, $pathFunction: any) {
     findAddress(latitude: $latitude, longitude: $longitude, type: $type)
       @rest(type: "Object", pathBuilder: $pathFunction, method: "GET") {
       results @type(name: "Address") {

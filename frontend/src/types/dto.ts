@@ -1,25 +1,46 @@
-interface AddressDto {
+type AddressComponent = {
+  name: string
+  types: string[]
+}
+
+type AddressDto = {
   address: string
-  components: {
-    name: string
-    types: string[]
-  }[]
-  geometry: {
-    location: {
-      lat: string
-      lng: string
-    }
+  components: AddressComponent[]
+  geometry: Geometry
+}
+
+type FindAddressData = {
+  findAddress: {
+    results: AddressDto[]
   }
 }
 
-interface PlaceDto {
-  businessStatus: string
-  geometry: {
-    location: {
-      lat: string
-      lng: string
-    }
+type FindCoordsData = {
+  findCoordinates: {
+    results: AddressDto[]
   }
+}
+
+type FindPlacesData = {
+  findPlaces: {
+    cursor?: string
+    results: PlaceDto[]
+    __typename: string
+  }
+}
+
+type Geometry = {
+  location: LatLng
+}
+
+type LatLng = {
+  lat: number
+  lng: number
+}
+
+type PlaceDto = {
+  businessStatus: string
+  geometry: Geometry
   icon: string
   name: string
   openingHours?: {
@@ -30,24 +51,13 @@ interface PlaceDto {
   vicinity: string
 }
 
-interface FindAddressData {
-  findAddress: {
-    results: AddressDto[]
-  }
+export type {
+  AddressComponent,
+  AddressDto,
+  FindAddressData,
+  FindCoordsData,
+  FindPlacesData,
+  Geometry,
+  LatLng,
+  PlaceDto,
 }
-
-interface FindCoordsData {
-  findCoordinates: {
-    results: AddressDto[]
-  }
-}
-
-interface FindPlacesData {
-  findPlaces: {
-    cursor?: string
-    results: PlaceDto[]
-    __typename: string
-  }
-}
-
-export type { AddressDto, FindAddressData, FindCoordsData, FindPlacesData, PlaceDto }

@@ -1,13 +1,13 @@
-interface Coords {
-  latitude: string
-  longitude: string
+type Coords = {
+  latitude: number
+  longitude: number
 }
 
-interface Place {
+type Place = {
   distance: number
   icon: string
-  lat: string
-  lng: string
+  lat: number
+  lng: number
   name: string
   openNow?: boolean
   rating: number
