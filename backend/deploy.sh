@@ -24,8 +24,11 @@ export AWS_DEFAULT_REGION="${TF_VAR_aws_region}"
 
 source "../environment/scripts/aws-utils.sh"
 
+redis_cluster_id="kahvilat-app-${env}-redis-cluster"
+security_group_name="kahvilat-app-${env}-lambda-sg"
+subnet_name="kahvilat-app-${env}-subnet-private"
+
 head -$(($(wc -l < serverless.yml) - 1)) serverless.yml > serverless-$env.yml
-redis_cluster_id="kahvilat-redis-${env}"
 
 serverless deploy \
   --config serverless-$env.yml \
@@ -33,10 +36,11 @@ serverless deploy \
   --google-api-key ${TF_VAR_backend_google_api_key} \
   --google-base-url ${TF_VAR_backend_google_base_url} \
   --google-language ${TF_VAR_backend_google_language} \
-  --redis-cluster-id ${redis_cluster_id} \
   --redis-host "$(get_redis_endpoint_address $redis_cluster_id)" \
   --redis-port "$(get_redis_endpoint_port $redis_cluster_id)" \
   --region ${TF_VAR_aws_region} \
+  --security-group-id "$(get_security_group_id $security_group_name)" \
+  --subnet-id "$(get_subnet_id $subnet_name)" \
   --stage $env \
   --verbose
 

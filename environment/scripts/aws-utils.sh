@@ -35,3 +35,25 @@ function get_cloudfront_distribution_id {
 
   echo "$DISTRIBUTION_ID"
 }
+
+function get_security_group_id {
+  local GROUP_ID="$( \
+    aws ec2 describe-security-groups \
+    --filters Name=group-name,Values=${1} \
+    --query 'SecurityGroups[*].GroupId' \
+    --output text
+  )"
+
+  echo "$GROUP_ID"
+}
+
+function get_subnet_id {
+  local SUBNET_ID="$( \
+    aws ec2 describe-subnets \
+    --filters Name=tag:Name,Values=${1} \
+    --query 'Subnets[*].SubnetId' \
+    --output text
+  )"
+
+  echo "$SUBNET_ID"
+}
