@@ -29,13 +29,7 @@ afterEach(() => {
   redisSetFn.mockClear()
 })
 
-it('should cache a given value', async () => {
-  await cache.set('some-key', 'some-value')
-  expect(redisSetFn).toHaveBeenCalledWith('some-key', 'some-value')
-  expect(redisExpFn).toHaveBeenCalledWith('some-key', 86400)
-})
-
-it('should cache a given value with the given expiratio time', async () => {
+it('should cache a given value with the given expiration time', async () => {
   await cache.set('some-key', 'some-value', 2000)
   expect(redisSetFn).toHaveBeenCalledWith('some-key', 'some-value')
   expect(redisExpFn).toHaveBeenCalledWith('some-key', 2000)

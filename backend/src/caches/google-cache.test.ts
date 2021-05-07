@@ -2,6 +2,7 @@ import GoogleCache from './google-cache'
 import { AsyncRedisClient } from '../clients'
 import { testAddress, testConfig, testPlace } from '../fixtures'
 
+const redisExpFn = jest.fn()
 const redisGetFn = jest.fn()
 const redisSetFn = jest.fn()
 const fetchFn = jest.fn()
@@ -11,7 +12,7 @@ let cache: GoogleCache
 
 jest.mock('../clients', () => ({
   AsyncRedisClient: jest.fn(() => ({
-    expire: jest.fn(),
+    expire: redisExpFn,
     get: redisGetFn,
     set: redisSetFn,
   })),
@@ -23,6 +24,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  redisExpFn.mockClear()
   redisGetFn.mockClear()
   redisSetFn.mockClear()
   fetchFn.mockClear()
@@ -66,6 +68,13 @@ describe('findAddress', () => {
     await cache.findAddress(fnParams1, fetchFn)
     expect(fetchFn).toHaveBeenCalled()
     expect(redisSetFn).toHaveBeenCalledWith(cacheKey1, JSON.stringify(successResponse))
+  })
+
+  it('should set an expiration time of one day for the cached value', async () => {
+    fetchFn.mockResolvedValueOnce(successResponse)
+    await cache.findAddress(fnParams1, fetchFn)
+    expect(fetchFn).toHaveBeenCalled()
+    expect(redisExpFn).toHaveBeenCalledWith(cacheKey1, 86400)
   })
 
   it('should not cache an erroneous fetch response', async () => {
@@ -114,6 +123,13 @@ describe('findPlaces', () => {
     await cache.findPlaces(fnParams1, fetchFn)
     expect(fetchFn).toHaveBeenCalled()
     expect(redisSetFn).toHaveBeenCalledWith(cacheKey1, JSON.stringify(successResponse))
+  })
+
+  it('should set an expiration time of one minute for the cached value', async () => {
+    fetchFn.mockResolvedValueOnce(successResponse)
+    await cache.findPlaces(fnParams1, fetchFn)
+    expect(fetchFn).toHaveBeenCalled()
+    expect(redisExpFn).toHaveBeenCalledWith(cacheKey1, 60)
   })
 
   it('should not cache an erroneous fetch response', async () => {

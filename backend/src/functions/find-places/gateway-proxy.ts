@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyEventQueryStringParameters, APIGatewayProxyResult } from 'aws-lambda'
 
 import { FunctionHandlerBase, GatewayProxyBase } from '../../bases'
-import { FindPlacesParams, Config, ValidationSchema } from '../../types'
+import { Config, FindPlacesParams, ValidationSchema } from '../../types'
 
 class GatewayProxy extends GatewayProxyBase {
   private handler: FunctionHandlerBase
