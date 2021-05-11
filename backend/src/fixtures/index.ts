@@ -1,5 +1,5 @@
-import testAddress from './test-address'
 import testConfig from './test-config'
-import testPlace from './test-place'
+import * as testData from './test-data'
+import * as testGoogle from './test-google'
 
-export { testAddress, testConfig, testPlace }
+export { testConfig, testData, testGoogle }

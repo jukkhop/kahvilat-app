@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 
 import FunctionHandler from './function-handler'
 import GatewayProxy from './gateway-proxy'
-import { testConfig, testPlace } from '../../fixtures'
+import { testConfig, testData } from '../../fixtures'
 import { FindPlacesParams, FunctionResult, GoogleResponse, Place } from '../../types'
 
 const fnParams: FindPlacesParams = {
@@ -46,7 +46,7 @@ const invalidEvent2: APIGatewayProxyEvent = {
 
 const successResult: FunctionResult<GoogleResponse<Place>> = {
   state: 'success',
-  data: { state: 'success', results: [testPlace], cursor: 'some-cursor' },
+  data: { state: 'success', results: [testData.place], cursor: 'some-cursor' },
 }
 
 const errorResult: FunctionResult<GoogleResponse<Place>> = {

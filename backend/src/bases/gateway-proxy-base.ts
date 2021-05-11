@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { Config, FunctionResult, Headers, ValidationResult, ValidationSchema } from '../types'
+import { Config, FunctionResult, ValidationResult, ValidationSchema } from '../types'
 
 class GatewayProxyBase {
   protected config: Config
@@ -70,7 +70,7 @@ class GatewayProxyBase {
     return this.mkResponse(status, body)
   }
 
-  private mkHeaders(): Headers {
+  private mkHeaders(): Record<string, boolean | number | string> {
     const { config } = this
     const origin = config.stage === 'local' ? '*' : config.frontend.url
 

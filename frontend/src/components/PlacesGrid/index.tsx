@@ -22,15 +22,15 @@ interface Props {
 function PlacesGrid(props: Props): JSX.Element {
   return (
     <Places>
-      {props.places.map(({ distance, icon, name, openNow, rating, vicinity }) => (
+      {props.places.map(({ address, distance, icon, name, openNow, rating }) => (
         <PlaceCard
+          address={address}
           distance={distance}
           icon={icon}
           key={name}
           name={name}
           openNow={openNow}
           rating={rating}
-          vicinity={vicinity}
         />
       ))}
     </Places>

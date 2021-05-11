@@ -1,40 +1,17 @@
 import fetch from 'node-fetch'
 import GoogleClient from './google-client'
-
+import { testConfig, testGoogle } from '../fixtures'
 import {
-  Address,
   FindAddressParams,
   FindPlacesParams,
-  GoogleErrorResponse,
-  GoogleSuccessResponse,
-  Place,
+  GoogleAddress as Address,
+  GooglePlace as Place,
+  GoogleErrorResponse as ErrorResponse,
+  GoogleSuccessResponse as SuccessResponse,
 } from '../types'
-
-import { testAddress, testConfig, testPlace } from '../fixtures'
 
 const { Response, FetchError } = jest.requireActual('node-fetch')
 jest.mock('node-fetch', jest.fn)
-
-const findAddressParams1: FindAddressParams = {
-  latitude: 60.1,
-  longitude: 24.9,
-}
-
-const findAddressParams2: FindAddressParams = {
-  address: 'some-address',
-}
-
-const findPlacesParams: FindPlacesParams = {
-  keyword: 'coffee',
-  latitude: 60.1,
-  longitude: 24.9,
-  radius: 500,
-  type: 'cafe',
-}
-
-const findMorePlacesParams: FindPlacesParams = {
-  cursor: 'some-cursor',
-}
 
 let client: GoogleClient
 let fetchFn: jest.MockedFunction<typeof fetch>
@@ -49,35 +26,45 @@ afterEach(() => {
 })
 
 describe('findAddress', () => {
+  const { address } = testGoogle
+  const fnParams1: FindAddressParams = { latitude: 60.1, longitude: 24.9 }
+  const fnParams2: FindAddressParams = { address: 'some-address' }
+
+  let successResponse: any
+  let errorResponse: any
+
+  beforeEach(() => {
+    successResponse = new Response(JSON.stringify({ results: [address] }), { status: 200 })
+    errorResponse = new Response(JSON.stringify('Something failed'), { status: 500 })
+  })
+
   it('calls Google API and returns valid data (using coordinates)', async () => {
     const expectedUrl = `https://maps.googleapis.com/maps/api/geocode/json?key=some-api-key&language=some-lang&latlng=60.1,24.9`
-    const expectedBody = { results: [testAddress] }
-    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify(expectedBody), { status: 200 }))
-    const response = (await client.findAddress(findAddressParams1)) as GoogleSuccessResponse<Address>
+    fetchFn.mockResolvedValueOnce(successResponse)
+    const response = (await client.findAddress(fnParams1)) as SuccessResponse<Address>
     expect(fetchFn).toHaveBeenCalledWith(expectedUrl)
-    expect(response.results).toEqual([testAddress])
+    expect(response.results).toEqual([address])
   })
 
   it('calls Google API and returns valid data (using address)', async () => {
     const expectedUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=some-address&key=some-api-key&language=some-lang`
-    const expectedBody = { results: [testAddress] }
-    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify(expectedBody), { status: 200 }))
-    const response = (await client.findAddress(findAddressParams2)) as GoogleSuccessResponse<Address>
+    fetchFn.mockResolvedValueOnce(successResponse)
+    const response = (await client.findAddress(fnParams2)) as SuccessResponse<Address>
     expect(fetchFn).toHaveBeenCalledWith(expectedUrl)
-    expect(response.results).toEqual([testAddress])
+    expect(response.results).toEqual([address])
   })
 
   it('returns HTTP status and error message returned by Google API', async () => {
-    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 500 }))
-    const response = (await client.findAddress(findAddressParams2)) as GoogleErrorResponse
+    fetchFn.mockResolvedValueOnce(errorResponse)
+    const response = (await client.findAddress(fnParams1)) as ErrorResponse
     expect(fetchFn).toHaveBeenCalled()
     expect(response.status).toBe(500)
-    expect(response.error).toBe('some-error')
+    expect(response.error).toBe('Something failed')
   })
 
   it('returns an error when Google API cannot be connected to', async () => {
     fetchFn.mockRejectedValueOnce(new FetchError('Connection timed out'))
-    const response = (await client.findAddress(findAddressParams2)) as GoogleErrorResponse
+    const response = (await client.findAddress(fnParams1)) as ErrorResponse
     expect(fetchFn).toHaveBeenCalled()
     expect(response.status).toBeUndefined()
     expect(response.error).toBe('Connection timed out')
@@ -85,36 +72,47 @@ describe('findAddress', () => {
 })
 
 describe('findPlaces', () => {
+  const { place } = testGoogle
+  const fnParams1: FindPlacesParams = { keyword: 'coffee', latitude: 60.1, longitude: 24.9, radius: 500, type: 'cafe' }
+  const fnParams2: FindPlacesParams = { cursor: 'some-cursor' }
+  const successBody = { results: [place], next_page_token: 'some-cursor' }
+
+  let successResponse: any
+  let errorResponse: any
+
+  beforeEach(() => {
+    successResponse = new Response(JSON.stringify(successBody), { status: 200 })
+    errorResponse = new Response(JSON.stringify('Something failed'), { status: 500 })
+  })
+
   it('calls Google API and returns valid data', async () => {
     const expectedUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=some-api-key&keyword=coffee&location=60.1,24.9&radius=500&types=cafe`
-    const expectedBody = { results: [testPlace], next_page_token: 'some-cursor' }
-    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify(expectedBody), { status: 200 }))
-    const response = (await client.findPlaces(findPlacesParams)) as GoogleSuccessResponse<Place>
+    fetchFn.mockResolvedValueOnce(successResponse)
+    const response = (await client.findPlaces(fnParams1)) as SuccessResponse<Place>
     expect(fetchFn).toHaveBeenCalledWith(expectedUrl)
-    expect(response.results).toEqual([testPlace])
+    expect(response.results).toEqual([place])
     expect(response.cursor).toEqual('some-cursor')
   })
 
   it('calls Google API and returns valid data using cursor', async () => {
     const expectedUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=some-api-key&pagetoken=some-cursor`
-    const expectedBody = { results: [testPlace] }
-    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify(expectedBody), { status: 200 }))
-    const response = ((await client.findPlaces(findMorePlacesParams)) as unknown) as GoogleSuccessResponse<Place>
+    fetchFn.mockResolvedValueOnce(successResponse)
+    const response = (await client.findPlaces(fnParams2)) as SuccessResponse<Place>
     expect(fetchFn).toHaveBeenCalledWith(expectedUrl)
-    expect(response.results).toEqual([testPlace])
+    expect(response.results).toEqual([place])
   })
 
   it('returns HTTP status and error message returned by Google API', async () => {
-    fetchFn.mockResolvedValueOnce(new Response(JSON.stringify('some-error'), { status: 500 }))
-    const response = (await client.findPlaces(findMorePlacesParams)) as GoogleErrorResponse
+    fetchFn.mockResolvedValueOnce(errorResponse)
+    const response = (await client.findPlaces(fnParams1)) as ErrorResponse
     expect(fetchFn).toHaveBeenCalled()
     expect(response.status).toBe(500)
-    expect(response.error).toBe('some-error')
+    expect(response.error).toBe('Something failed')
   })
 
   it('returns an error message when Google API cannot be connected to', async () => {
     fetchFn.mockRejectedValueOnce(new FetchError('Connection timed out'))
-    const response = (await client.findPlaces(findMorePlacesParams)) as GoogleErrorResponse
+    const response = (await client.findPlaces(fnParams1)) as ErrorResponse
     expect(fetchFn).toHaveBeenCalled()
     expect(response.status).toBeUndefined()
     expect(response.error).toBe('Connection timed out')

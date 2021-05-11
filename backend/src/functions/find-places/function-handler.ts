@@ -1,6 +1,7 @@
 import { FunctionHandlerBase } from '../../bases'
 import { GoogleCache } from '../../caches'
 import { GoogleClient } from '../../clients'
+import { transformPlace } from '../../transformers'
 import { FindPlacesParams, FunctionResult, GoogleResponse, Place } from '../../types'
 
 class FunctionHandler extends FunctionHandlerBase {
@@ -19,7 +20,7 @@ class FunctionHandler extends FunctionHandlerBase {
     // prettier-ignore
     return cache
       .findPlaces(params, () => client.findPlaces(params))
-      .then(response => this.convert(response))
+      .then(response => this.convert(response, transformPlace))
   }
 }
 

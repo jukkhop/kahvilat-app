@@ -1,7 +1,7 @@
 import React from 'react'
 import { GoogleMap, Marker } from '@react-google-maps/api'
 
-import { Place } from '../../types'
+import { Coords, Place } from '../../types'
 
 const containerStyle = {
   width: '100%',
@@ -19,40 +19,35 @@ const options = {
 }
 
 interface Props {
-  coords: {
-    latitude: number
-    longitude: number
-  }
+  center: Coords
   places: Place[]
 }
 
 function PlacesMap(props: Props): JSX.Element {
-  const { coords, places } = props
-  const latitude = Number(coords.latitude)
-  const longitude = Number(coords.longitude)
+  const { center, places } = props
 
   const onLoad = React.useCallback(
     map => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const bounds = new window.google.maps.LatLngBounds()
-      bounds.extend({ lat: latitude, lng: longitude })
-      places.forEach(place => bounds.extend(place))
+      bounds.extend({ lat: center.latitude, lng: center.longitude })
+      places.forEach(place => bounds.extend({ lat: place.coords.latitude, lng: place.coords.longitude }))
       map.fitBounds(bounds)
     },
-    [coords, places],
+    [center, places],
   )
 
   return (
     <GoogleMap
-      center={{ lat: latitude, lng: longitude }}
+      center={{ lat: center.latitude, lng: center.longitude }}
       mapContainerStyle={containerStyle}
       onLoad={onLoad}
       options={options}
       zoom={2}
     >
-      {places.map(({ name, lat, lng }) => (
-        <Marker key={name} position={{ lat, lng }}>
+      {places.map(({ name, coords: { latitude, longitude } }) => (
+        <Marker key={name} position={{ lat: latitude, lng: longitude }}>
           {/* <InfoWindow>
             <InfoWindowText>{name}</InfoWindowText>
           </InfoWindow> */}

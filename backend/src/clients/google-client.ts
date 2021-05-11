@@ -1,6 +1,14 @@
 import fetch, { FetchError } from 'node-fetch'
 import qs from 'qs'
-import { Address, Config, GoogleResponse, FindAddressParams, FindPlacesParams, Place } from '../types'
+
+import {
+  Config,
+  FindAddressParams,
+  FindPlacesParams,
+  GoogleAddress as Address,
+  GooglePlace as Place,
+  GoogleResponse as Response,
+} from '../types'
 
 class GoogleClient {
   private apiKey: string
@@ -13,7 +21,7 @@ class GoogleClient {
     this.language = config.google.language
   }
 
-  async findAddress(params: FindAddressParams): Promise<GoogleResponse<Address>> {
+  async findAddress(params: FindAddressParams): Promise<Response<Address>> {
     const queryParams = () => {
       if ('address' in params) {
         return {
@@ -43,7 +51,7 @@ class GoogleClient {
     return this.request('geocode', queryParams(), encodeParams())
   }
 
-  async findPlaces(params: FindPlacesParams): Promise<GoogleResponse<Place>> {
+  async findPlaces(params: FindPlacesParams): Promise<Response<Place>> {
     const queryParams = () => {
       if ('cursor' in params) {
         return { key: this.apiKey, pagetoken: params.cursor }
@@ -65,7 +73,7 @@ class GoogleClient {
     return this.request('place/nearbysearch', queryParams())
   }
 
-  async request<T>(endpoint: string, queryParams: any, encodeParams = false): Promise<GoogleResponse<T>> {
+  async request<T>(endpoint: string, queryParams: any, encodeParams = false): Promise<Response<T>> {
     const queryString = qs.stringify(queryParams, { encode: encodeParams })
     const url = `${this.baseUrl}/${endpoint}/json?${queryString}`
 

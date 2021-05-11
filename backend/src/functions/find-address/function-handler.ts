@@ -1,6 +1,7 @@
 import { FunctionHandlerBase } from '../../bases'
 import { GoogleCache } from '../../caches'
 import { GoogleClient } from '../../clients'
+import { transformAddress } from '../../transformers'
 import { Address, FindAddressParams, FunctionResult, GoogleResponse } from '../../types'
 
 class FunctionHandler extends FunctionHandlerBase {
@@ -19,7 +20,7 @@ class FunctionHandler extends FunctionHandlerBase {
     // prettier-ignore
     return cache
       .findAddress(params, () => client.findAddress(params))
-      .then(response => this.convert(response))
+      .then(response => this.convert(response, transformAddress))
   }
 }
 

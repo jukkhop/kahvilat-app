@@ -7,9 +7,9 @@ import { useLazyQuery } from '@apollo/react-hooks'
 
 import PlacesPage from '../../components/PlacesPage'
 import { DEFAULT_DISTANCE } from '../../constants'
-import { FIND_ADDRESS, FIND_COORDINATES, FIND_PLACES, FIND_MORE_PLACES, buildPath } from '../../graphql'
+import { buildPath, findAddressQuery, findCoordinatesQuery, findPlacesQuery, findMorePlacesQuery } from '../../graphql'
 import { useGeoLocation } from '../../hooks'
-import { Coords, FindAddressData, FindCoordsData, FindPlacesData, FormValues, PlaceDto } from '../../types/'
+import { Coords, FindAddressData, FindCoordsData, FindPlacesData, FormValues } from '../../types/'
 import { mapPlace, sleep, sortPlaces } from '../../utils'
 
 function PlacesPageContainer(): JSX.Element {
@@ -17,9 +17,9 @@ function PlacesPageContainer(): JSX.Element {
   const [userCoords, setUserCoords] = useState<Coords | undefined>(undefined)
   const [prevAddress, setPrevAddress] = useState<string | undefined>(undefined)
   const [prevDistance, setPrevDistance] = useState<number | undefined>(undefined)
-  const [findAddress, findAddressData] = useLazyQuery<FindAddressData>(FIND_ADDRESS)
-  const [findCoordinates, findCoordsData] = useLazyQuery<FindCoordsData>(FIND_COORDINATES)
-  const [findPlaces, findPlacesData] = useLazyQuery<FindPlacesData>(FIND_PLACES)
+  const [findAddress, findAddressData] = useLazyQuery<FindAddressData>(findAddressQuery)
+  const [findCoordinates, findCoordsData] = useLazyQuery<FindCoordsData>(findCoordinatesQuery)
+  const [findPlaces, findPlacesData] = useLazyQuery<FindPlacesData>(findPlacesQuery)
   const geoLocation = useGeoLocation()
 
   const foundAddressByCoords = findAddressData.data?.findAddress.results?.[0]
@@ -82,7 +82,7 @@ function PlacesPageContainer(): JSX.Element {
     await sleep(2000)
 
     return findPlacesData.fetchMore({
-      query: FIND_MORE_PLACES,
+      query: findMorePlacesQuery,
       variables: {
         cursor,
         pathFunction: buildPath('/find-places'),
@@ -121,8 +121,8 @@ function PlacesPageContainer(): JSX.Element {
 
   useEffect(() => {
     if (foundAddressByAddress) {
-      const { lat, lng } = foundAddressByAddress.geometry.location
-      setUserCoords({ latitude: lat, longitude: lng })
+      const { latitude, longitude } = foundAddressByAddress.location
+      setUserCoords({ latitude, longitude })
     }
   }, [foundAddressByAddress])
 
@@ -143,7 +143,7 @@ function PlacesPageContainer(): JSX.Element {
 
   const mappedPlaces = userCoords
     ? uniqBy(foundPlaces, x => x.name)
-        .filter((x: PlaceDto) => x.businessStatus === 'OPERATIONAL')
+        .filter(x => x.status === 'OPERATIONAL')
         .map(mapPlace(userCoords))
         .sort(sortPlaces)
     : []

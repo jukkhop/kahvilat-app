@@ -7,9 +7,14 @@ type Config = {
   }
 }
 
+type Coords = {
+  latitude: number
+  longitude: number
+}
+
 type FormValues = {
   address: string
   distance: number
 }
 
-export type { Config, FormValues }
+export type { Config, Coords, FormValues }

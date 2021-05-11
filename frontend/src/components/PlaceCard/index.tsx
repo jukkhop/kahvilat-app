@@ -99,16 +99,16 @@ const Address = styled.div`
 `
 
 interface Props {
+  address: string
   distance: number
   icon: string
   name: string
   openNow?: boolean
   rating: number
-  vicinity: string
 }
 
 function PlaceComponent(props: Props): JSX.Element {
-  const { distance, icon, name, openNow, rating, vicinity } = props
+  const { address, distance, icon, name, openNow, rating } = props
   return (
     <Outer>
       <Inner>
@@ -116,7 +116,7 @@ function PlaceComponent(props: Props): JSX.Element {
           <img src={icon} alt="icon" />
         </Icon>
         <Name>{name}</Name>
-        <Address>{vicinity}</Address>
+        <Address>{address}</Address>
         <Details>
           <Detail color={openNow ? COLORS.green : COLORS.red}>
             <FontAwesomeIcon icon={faClock} />

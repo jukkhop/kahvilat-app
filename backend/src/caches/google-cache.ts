@@ -2,8 +2,16 @@ import qs from 'qs'
 
 import { CacheBase } from '../bases'
 import { AsyncRedisClient } from '../clients'
-import { MINUTE_IN_SECONDS, DAY_IN_SECONDS } from '../constants'
-import { Address, Config, FindAddressParams, FindPlacesParams, GoogleResponse, Place } from '../types'
+import { DAY_IN_SECONDS, MINUTE_IN_SECONDS } from '../constants'
+
+import {
+  Config,
+  FindAddressParams,
+  FindPlacesParams,
+  GoogleAddress as Address,
+  GooglePlace as Place,
+  GoogleResponse as Response,
+} from '../types'
 
 class GoogleCache extends CacheBase {
   constructor(config: Config, client?: AsyncRedisClient) {
@@ -12,15 +20,16 @@ class GoogleCache extends CacheBase {
 
   async findAddress(
     queryParams: FindAddressParams,
-    fetchFn: () => Promise<GoogleResponse<Address>>,
-  ): Promise<GoogleResponse<Address>> {
+    fetchFn: () => Promise<Response<Address>>,
+  ): Promise<Response<Address>> {
     return this.cachedFetch('find-address', queryParams, DAY_IN_SECONDS, fetchFn)
   }
 
+  // prettier-ignore
   async findPlaces(
     queryParams: FindPlacesParams,
-    fetchFn: () => Promise<GoogleResponse<Place>>,
-  ): Promise<GoogleResponse<Place>> {
+    fetchFn: () => Promise<Response<Place>>,
+  ): Promise<Response<Place>> {
     return this.cachedFetch('find-places', queryParams, MINUTE_IN_SECONDS, fetchFn)
   }
 
@@ -28,8 +37,8 @@ class GoogleCache extends CacheBase {
     endpoint: string,
     queryParams: any,
     cacheExpireSecs: number,
-    fetchFn: () => Promise<GoogleResponse<T>>,
-  ): Promise<GoogleResponse<T>> {
+    fetchFn: () => Promise<Response<T>>,
+  ): Promise<Response<T>> {
     const queryString = qs.stringify(queryParams, { encode: false })
     const cacheKey = `${endpoint}?${queryString}`
     const cachedResponse = await this.get(cacheKey)

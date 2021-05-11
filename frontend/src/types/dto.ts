@@ -1,63 +1,25 @@
-type AddressComponent = {
-  name: string
-  types: string[]
-}
-
-type AddressDto = {
-  address: string
-  components: AddressComponent[]
-  geometry: Geometry
-}
+import { Address, Place } from './common'
 
 type FindAddressData = {
   findAddress: {
-    results: AddressDto[]
+    results: Address[]
+    __typename: string
   }
 }
 
 type FindCoordsData = {
   findCoordinates: {
-    results: AddressDto[]
+    results: Address[]
+    __typename: string
   }
 }
 
 type FindPlacesData = {
   findPlaces: {
     cursor?: string
-    results: PlaceDto[]
+    results: Place[]
     __typename: string
   }
 }
 
-type Geometry = {
-  location: LatLng
-}
-
-type LatLng = {
-  lat: number
-  lng: number
-}
-
-type PlaceDto = {
-  businessStatus: string
-  geometry: Geometry
-  icon: string
-  name: string
-  openingHours?: {
-    openNow: boolean
-  }
-  rating: number
-  reference: string
-  vicinity: string
-}
-
-export type {
-  AddressComponent,
-  AddressDto,
-  FindAddressData,
-  FindCoordsData,
-  FindPlacesData,
-  Geometry,
-  LatLng,
-  PlaceDto,
-}
+export type { FindAddressData, FindCoordsData, FindPlacesData }

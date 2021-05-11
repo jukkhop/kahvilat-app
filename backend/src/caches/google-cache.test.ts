@@ -1,6 +1,6 @@
 import GoogleCache from './google-cache'
 import { AsyncRedisClient } from '../clients'
-import { testAddress, testConfig, testPlace } from '../fixtures'
+import { testConfig, testData } from '../fixtures'
 
 const redisExpFn = jest.fn()
 const redisGetFn = jest.fn()
@@ -37,7 +37,7 @@ describe('findAddress', () => {
   const { latitude, longitude } = fnParams2
   const cacheKey1 = `find-address?address=${address}`
   const cacheKey2 = `find-address?latitude=${latitude}&longitude=${longitude}`
-  const successResponse = { state: 'success', results: [testAddress] }
+  const successResponse = { state: 'success', results: [testData.address] }
   const errorResponse = { state: 'error', error: 'Something failed' }
 
   it('should return a cached response, if present (using address)', async () => {
@@ -92,7 +92,7 @@ describe('findPlaces', () => {
   const { cursor } = fnParams2
   const cacheKey1 = `find-places?keyword=${keyword}&latitude=${latitude}&longitude=${longitude}&radius=${radius}&type=${type}`
   const cacheKey2 = `find-places?cursor=${cursor}`
-  const successResponse = { state: 'success', results: [testPlace], cursor: 'some-cursor' }
+  const successResponse = { state: 'success', results: [testData.place], cursor: 'some-cursor' }
   const errorResponse = { state: 'error', error: 'Something failed' }
 
   it('should return a cached response, if present', async () => {

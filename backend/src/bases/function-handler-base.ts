@@ -13,10 +13,10 @@ import {
 abstract class FunctionHandlerBase {
   abstract handle(params: Record<string, any>): Promise<FunctionResult<any>>
 
-  convert<T>(response: GoogleResponse<T>): FunctionResult<GoogleResponse<T>> {
+  convert<A, B>(response: GoogleResponse<A>, transform: (obj: A) => B): FunctionResult<GoogleResponse<B>> {
     switch (response.state) {
       case 'success':
-        return this.mkSuccessResult(response)
+        return this.mkSuccessResult(response, transform)
       case 'error':
         return this.mkErrorResult(response)
       default:
@@ -24,10 +24,17 @@ abstract class FunctionHandlerBase {
     }
   }
 
-  private mkSuccessResult<T>(response: GoogleSuccessResponse<T>): FunctionSuccessResult<GoogleResponse<T>> {
+  private mkSuccessResult<A, B>(
+    response: GoogleSuccessResponse<A>,
+    transform: (obj: A) => B,
+  ): FunctionSuccessResult<GoogleResponse<B>> {
     return {
       state: 'success',
-      data: { state: 'success', results: response.results, cursor: response.cursor },
+      data: {
+        state: 'success',
+        results: response.results.map(transform),
+        cursor: response.cursor,
+      },
     }
   }
 

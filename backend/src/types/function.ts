@@ -10,4 +10,4 @@ type FunctionErrorResult = {
   errors: Error[]
 }
 
-export type { FunctionResult, FunctionSuccessResult, FunctionErrorResult }
+export type { FunctionErrorResult, FunctionResult, FunctionSuccessResult }

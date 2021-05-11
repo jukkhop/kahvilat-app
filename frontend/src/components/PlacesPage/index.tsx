@@ -10,7 +10,7 @@ import Layout from '../Layout'
 import { getConfig } from '../../config'
 import theme from '../../theme'
 import { Coords, Place } from '../../types'
-import { convertDistance } from '../../utils/converters'
+import { convertDistance } from '../../utils'
 
 const Form = styled.form`
   font-family: Source Sans Pro;
@@ -164,7 +164,7 @@ function PlacesPage(props: Props): JSX.Element {
           return (
             <div>
               <PlacesMapWrapper>
-                <PlacesMap coords={coords} places={places} />
+                <PlacesMap center={coords} places={places} />
               </PlacesMapWrapper>
               <PlacesGrid places={places} />
             </div>
