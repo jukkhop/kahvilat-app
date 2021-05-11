@@ -30,17 +30,13 @@ function PlacesPageContainer(): JSX.Element {
   const loading = findPlacesData.loading || findCoordsData.loading || findAddressData.loading
   const error = findPlacesData.error || findCoordsData.error || findAddressData.error
 
-  function onFindCoordinates(values: FormValues) {
+  function onFindCoordinates(values: FormValues): void {
     const { address, distance } = values
     const addressChanged = address !== prevAddress
     const distanceChanged = distance !== prevDistance
 
-    if (userCoords && !addressChanged && !distanceChanged) {
-      return
-    }
-
-    if (userCoords && distanceChanged) {
-      return onFindPlaces(distance)
+    if (userCoords && !addressChanged) {
+      return distanceChanged ? onFindPlaces(distance) : undefined
     }
 
     const options = {
@@ -56,7 +52,7 @@ function PlacesPageContainer(): JSX.Element {
     findCoordinates(options)
   }
 
-  function onFindPlaces(distance?: number) {
+  function onFindPlaces(distance?: number): void {
     if (!userCoords) return
 
     const options = {
