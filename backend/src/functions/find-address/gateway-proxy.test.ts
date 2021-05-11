@@ -5,14 +5,8 @@ import GatewayProxy from './gateway-proxy'
 import { testConfig, testData } from '../../fixtures'
 import { Address, FindAddressParams, FunctionResult, GoogleResponse } from '../../types'
 
-const fnParams1: FindAddressParams = {
-  latitude: 60.16,
-  longitude: 24.93,
-}
-
-const fnParams2: FindAddressParams = {
-  address: 'Mannerheimintie 1',
-}
+const fnParams1: FindAddressParams = { latitude: 60.16, longitude: 24.93 }
+const fnParams2: FindAddressParams = { address: 'Mannerheimintie 1' }
 
 // @ts-ignore
 const validEvent1: APIGatewayProxyEvent = {
@@ -62,13 +56,11 @@ jest.mock('./function-handler', () =>
   })),
 )
 
-// @ts-ignore
-const handler = new FunctionHandler(undefined, undefined)
-
 let proxy: GatewayProxy
 
 beforeEach(() => {
-  proxy = new GatewayProxy(testConfig, handler)
+  // @ts-ignore
+  proxy = new GatewayProxy(testConfig, new FunctionHandler(undefined, undefined))
 })
 
 afterEach(() => {

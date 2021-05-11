@@ -62,13 +62,11 @@ jest.mock('./function-handler', () =>
   })),
 )
 
-// @ts-ignore
-const handler = new FunctionHandler(undefined, undefined)
-
 let proxy: GatewayProxy
 
 beforeEach(() => {
-  proxy = new GatewayProxy(testConfig, handler)
+  // @ts-ignore
+  proxy = new GatewayProxy(testConfig, new FunctionHandler(undefined, undefined))
 })
 
 afterEach(() => {
