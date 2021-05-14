@@ -155,7 +155,7 @@ function PlacesPageContainer(): JSX.Element {
 
   return (
     <PlacesPage
-      address={foundAddressByCoords?.address}
+      address={foundAddressByCoords?.address || foundAddressByAddress?.address}
       coords={userCoords}
       defaultDistance={DEFAULT_DISTANCE}
       error={error ? true : false}
