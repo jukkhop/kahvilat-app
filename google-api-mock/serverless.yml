@@ -1,0 +1,68 @@
+service: kahvilat-app-google-api-mock
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'local'}
+  apiGateway:
+    shouldStartNameWithService: true
+
+package:
+  excludeDevDependencies: false
+
+functions:
+  main:
+    handler: src/main.invoke
+    events:
+      - http:
+          path: /maps/api/geocode/{format}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                format: true
+              querystrings:
+                address: false
+                latlng: false
+      - http:
+          path: /maps/api/place/nearbysearch/{format}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                format: true
+              querystrings:
+                keyword: false
+                location: false
+                pagetoken: false
+                radius: false
+                types: false
+
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+
+    GatewayResponseDefault5XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
