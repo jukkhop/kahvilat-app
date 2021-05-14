@@ -10,19 +10,16 @@ const address: GoogleAddress = {
   ],
   formatted_address: 'Telakkakatu 6, 00150 Helsinki, Suomi',
   geometry: {
-    location: { lat: 60.15855180000001, lng: 24.9323386 },
+    bounds: { northeast: { lat: 60.15883530000001, lng: 24.9319062 }, southwest: { lat: 60.1585668, lng: 24.9315268 } },
+    location: { lat: 60.1587165, lng: 24.9317486 },
     location_type: 'ROOFTOP',
     viewport: {
-      northeast: { lat: 60.15990078029151, lng: 24.9336875802915 },
-      southwest: { lat: 60.15720281970849, lng: 24.93098961970849 },
+      northeast: { lat: 60.16005003029151, lng: 24.9330654802915 },
+      southwest: { lat: 60.15735206970849, lng: 24.9303675197085 },
     },
   },
-  place_id: 'ChIJeU3PtysKkkYR948uyfnAMX4',
-  plus_code: {
-    compound_code: '5W5J+CW Helsinki, Suomi',
-    global_code: '9GG65W5J+CW',
-  },
-  types: ['establishment', 'point_of_interest'],
+  place_id: 'ChIJ8W5KFbQLkkYRSXUp2rrqSr4',
+  types: ['premise'],
 }
 
 const place: GooglePlace = {
@@ -34,22 +31,18 @@ const place: GooglePlace = {
       southwest: { lat: 60.15973187010727, lng: 24.94034802010728 },
     },
   },
-  icon: 'https://maps.gstatic.com/mapfiles/place_api/icons/cafe-71.png',
-  id: '4ed1c053cd3806efbba2786cc74e20af94df9d4c',
+  icon: 'https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/cafe-71.png',
   name: 'Brooklyn Cafe',
-  opening_hours: { open_now: false },
+  opening_hours: { open_now: true },
   photos: [],
   place_id: 'ChIJgUCiJ7YLkkYRj6mOfjUbO5c',
-  plus_code: {
-    compound_code: '5W6R+CP Helsinki',
-    global_code: '9GG65W6R+CP',
-  },
+  plus_code: { compound_code: '5W6R+CP Helsinki', global_code: '9GG65W6R+CP' },
   price_level: 2,
   rating: 4.5,
   reference: 'ChIJgUCiJ7YLkkYRj6mOfjUbO5c',
   scope: 'GOOGLE',
   types: ['cafe', 'food', 'point_of_interest', 'establishment'],
-  user_ratings_total: 477,
+  user_ratings_total: 529,
   vicinity: 'Fredrikinkatu 19, Helsinki',
 }
 
