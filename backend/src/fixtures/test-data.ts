@@ -13,7 +13,6 @@ const place: Place = {
   location: { latitude: 60.1611124, longitude: 24.9417875 },
   name: 'Brooklyn Cafe',
   openNow: false,
-  priceLevel: 2,
   rating: 4.5,
   status: 'OPERATIONAL',
   types: ['cafe', 'food', 'point_of_interest', 'establishment'],

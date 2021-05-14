@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable no-unused-vars */
 
 import FunctionHandlerBase from './function-handler-base'
 import { FunctionResult, GoogleResponse } from '../types'

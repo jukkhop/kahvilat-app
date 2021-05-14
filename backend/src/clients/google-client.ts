@@ -73,7 +73,7 @@ class GoogleClient {
     return this.request('place/nearbysearch', queryParams())
   }
 
-  async request<T>(endpoint: string, queryParams: any, encodeParams = false): Promise<Response<T>> {
+  private async request<T>(endpoint: string, queryParams: any, encodeParams = false): Promise<Response<T>> {
     const queryString = qs.stringify(queryParams, { encode: encodeParams })
     const url = `${this.baseUrl}/${endpoint}/json?${queryString}`
 
@@ -81,15 +81,24 @@ class GoogleClient {
       const response = await fetch(url)
       const body = await response.json()
 
-      if (response.status !== 200) {
+      if (!response.ok) {
         return { state: 'error', status: response.status, error: body }
       }
 
       const { results, next_page_token: cursor = undefined } = body
-      return { state: 'success', results, cursor }
+
+      return {
+        state: 'success',
+        results,
+        cursor,
+      }
     } catch (ex) {
       const err: FetchError = ex
-      return { state: 'error', error: err.message }
+
+      return {
+        state: 'error',
+        error: err.message,
+      }
     }
   }
 }

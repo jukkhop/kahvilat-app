@@ -11,7 +11,6 @@ type Place = {
   location: Location
   name: string
   openNow: boolean
-  priceLevel: number
   rating: number
   status: string
   types: string[]

@@ -40,7 +40,7 @@ Frontend
 - Up the cache `docker-compose up -d`
 - Install deps `yarn install`
 - Run `yarn start`
-- Run `curl http://localhost:3001/local/places` to verify that the API works as expected
+- Run `curl http://localhost:3010/local/places` to verify that the API works as expected
 
 #### Frontend
 

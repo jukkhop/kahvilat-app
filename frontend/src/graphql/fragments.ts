@@ -22,7 +22,6 @@ const placeFragment = gql`
     }
     name
     openNow
-    priceLevel
     rating
     status
     types

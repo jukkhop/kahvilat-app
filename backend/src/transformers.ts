@@ -22,7 +22,6 @@ function transformPlace(place: GooglePlace): Place {
     },
     name: place.name,
     openNow: place.opening_hours?.open_now || false,
-    priceLevel: place.price_level,
     rating: place.rating,
     status: place.business_status,
     types: place.types,

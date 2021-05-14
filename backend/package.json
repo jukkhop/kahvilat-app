@@ -8,7 +8,7 @@
     "format": "prettier src/**/*.ts --check",
     "lint": "eslint src --ext .ts",
     "test": "jest",
-    "start": "sls offline --httpPort 3001 start"
+    "start": "sls offline --httpPort 3010 --lambdaPort 3011 start"
   },
   "dependencies": {
     "node-fetch": "^2.6.1",

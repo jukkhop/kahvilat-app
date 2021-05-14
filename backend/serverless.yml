@@ -7,8 +7,8 @@ provider:
   stage: ${opt:stage, 'local'}
   environment:
     FRONTEND_URL: ${opt:frontend-url, 'http://localhost:3000'}
-    GOOGLE_API_KEY: ${opt:google-api-key, ''}
-    GOOGLE_BASE_URL: ${opt:google-base-url, 'https://maps.googleapis.com/maps/api'}
+    GOOGLE_API_KEY: ${opt:google-api-key, 'google-api-key'}
+    GOOGLE_BASE_URL: ${opt:google-base-url, 'http://localhost:3020/local/maps/api'}
     GOOGLE_LANGUAGE: ${opt:google-language, 'fi'}
     REDIS_HOST: ${opt:redis-host, 'localhost'}
     REDIS_PORT: ${opt:redis-port, '6380'}
