@@ -110,23 +110,23 @@ interface Props {
 function PlaceComponent(props: Props): JSX.Element {
   const { address, distance, icon, name, openNow, rating } = props
   return (
-    <Outer>
+    <Outer className="place-item">
       <Inner>
-        <Icon>
+        <Icon className="place-icon">
           <img src={icon} alt="icon" />
         </Icon>
-        <Name>{name}</Name>
-        <Address>{address}</Address>
-        <Details>
-          <Detail color={openNow ? COLORS.green : COLORS.red}>
+        <Name className="place-name">{name}</Name>
+        <Address className="place-address">{address}</Address>
+        <Details className="place-details">
+          <Detail className="place-open-now" color={openNow ? COLORS.green : COLORS.red}>
             <FontAwesomeIcon icon={faClock} />
             {openNow ? 'open' : 'closed'}
           </Detail>
-          <Detail>
+          <Detail className="place-distance">
             <FontAwesomeIcon icon={faWalking} />
             {distance} m
           </Detail>
-          <Detail>
+          <Detail className="place-rating">
             <FontAwesomeIcon icon={faSmile} />
             {Number(rating).toFixed(1)}
           </Detail>

@@ -32,7 +32,7 @@ function PlacesMap(props: Props): JSX.Element {
       // @ts-ignore
       const bounds = new window.google.maps.LatLngBounds()
       bounds.extend({ lat: center.latitude, lng: center.longitude })
-      places.forEach(place => bounds.extend({ lat: place.coords.latitude, lng: place.coords.longitude }))
+      places.forEach(({ coords }) => bounds.extend({ lat: coords.latitude, lng: coords.longitude }))
       map.fitBounds(bounds)
     },
     [center, places],
@@ -41,6 +41,7 @@ function PlacesMap(props: Props): JSX.Element {
   return (
     <GoogleMap
       center={{ lat: center.latitude, lng: center.longitude }}
+      id="places-map"
       mapContainerStyle={containerStyle}
       onLoad={onLoad}
       options={options}

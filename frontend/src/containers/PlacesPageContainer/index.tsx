@@ -83,7 +83,6 @@ function PlacesPageContainer(): JSX.Element {
         cursor,
         pathFunction: buildPath('/find-places'),
       },
-      // @ts-ignore
       updateQuery: (previousResult, { fetchMoreResult }) => {
         const previousEntry = previousResult.findPlaces
         const newCursor = fetchMoreResult?.findPlaces?.cursor

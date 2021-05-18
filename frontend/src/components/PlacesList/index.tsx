@@ -19,9 +19,9 @@ interface Props {
   places: Place[]
 }
 
-function PlacesGrid(props: Props): JSX.Element {
+function PlacesList(props: Props): JSX.Element {
   return (
-    <Places>
+    <Places id="places-list">
       {props.places.map(({ address, distance, icon, name, openNow, rating }) => (
         <PlaceCard
           address={address}
@@ -37,4 +37,4 @@ function PlacesGrid(props: Props): JSX.Element {
   )
 }
 
-export default PlacesGrid
+export default PlacesList
