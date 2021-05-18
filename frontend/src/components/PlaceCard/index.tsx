@@ -120,7 +120,7 @@ function PlaceComponent(props: Props): JSX.Element {
         <Details className="place-details">
           <Detail className="place-open-now" color={openNow ? COLORS.green : COLORS.red}>
             <FontAwesomeIcon icon={faClock} />
-            {openNow ? 'open' : 'closed'}
+            {openNow ? 'auki' : 'suljettu'}
           </Detail>
           <Detail className="place-distance">
             <FontAwesomeIcon icon={faWalking} />
