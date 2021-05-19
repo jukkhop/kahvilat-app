@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import qs from 'qs'
 
 import { getConfig } from '../config'
-import { place1, place2 } from '../data'
+import { address, place1, place2 } from '../data'
 import { GoogleErrorResponse, GoogleSuccessResponse, Place } from '../types'
 
 let baseUrl: string
@@ -13,13 +13,8 @@ beforeAll(() => {
 })
 
 it('responds with HTTP 200 for a valid query with search terms', async () => {
-  const queryString = qs.stringify({
-    keyword: 'coffee',
-    latitude: 60.1631932,
-    longitude: 24.93846,
-    radius: 250,
-    type: 'cafe',
-  })
+  const { latitude, longitude } = address.location
+  const queryString = qs.stringify({ keyword: 'coffee', latitude, longitude, radius: 250, type: 'cafe' })
   const url = `${baseUrl}/find-places?${queryString}`
   const response = await fetch(url)
   const body = (await response.json()) as GoogleSuccessResponse<Place>
