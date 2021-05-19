@@ -22,7 +22,7 @@ it('responds with HTTP 200 for a valid query with address', async () => {
 })
 
 it('returns HTTP 200 for a valid query with latitude and longitude', async () => {
-  const queryString = qs.stringify({ latitude: 11.11, longitude: 22.22 })
+  const queryString = qs.stringify({ latitude: 60.1631932, longitude: 24.93846 })
   const url = `${baseUrl}/find-address?${queryString}`
   const response = await fetch(url)
   const body = (await response.json()) as GoogleSuccessResponse<Address>

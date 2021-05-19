@@ -13,17 +13,23 @@ beforeAll(() => {
 })
 
 it('responds with HTTP 200 for a valid query with search terms', async () => {
-  const queryString = qs.stringify({ keyword: 'coffee', latitude: 11.1, longitude: 22.2, radius: 250, type: 'cafe' })
+  const queryString = qs.stringify({
+    keyword: 'coffee',
+    latitude: 60.1631932,
+    longitude: 24.93846,
+    radius: 250,
+    type: 'cafe',
+  })
   const url = `${baseUrl}/find-places?${queryString}`
   const response = await fetch(url)
   const body = (await response.json()) as GoogleSuccessResponse<Place>
   expect(response.status).toEqual(200)
   expect(body.results).toEqual([place1])
-  expect(body.cursor).toEqual('token')
+  expect(body.cursor).toEqual('token2')
 })
 
 it('responds with HTTP 200 for a valid query with cursor', async () => {
-  const queryString = qs.stringify({ cursor: 'token' })
+  const queryString = qs.stringify({ cursor: 'token2' })
   const url = `${baseUrl}/find-places?${queryString}`
   const response = await fetch(url)
   const body = (await response.json()) as GoogleSuccessResponse<Place>

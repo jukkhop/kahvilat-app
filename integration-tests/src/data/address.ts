@@ -1,12 +1,9 @@
 import { Address } from '../types'
 
 const address: Address = {
-  address: 'Fredrikinkatu 12, 00120 Helsinki, Suomi',
-  id: 'ChIJD5l4L7YLkkYRhhXiW_iyw0g',
-  location: {
-    latitude: 60.160855,
-    longitude: 24.941458,
-  },
+  address: 'Fredrikinkatu 22, 00120 Helsinki, Suomi',
+  id: 'ChIJeaeDGcoLkkYRS6RluIAPJtM',
+  location: { latitude: 60.1631932, longitude: 24.93846 },
 }
 
 export { address }
