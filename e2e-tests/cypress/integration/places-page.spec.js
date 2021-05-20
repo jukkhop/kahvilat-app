@@ -6,7 +6,7 @@ context('Places Page', () => {
     cy.visit('/places')
   })
 
-  describe('General layout', () => {
+  describe('Layout', () => {
     it('should have a document title', () => {
       cy.title().should('include', 'kahvilat.app')
     })
@@ -28,7 +28,7 @@ context('Places Page', () => {
     })
   })
 
-  describe('Main layout', () => {
+  describe('Content', () => {
     it('should render the form', () => {
       cy.get('main form').should('exist')
     })
@@ -68,7 +68,7 @@ context('Places Page', () => {
     })
   })
 
-  describe('Form / Places List', () => {
+  describe('Functionality', () => {
     it('should fetch and render the correct amount of places', () => {
       const placesUrl = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=250&type=cafe'
       const morePlacesUrl = '**/find-places?cursor=token2'
