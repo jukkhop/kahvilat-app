@@ -13,7 +13,7 @@ import { Coords, FindAddressData, FindCoordsData, FindPlacesData, FormValues } f
 import { mapPlace, sleep, sortPlaces } from '../../utils'
 
 function PlacesPageContainer(): JSX.Element {
-  const { getValues, handleSubmit, register, setValue } = useForm()
+  const { formState, getValues, handleSubmit, register, setValue } = useForm()
   const [userCoords, setUserCoords] = useState<Coords | undefined>(undefined)
   const [prevAddress, setPrevAddress] = useState<string | undefined>(undefined)
   const [prevDistance, setPrevDistance] = useState<number | undefined>(undefined)
@@ -158,6 +158,7 @@ function PlacesPageContainer(): JSX.Element {
       coords={userCoords}
       defaultDistance={DEFAULT_DISTANCE}
       error={error ? true : false}
+      isSubmitted={formState.isSubmitted}
       loading={loading}
       onAddressChange={onAddressChange}
       onDistanceChange={onDistanceChange}

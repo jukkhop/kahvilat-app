@@ -69,6 +69,7 @@ interface Props {
   defaultDistance: number
   error?: boolean
   inputErrors?: Record<string, string>
+  isSubmitted: boolean
   loading: boolean
   onAddressChange: ChangeEventHandler<HTMLInputElement>
   onDistanceChange: (event: React.ChangeEvent<any>, value: number | number[]) => void
@@ -89,6 +90,7 @@ function PlacesPage(props: Props): JSX.Element {
     coords,
     defaultDistance,
     error,
+    isSubmitted,
     loading,
     onAddressChange,
     onDistanceChange,
@@ -149,7 +151,7 @@ function PlacesPage(props: Props): JSX.Element {
       </ThemeProvider>
       <LoadScript googleMapsApiKey={config.google.apiKey}>
         {(() => {
-          if (!coords) {
+          if (!isSubmitted) {
             return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaaksesi.</Message>
           }
           if (loading) {
@@ -157,6 +159,9 @@ function PlacesPage(props: Props): JSX.Element {
           }
           if (error) {
             return <Message>Haussa tapahtui virhe.</Message>
+          }
+          if (!coords) {
+            return <Message>Antamaasi osoitetta ei löytynyt. Tarkista oikeinkirjoitus.</Message>
           }
           if (places.length === 0) {
             return <Message>Valitettavasti kahviloita ei löytynyt. Voit kokeilla kasvattaa etäisyyttä.</Message>
