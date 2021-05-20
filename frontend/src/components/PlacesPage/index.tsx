@@ -151,7 +151,7 @@ function PlacesPage(props: Props): JSX.Element {
       </ThemeProvider>
       <LoadScript googleMapsApiKey={config.google.apiKey}>
         {(() => {
-          if (!isSubmitted) {
+          if (!address && !coords && !isSubmitted) {
             return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaaksesi.</Message>
           }
           if (loading) {
@@ -160,11 +160,11 @@ function PlacesPage(props: Props): JSX.Element {
           if (error) {
             return <Message>Haussa tapahtui virhe.</Message>
           }
-          if (!coords) {
+          if (!address || !coords) {
             return <Message>Antamaasi osoitetta ei löytynyt. Tarkista oikeinkirjoitus.</Message>
           }
           if (places.length === 0) {
-            return <Message>Valitettavasti kahviloita ei löytynyt. Voit kokeilla kasvattaa etäisyyttä.</Message>
+            return <Message>Valitettavasti kahviloita ei löytynyt. Kokeile kasvattaa etäisyyttä.</Message>
           }
           return (
             <div>
