@@ -179,7 +179,7 @@ const place6: GooglePlace = {
   photos: [],
   place_id: 'ChIJoS_dJvMLkkYRnzPd5hC-e3I',
   plus_code: { compound_code: '5W5V+73 Helsinki', global_code: '9GG65W5V+73' },
-  rating: 4.5,
+  rating: 4.4,
   reference: 'ChIJoS_dJvMLkkYRnzPd5hC-e3I',
   scope: 'GOOGLE',
   types: ['cafe', 'restaurant', 'food', 'point_of_interest', 'establishment'],
