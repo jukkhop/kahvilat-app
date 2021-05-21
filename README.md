@@ -21,7 +21,6 @@ Backend
 - Redis as a cache
 - Serverless framework
 - Docker (for local development only)
-- Jest with `ts-jest` as a testing solution
 
 Frontend
 
