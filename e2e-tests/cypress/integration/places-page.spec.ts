@@ -52,7 +52,7 @@ context('Places Page', () => {
       cy.get('form > button').contains('Etsi kahvilat').should('exist')
     })
 
-    it('should render the instruction text', () => {
+    it('should render the instruction message', () => {
       cy.get('main > p').contains('Klikkaa "ETSI KAHVILAT" aloittaaksesi.')
     })
 
@@ -151,64 +151,47 @@ context('Places Page', () => {
       cy.get('@placeDetails').find('.place-rating').contains('4.5')
     })
 
-    it('should render a loading message when data is being fetched', () => {
-      const url = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=500&type=cafe'
-      cy.intercept('GET', url).as('fetchPlaces')
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-      cy.get('button').contains('Etsi kahvilat').click()
-      cy.get('main > p').contains('Ladataan..')
-      cy.wait('@fetchPlaces')
-    })
+    describe('Status message', () => {
+      const headers = { 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Origin': '*' }
+      const errorResponse = { statusCode: 500, body: { error: 'Something failed' }, headers, delayMs: 500 }
+      const emptyResponse = { statusCode: 200, body: { results: [] }, headers, delayMs: 500 }
 
-    it('should render a generic error message when there is an error while fetching', () => {
-      cy.intercept(
-        { method: 'GET', url: '**/find-address?*' },
-        {
-          statusCode: 500,
-          body: { error: 'Something failed' },
-          headers: { 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Origin': '*' },
-          delayMs: 500,
-        },
-      ).as('fetchAddress')
+      it('should render an instruction message initially', () => {
+        cy.get('main > p').contains('Klikkaa "ETSI KAHVILAT" aloittaaksesi.')
+      })
 
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-      cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchAddress')
-      cy.get('main > p').contains('Haussa tapahtui virhe.')
-    })
+      it('should render a loading message when data is being fetched', () => {
+        const url = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=500&type=cafe'
+        cy.intercept('GET', url).as('fetchPlaces')
+        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.get('button').contains('Etsi kahvilat').click()
+        cy.get('main > p').contains('Ladataan..')
+        cy.wait('@fetchPlaces')
+      })
 
-    it('should render a specific error message when no address could be found', () => {
-      cy.intercept(
-        { method: 'GET', url: '**/find-address?*' },
-        {
-          statusCode: 200,
-          body: { results: [] },
-          headers: { 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Origin': '*' },
-          delayMs: 500,
-        },
-      ).as('fetchAddress')
+      it('should render a generic error message when there is an error while fetching', () => {
+        cy.intercept({ method: 'GET', url: '**/find-address?*' }, errorResponse).as('fetchAddress')
+        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.get('button').contains('Etsi kahvilat').click()
+        cy.wait('@fetchAddress')
+        cy.get('main > p').contains('Haussa tapahtui virhe.')
+      })
 
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-      cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchAddress')
-      cy.get('main > p').contains('Antamaasi osoitetta ei löytynyt.')
-    })
+      it('should render a specific error message when no address could be found', () => {
+        cy.intercept({ method: 'GET', url: '**/find-address?*' }, emptyResponse).as('fetchAddress')
+        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.get('button').contains('Etsi kahvilat').click()
+        cy.wait('@fetchAddress')
+        cy.get('main > p').contains('Antamaasi osoitetta ei löytynyt.')
+      })
 
-    it('should render a specific error message when no places could be found', () => {
-      cy.intercept(
-        { method: 'GET', url: '**/find-places?*' },
-        {
-          statusCode: 200,
-          body: { results: [] },
-          headers: { 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Origin': '*' },
-          delayMs: 500,
-        },
-      ).as('fetchPlaces')
-
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-      cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchPlaces')
-      cy.get('main > p').contains('Valitettavasti kahviloita ei löytynyt.')
+      it('should render a specific error message when no places could be found', () => {
+        cy.intercept({ method: 'GET', url: '**/find-places?*' }, emptyResponse).as('fetchPlaces')
+        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.get('button').contains('Etsi kahvilat').click()
+        cy.wait('@fetchPlaces')
+        cy.get('main > p').contains('Valitettavasti kahviloita ei löytynyt.')
+      })
     })
 
     describe('Sorting of places', () => {
@@ -239,8 +222,8 @@ context('Places Page', () => {
         cy.get('#places-list .place-item').should('have.length', 6).as('placeItems')
         cy.get('@placeItems').first().next().next().find('.place-rating').contains('4.4')
         cy.get('@placeItems').first().next().next().find('.place-distance').contains('100 m')
-        cy.get('@placeItems').first().next().next().next().find('.place-rating').contains('4.4')
-        cy.get('@placeItems').first().next().next().next().find('.place-distance').contains('600 m')
+        cy.get('@placeItems').last().prev().prev().find('.place-rating').contains('4.4')
+        cy.get('@placeItems').last().prev().prev().find('.place-distance').contains('600 m')
       })
     })
 
