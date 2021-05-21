@@ -9,8 +9,10 @@
 Miscellaneous
 
 - AWS as cloud provider (API Gateway, CloudFront, ElastiCache, Lambda, Route53, S3, VPC)
-- Terraform for infrastructure-as-code
-- CircleCI for CI/CD automation
+- [Terraform](https://www.terraform.io/) for infrastructure-as-code
+- [CircleCI](https://circleci.com/) for CI/CD automation
+- [Cypress](https://www.cypress.io/) for end-to-end testing
+- [Jest](https://jestjs.io/) for integration and unit testing
 - [git-crypt](https://github.com/AGWA/git-crypt) for encryption
 
 Backend
