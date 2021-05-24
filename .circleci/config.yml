@@ -94,7 +94,6 @@ jobs:
               echo "No changes to backend code, skipping job."
               circleci step halt
             fi
-      - aws-cli/setup
       - restore_cache:
           keys:
             - backend-npm-cache
@@ -164,7 +163,6 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - aws-cli/setup
       - restore_cache:
           keys:
             - integration-npm-cache
