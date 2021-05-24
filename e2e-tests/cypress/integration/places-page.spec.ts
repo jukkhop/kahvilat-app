@@ -104,11 +104,11 @@ context('Places Page', () => {
       cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
       cy.get('button').contains('Etsi kahvilat').click()
       cy.wait('@fetchPlaces1').its('response.body.results').should('have.length', 1)
-      cy.get('#places-list').find('.place-name').should('have.length', 2).first().contains('Andante Coffee')
+      cy.get('#places-list').find('.place-address').should('have.length', 2).first().contains('Fredrikinkatu')
       cy.get('input#address').clear().type('Perämiehenkatu 1, Helsinki')
       cy.get('button').contains('Etsi kahvilat').click()
       cy.wait('@fetchPlaces2').its('response.body.results').should('have.length', 1)
-      cy.get('#places-list').find('.place-name').should('have.length', 2).first().contains('Kaffa Roastery')
+      cy.get('#places-list').find('.place-address').should('have.length', 2).last().contains('Perämiehenkatu')
     })
 
     it('should re-fetch places when selecting a different distance', () => {
