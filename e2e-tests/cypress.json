@@ -1,5 +1,4 @@
 {
-  "baseUrl": "https://dev.kahvilat.app",
   "defaultCommandTimeout": 5000,
   "testFiles": "**/*.spec.ts",
   "video": false
