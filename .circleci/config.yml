@@ -80,7 +80,7 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >>
 
-  test-backend:
+  check-backend:
     docker:
       - image: circleci/node:12.16.2
     working_directory: ~/repo/backend
@@ -106,7 +106,7 @@ jobs:
           paths:
             - node_modules
       - run:
-          name: Run check script
+          name: Check code and run unit tests
           command: ./check.sh
 
   deploy-backend:
@@ -154,6 +154,40 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >>
 
+  test-backend:
+    parameters:
+      stage:
+        type: string
+    docker:
+      - image: circleci/node:12.16.2
+    working_directory: ~/repo/integration-tests
+    steps:
+      - checkout:
+          path: ~/repo
+      - aws-cli/setup
+      - restore_cache:
+          keys:
+            - integration-npm-cache
+      - run:
+          name: Install dependencies
+          command: yarn install
+      - save_cache:
+          key: integration-npm-cache
+          paths:
+            - node_modules
+      - run:
+          name: Set up git-crypt
+          command: |
+            sudo apt-get install -y git-crypt
+            echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
+            git-crypt unlock ./git-crypt.key
+      - run:
+          name: Check code
+          command: ./check.sh
+      - run:
+          name: Run integration tests
+          command: ./run.sh << parameters.stage >>
+
 workflows:
   version: 2
   frontend-dev:
@@ -192,7 +226,7 @@ workflows:
 
   backend-dev:
     jobs:
-      - test-backend:
+      - check-backend:
           filters:
             branches:
               only:
@@ -200,7 +234,15 @@ workflows:
       - deploy-backend:
           stage: dev
           requires:
-            - test-backend
+            - check-backend
+          filters:
+            branches:
+              only:
+                - master
+      - test-backend:
+          stage: dev
+          requires:
+            - deploy-backend
           filters:
             branches:
               only:
@@ -208,7 +250,7 @@ workflows:
 
   backend-prd:
     jobs:
-      - test-backend:
+      - check-backend:
           filters:
             branches:
               only:
@@ -216,7 +258,7 @@ workflows:
       - deploy-backend:
           stage: prd
           requires:
-            - test-backend
+            - check-backend
           filters:
             branches:
               only:
