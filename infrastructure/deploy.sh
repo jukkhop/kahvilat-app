@@ -10,6 +10,8 @@ cd "$(dirname "$0")"
 )
 
 env="${1}"
+shift
+terraform_options="${@:-}"
 
 set -o allexport
 
@@ -24,4 +26,4 @@ terraform init \
 
 terraform workspace select ${env} || terraform workspace new ${env}
 
-terraform apply
+terraform apply ${terraform_options}

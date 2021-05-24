@@ -5,6 +5,34 @@ orbs:
   cypress: cypress-io/cypress@1.28.0
 
 jobs:
+  deploy-infrastructure:
+    parameters:
+      stage:
+        type: string
+    docker:
+      - image: circleci/node:12.16.2
+    parallelism: 1
+    working_directory: ~/repo/infrastructure
+    steps:
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Set up terraform
+          command: |
+            wget https://releases.hashicorp.com/terraform/0.13.6/terraform_0.13.6_linux_amd64.zip
+            unzip terraform_0.13.6_linux_amd64.zip
+            sudo mv terraform /usr/local/bin/
+            terraform -v
+      - run:
+          name: Set up git-crypt
+          command: |
+            sudo apt-get install -y git-crypt
+            echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
+            git-crypt unlock ./git-crypt.key
+      - run:
+          name: Run deploy script
+          command: ./deploy.sh << parameters.stage >> -auto-approve
+
   prepare-frontend:
     parameters:
       stage:
@@ -162,6 +190,12 @@ workflows:
   version: 2
   dev:
     jobs:
+      - deploy-infrastructure:
+          stage: dev
+          filters:
+            branches:
+              only:
+                - master
       - prepare-frontend:
           stage: dev
           filters:
@@ -219,6 +253,12 @@ workflows:
 
   prd:
     jobs:
+      - deploy-infrastructure:
+          stage: prd
+          filters:
+            branches:
+              only:
+                - production
       - prepare-frontend:
           stage: prd
           filters:
