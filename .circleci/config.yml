@@ -2,11 +2,10 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@1.0.0
-  compare-url: iynere/compare-url@1.2.0
   cypress: cypress-io/cypress@1.28.0
 
 jobs:
-  build-frontend:
+  prepare-frontend:
     parameters:
       stage:
         type: string
@@ -17,13 +16,6 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - compare-url/reconstruct
-      - compare-url/use:
-          custom-logic: |
-            if [[ $(git diff $COMMIT_RANGE --name-status | grep "frontend") == "" ]]; then
-              echo "No changes to frontend code, skipping job."
-              circleci step halt
-            fi
       - attach_workspace:
           at: ~/repo/frontend
       - run:
@@ -51,13 +43,6 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - compare-url/reconstruct
-      - compare-url/use:
-          custom-logic: |
-            if [[ $(git diff $COMMIT_RANGE --name-status | grep "frontend") == "" ]]; then
-              echo "No changes to frontend code, skipping job."
-              circleci step halt
-            fi
       - aws-cli/setup
       - attach_workspace:
           at: ~/repo/frontend
@@ -81,20 +66,13 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >>
 
-  test-backend:
+  prepare-backend:
     docker:
       - image: circleci/node:12.16.2
     working_directory: ~/repo/backend
     steps:
       - checkout:
           path: ~/repo
-      - compare-url/reconstruct
-      - compare-url/use:
-          custom-logic: |
-            if [[ $(git diff $COMMIT_RANGE --name-status | grep "backend") == "" ]]; then
-              echo "No changes to backend code, skipping job."
-              circleci step halt
-            fi
       - restore_cache:
           keys:
             - backend-npm-cache
@@ -119,13 +97,6 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - compare-url/reconstruct
-      - compare-url/use:
-          custom-logic: |
-            if [[ $(git diff $COMMIT_RANGE --name-status | grep "backend") == "" ]]; then
-              echo "No changes to backend code, skipping job."
-              circleci step halt
-            fi
       - aws-cli/setup
       - restore_cache:
           keys:
@@ -154,7 +125,7 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >>
 
-  integration-tests:
+  run-integration-tests:
     parameters:
       stage:
         type: string
@@ -191,7 +162,7 @@ workflows:
   version: 2
   dev:
     jobs:
-      - build-frontend:
+      - prepare-frontend:
           stage: dev
           filters:
             branches:
@@ -200,12 +171,12 @@ workflows:
       - deploy-frontend:
           stage: dev
           requires:
-            - build-frontend
+            - prepare-frontend
           filters:
             branches:
               only:
                 - master
-      - test-backend:
+      - prepare-backend:
           filters:
             branches:
               only:
@@ -213,12 +184,12 @@ workflows:
       - deploy-backend:
           stage: dev
           requires:
-            - test-backend
+            - prepare-backend
           filters:
             branches:
               only:
                 - master
-      - integration-tests:
+      - run-integration-tests:
           stage: dev
           requires:
             - deploy-backend
@@ -226,13 +197,21 @@ workflows:
             branches:
               only:
                 - master
-      - cypress/install
-      - cypress/run:
+      - cypress/install:
+          name: prepare-e2e-tests
           yarn: true
-          working_directory: frontend
+          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "e2e-tests/yarn.lock"}}'
+          working_directory: e2e-tests
+      - cypress/run:
+          name: run-e2e-tests
+          yarn: true
+          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "e2e-tests/yarn.lock"}}'
+          working_directory: e2e-tests
+          no-workspace: true
           requires:
             - deploy-frontend
             - deploy-backend
+            - prepare-e2e-tests
           filters:
             branches:
               only:
@@ -240,7 +219,7 @@ workflows:
 
   prd:
     jobs:
-      - build-frontend:
+      - prepare-frontend:
           stage: prd
           filters:
             branches:
@@ -249,12 +228,12 @@ workflows:
       - deploy-frontend:
           stage: prd
           requires:
-            - build-frontend
+            - prepare-frontend
           filters:
             branches:
               only:
                 - production
-      - test-backend:
+      - prepare-backend:
           filters:
             branches:
               only:
@@ -262,7 +241,7 @@ workflows:
       - deploy-backend:
           stage: prd
           requires:
-            - test-backend
+            - prepare-backend
           filters:
             branches:
               only:
