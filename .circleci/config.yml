@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@1.0.0
   compare-url: iynere/compare-url@1.2.0
+  cypress: cypress-io/cypress@1.28.0
 
 jobs:
   build-frontend:
@@ -80,7 +81,7 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >>
 
-  check-backend:
+  test-backend:
     docker:
       - image: circleci/node:12.16.2
     working_directory: ~/repo/backend
@@ -128,14 +129,14 @@ jobs:
       - aws-cli/setup
       - restore_cache:
           keys:
-            - backend-cache
+            - backend-npm-cache
       - run:
           name: Install Serverless CLI and dependencies
           command: |
             sudo yarn global add serverless
             yarn install
       - save_cache:
-          key: backend-cache
+          key: backend-npm-cache
           paths:
             - node_modules
       - run:
@@ -153,7 +154,7 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >>
 
-  test-backend:
+  integration-tests:
     parameters:
       stage:
         type: string
@@ -188,7 +189,7 @@ jobs:
 
 workflows:
   version: 2
-  frontend-dev:
+  dev:
     jobs:
       - build-frontend:
           stage: dev
@@ -204,27 +205,7 @@ workflows:
             branches:
               only:
                 - master
-
-  frontend-prd:
-    jobs:
-      - build-frontend:
-          stage: prd
-          filters:
-            branches:
-              only:
-                - production
-      - deploy-frontend:
-          stage: prd
-          requires:
-            - build-frontend
-          filters:
-            branches:
-              only:
-                - production
-
-  backend-dev:
-    jobs:
-      - check-backend:
+      - test-backend:
           filters:
             branches:
               only:
@@ -232,12 +213,12 @@ workflows:
       - deploy-backend:
           stage: dev
           requires:
-            - check-backend
+            - test-backend
           filters:
             branches:
               only:
                 - master
-      - test-backend:
+      - integration-tests:
           stage: dev
           requires:
             - deploy-backend
@@ -245,10 +226,35 @@ workflows:
             branches:
               only:
                 - master
+      - cypress/install
+      - cypress/run:
+          yarn: true
+          working_directory: frontend
+          requires:
+            - deploy-frontend
+            - deploy-backend
+          filters:
+            branches:
+              only:
+                - master
 
-  backend-prd:
+  prd:
     jobs:
-      - check-backend:
+      - build-frontend:
+          stage: prd
+          filters:
+            branches:
+              only:
+                - production
+      - deploy-frontend:
+          stage: prd
+          requires:
+            - build-frontend
+          filters:
+            branches:
+              only:
+                - production
+      - test-backend:
           filters:
             branches:
               only:
@@ -256,7 +262,7 @@ workflows:
       - deploy-backend:
           stage: prd
           requires:
-            - check-backend
+            - test-backend
           filters:
             branches:
               only:
