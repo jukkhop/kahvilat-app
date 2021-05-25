@@ -236,6 +236,10 @@ workflows:
           yarn: true
           cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "e2e-tests/yarn.lock"}}'
           working_directory: e2e-tests
+          filters:
+            branches:
+              only:
+                - master
       - cypress/run:
           name: run-e2e-tests
           yarn: true
