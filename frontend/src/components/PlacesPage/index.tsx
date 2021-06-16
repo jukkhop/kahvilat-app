@@ -81,7 +81,7 @@ const config = getConfig()
 
 const marks = [250, 500, 750, 1000, 1250, 1500].map(metres => ({
   value: metres,
-  label: `${convertDistance(metres)}`,
+  label: convertDistance(metres),
 }))
 
 function PlacesPage(props: Props): JSX.Element {
