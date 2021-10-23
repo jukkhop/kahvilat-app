@@ -1,7 +1,7 @@
-import { FunctionHandlerBase } from '../../bases'
+import { FunctionHandlerBase } from '../index'
 import { GoogleCache } from '../../caches'
 import { GoogleClient } from '../../clients'
-import { transformAddress } from '../../transformers'
+import { transformAddress } from '../../utils'
 import { Address, FindAddressParams, FunctionResult, GoogleResponse } from '../../types'
 
 class FunctionHandler extends FunctionHandlerBase {
@@ -17,10 +17,9 @@ class FunctionHandler extends FunctionHandlerBase {
   async handle(params: FindAddressParams): Promise<FunctionResult<GoogleResponse<Address>>> {
     const { cache, client } = this
 
-    // prettier-ignore
     return cache
       .findAddress(params, () => client.findAddress(params))
-      .then(response => this.convert(response, transformAddress))
+      .then((response) => this.convert(response, transformAddress))
   }
 }
 

@@ -1,4 +1,4 @@
-import { Address, GoogleAddress, GooglePlace, Place } from './types'
+import { Address, GoogleAddress, GooglePlace, Place } from '../types'
 
 function transformAddress(address: GoogleAddress): Address {
   return {

@@ -1,10 +1,12 @@
 /* eslint-disable jest/no-commented-out-tests */
 
-import FunctionHandler from './function-handler'
-import { GoogleCache } from '../../caches'
-import { AsyncRedisClient, GoogleClient } from '../../clients'
-import { testConfig, testData, testGoogle } from '../../fixtures'
-import { FindPlacesParams, FunctionResult, GooglePlace, GoogleResponse, Place } from '../../types'
+import { GoogleCache } from '../../../src/caches'
+import { AsyncRedisClient, GoogleClient } from '../../../src/clients'
+import FunctionHandler from '../../../src/functions/find-places/function-handler'
+
+import * as CommonTestData from '../../test/data/common'
+import * as GoogleTestData from '../../test/data/google'
+import { FindPlacesParams, FunctionResult, GooglePlace, GoogleResponse, Place } from '../../../src/types'
 
 const fnParams: FindPlacesParams = {
   keyword: 'coffee',
@@ -14,16 +16,16 @@ const fnParams: FindPlacesParams = {
   type: 'cafe',
 }
 
-const clientSuccessResp: GoogleResponse<GooglePlace> = { state: 'success', results: [testGoogle.place] }
-const clientErrorResp: GoogleResponse<GooglePlace> = { state: 'error', error: 'Something failed' }
+const clientSuccessResp: GoogleResponse<GooglePlace> = { type: 'success', results: [GoogleTestData.place] }
+const clientErrorResp: GoogleResponse<GooglePlace> = { type: 'error', error: 'Something failed' }
 
 const successResult: FunctionResult<GoogleResponse<Place>> = {
-  state: 'success',
-  data: { state: 'success', results: [testData.place] },
+  type: 'success',
+  data: { type: 'success', results: [CommonTestData.place] },
 }
 
 const errorResult: FunctionResult<GoogleResponse<Place>> = {
-  state: 'error',
+  type: 'error',
   errors: [new Error('Third party API call failed with error: Something failed')],
 }
 
@@ -33,7 +35,7 @@ const clientFn = jest.fn()
 let handler: FunctionHandler
 let cacheFn: jest.SpyInstance<Promise<any>, [queryParams: FindPlacesParams, fetchFn: () => Promise<any>]>
 
-jest.mock('../../clients', () => ({
+jest.mock('../../../src/clients', () => ({
   AsyncRedisClient: jest.fn(() => ({
     expire: jest.fn(),
     get: redisFn,
@@ -46,8 +48,8 @@ jest.mock('../../clients', () => ({
 
 beforeEach(() => {
   const redisClient = new AsyncRedisClient()
-  const cache = new GoogleCache(testConfig, redisClient)
-  const client = new GoogleClient(testConfig)
+  const cache = new GoogleCache(CommonTestData.config, redisClient)
+  const client = new GoogleClient(CommonTestData.config)
 
   handler = new FunctionHandler(cache, client)
   cacheFn = jest.spyOn(GoogleCache.prototype, 'findPlaces')
@@ -89,16 +91,16 @@ it('should return an error result if data cannot be fetched', async () => {
 
 it('should return the cursor string from the Google Client response', async () => {
   clientFn.mockResolvedValueOnce({
-    state: 'success',
-    results: [testGoogle.place],
+    type: 'success',
+    results: [GoogleTestData.place],
     cursor: 'some-cursor',
   })
 
   const result = await handler.handle(fnParams)
 
   expect(result).toEqual({
-    state: 'success',
-    data: { state: 'success', results: [testData.place], cursor: 'some-cursor' },
+    type: 'success',
+    data: { type: 'success', results: [CommonTestData.place], cursor: 'some-cursor' },
   })
 })
 

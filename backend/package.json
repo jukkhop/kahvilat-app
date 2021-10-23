@@ -2,12 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "private": true,
-  "author": "Jukka Hopeavuori <jukka.hopea@gmail.com>",
-  "license": "MIT",
   "scripts": {
-    "format": "prettier src/**/*.ts --check",
-    "lint": "eslint src --ext .ts",
-    "test": "jest",
+    "build": "tsc",
+    "format": "prettier  \"src/**/*.ts\" --check",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "jest --coverage",
     "start": "sls offline --httpPort 3010 --lambdaPort 3011 start"
   },
   "dependencies": {

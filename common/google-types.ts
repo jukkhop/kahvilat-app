@@ -3,13 +3,13 @@
 type GoogleResponse<T> = GoogleSuccessResponse<T> | GoogleErrorResponse
 
 type GoogleSuccessResponse<T> = {
-  state: 'success'
+  type: 'success'
   cursor?: string
   results: T[]
 }
 
 type GoogleErrorResponse = {
-  state: 'error'
+  type: 'error'
   status?: number
   error: string
 }

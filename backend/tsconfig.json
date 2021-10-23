@@ -1,20 +1,16 @@
 {
   "compilerOptions": {
-    "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["es2015"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "lib": ["ES2019"],
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "outDir": ".build",
     "rootDir": ".",
     "skipLibCheck": true,
     "strict": true,
-    "target": "es5"
+    "target": "ES2019"
   },
+  "include": ["src"],
   "exclude": ["node_modules"]
 }

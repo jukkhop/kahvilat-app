@@ -1,9 +1,11 @@
 import { APIGatewayProxyEvent } from 'aws-lambda'
 
-import FunctionHandler from './function-handler'
-import GatewayProxy from './gateway-proxy'
-import { testConfig, testData } from '../../fixtures'
-import { Address, FindAddressParams, FunctionResult, GoogleResponse } from '../../types'
+import * as CommonTestData from '../../test/data/common'
+
+import FunctionHandler from '../../../src/functions/find-address/function-handler'
+import GatewayProxy from '../../../src/functions/find-address/gateway-proxy'
+
+import { Address, FindAddressParams, FunctionResult, GoogleResponse } from '../../../src/types'
 
 const fnParams1: FindAddressParams = { latitude: 60.16, longitude: 24.93 }
 const fnParams2: FindAddressParams = { address: 'Mannerheimintie 1' }
@@ -39,18 +41,18 @@ const invalidEvent2: APIGatewayProxyEvent = {
 }
 
 const successResult: FunctionResult<GoogleResponse<Address>> = {
-  state: 'success',
-  data: { state: 'success', results: [testData.address], cursor: 'value' },
+  type: 'success',
+  data: { type: 'success', results: [CommonTestData.address], cursor: 'value' },
 }
 
 const errorResult: FunctionResult<GoogleResponse<Address>> = {
-  state: 'error',
+  type: 'error',
   errors: [new Error('Something failed')],
 }
 
 const handleFn = jest.fn()
 
-jest.mock('./function-handler', () =>
+jest.mock('../../../src/functions/find-address/function-handler', () =>
   jest.fn(() => ({
     handle: handleFn,
   })),
@@ -60,7 +62,7 @@ let proxy: GatewayProxy
 
 beforeEach(() => {
   // @ts-ignore
-  proxy = new GatewayProxy(testConfig, new FunctionHandler(undefined, undefined))
+  proxy = new GatewayProxy(CommonTestData.config, new FunctionHandler(undefined, undefined))
 })
 
 afterEach(() => {

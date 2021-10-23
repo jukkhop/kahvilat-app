@@ -1,6 +1,10 @@
-import { APIGatewayProxyEvent, APIGatewayProxyEventQueryStringParameters, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent as ProxyEvent,
+  APIGatewayProxyEventQueryStringParameters as QueryStringParameters,
+  APIGatewayProxyResult as ProxyResult,
+} from 'aws-lambda'
 
-import { FunctionHandlerBase, GatewayProxyBase } from '../../bases'
+import { FunctionHandlerBase, GatewayProxyBase } from '../index'
 import { Config, FindPlacesParams, ValidationSchema } from '../../types'
 
 class GatewayProxy extends GatewayProxyBase {
@@ -11,31 +15,39 @@ class GatewayProxy extends GatewayProxyBase {
     this.handler = handler
   }
 
-  async process(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  async process(event: ProxyEvent): Promise<ProxyResult> {
     const queryParams = event.queryStringParameters || {}
     const validationResult = this.validate(event, GatewayProxy.schema(queryParams))
 
-    if (validationResult.state === 'error') {
+    if (validationResult.type === 'error') {
       return validationResult.response
     }
 
     const { cursor, keyword, latitude, longitude, radius, type } = queryParams as Record<string, string>
 
-    // prettier-ignore
     const fnParams: FindPlacesParams = queryParams.cursor
       ? { cursor }
-      : { keyword, latitude: Number(latitude), longitude: Number(longitude), radius: Number(radius), type }
+      : {
+          keyword,
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+          radius: Number(radius),
+          type,
+        }
 
-    // prettier-ignore
-    return this.handler
-      .handle(fnParams)
-      .then(result => this.convert(result))
+    return this.handler.handle(fnParams).then((result) => this.convert(result))
   }
 
-  private static schema(queryParams: APIGatewayProxyEventQueryStringParameters): ValidationSchema {
+  private static schema(queryParams: QueryStringParameters): ValidationSchema {
     return queryParams.cursor
       ? { cursor: 'string' }
-      : { keyword: 'string', latitude: 'number', longitude: 'number', radius: 'number', type: 'string' }
+      : {
+          keyword: 'string',
+          latitude: 'number',
+          longitude: 'number',
+          radius: 'number',
+          type: 'string',
+        }
   }
 }
 
