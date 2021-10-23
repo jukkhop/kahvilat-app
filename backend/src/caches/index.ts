@@ -1,3 +1,4 @@
+import CacheBase from './cache-base'
 import GoogleCache from './google-cache'
 
-export { GoogleCache }
+export { CacheBase, GoogleCache }

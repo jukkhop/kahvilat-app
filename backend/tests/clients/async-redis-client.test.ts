@@ -1,5 +1,5 @@
 import redis, { RedisClient } from 'redis-mock'
-import AsyncRedisClient from './async-redis-client'
+import { AsyncRedisClient } from '../../src/clients'
 
 let client: RedisClient
 let asyncClient: AsyncRedisClient
@@ -16,7 +16,7 @@ beforeEach(() => {
 })
 
 afterEach(async () => {
-  await client.del('some-key')
+  client.del('some-key')
 })
 
 it('should cache a given value, and return it', async () => {

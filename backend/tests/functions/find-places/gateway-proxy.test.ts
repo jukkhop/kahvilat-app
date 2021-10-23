@@ -1,9 +1,10 @@
 import { APIGatewayProxyEvent } from 'aws-lambda'
 
-import FunctionHandler from './function-handler'
-import GatewayProxy from './gateway-proxy'
-import { testConfig, testData } from '../../fixtures'
-import { FindPlacesParams, FunctionResult, GoogleResponse, Place } from '../../types'
+import * as CommonTestData from '../../test/data/common'
+
+import FunctionHandler from '../../../src/functions/find-places/function-handler'
+import GatewayProxy from '../../../src/functions/find-places/gateway-proxy'
+import { FindPlacesParams, FunctionResult, GoogleResponse, Place } from '../../../src/types'
 
 const fnParams: FindPlacesParams = {
   keyword: 'coffee',
@@ -45,18 +46,18 @@ const invalidEvent2: APIGatewayProxyEvent = {
 }
 
 const successResult: FunctionResult<GoogleResponse<Place>> = {
-  state: 'success',
-  data: { state: 'success', results: [testData.place], cursor: 'some-cursor' },
+  type: 'success',
+  data: { type: 'success', results: [CommonTestData.place], cursor: 'some-cursor' },
 }
 
 const errorResult: FunctionResult<GoogleResponse<Place>> = {
-  state: 'error',
+  type: 'error',
   errors: [new Error('Something failed')],
 }
 
 const handleFn = jest.fn()
 
-jest.mock('./function-handler', () =>
+jest.mock('../../../src/functions/find-places/function-handler', () =>
   jest.fn(() => ({
     handle: handleFn,
   })),
@@ -66,7 +67,7 @@ let proxy: GatewayProxy
 
 beforeEach(() => {
   // @ts-ignore
-  proxy = new GatewayProxy(testConfig, new FunctionHandler(undefined, undefined))
+  proxy = new GatewayProxy(CommonTestData.config, new FunctionHandler(undefined, undefined))
 })
 
 afterEach(() => {

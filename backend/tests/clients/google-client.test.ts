@@ -1,6 +1,10 @@
 import fetch from 'node-fetch'
-import GoogleClient from './google-client'
-import { testConfig, testGoogle } from '../fixtures'
+
+import * as CommonTestData from '../test/data/common'
+import * as GoogleTestData from '../test/data/google'
+
+import { GoogleClient } from '../../src/clients'
+
 import {
   FindAddressParams,
   FindPlacesParams,
@@ -8,7 +12,7 @@ import {
   GooglePlace as Place,
   GoogleErrorResponse as ErrorResponse,
   GoogleSuccessResponse as SuccessResponse,
-} from '../types'
+} from '../../src/types'
 
 const { Response, FetchError } = jest.requireActual('node-fetch')
 jest.mock('node-fetch', jest.fn)
@@ -17,7 +21,7 @@ let client: GoogleClient
 let fetchFn: jest.MockedFunction<typeof fetch>
 
 beforeEach(() => {
-  client = new GoogleClient(testConfig)
+  client = new GoogleClient(CommonTestData.config)
   fetchFn = fetch as jest.MockedFunction<typeof fetch>
 })
 
@@ -26,7 +30,7 @@ afterEach(() => {
 })
 
 describe('findAddress', () => {
-  const { address } = testGoogle
+  const { address } = GoogleTestData
   const fnParams1: FindAddressParams = { latitude: 60.1, longitude: 24.9 }
   const fnParams2: FindAddressParams = { address: 'some-address' }
 
@@ -72,7 +76,7 @@ describe('findAddress', () => {
 })
 
 describe('findPlaces', () => {
-  const { place } = testGoogle
+  const { place } = GoogleTestData
   const fnParams1: FindPlacesParams = { keyword: 'coffee', latitude: 60.1, longitude: 24.9, radius: 500, type: 'cafe' }
   const fnParams2: FindPlacesParams = { cursor: 'some-cursor' }
   const successBody = { results: [place], next_page_token: 'some-cursor' }

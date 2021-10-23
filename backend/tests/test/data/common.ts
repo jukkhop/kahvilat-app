@@ -1,4 +1,22 @@
-import { Address, Place } from '../types'
+import { Address, Config, Place } from '../../../src/types'
+
+const config: Config = {
+  frontend: {
+    url: 'http://localhost:3000',
+  },
+  google: {
+    apiKey: 'some-api-key',
+    baseUrl: 'https://maps.googleapis.com/maps/api',
+    language: 'some-lang',
+  },
+  redis: {
+    host: 'some-host',
+    port: 1234,
+  },
+  stage: 'test',
+}
+
+export { config }
 
 const address: Address = {
   address: 'Telakkakatu 6, 00150 Helsinki, Suomi',

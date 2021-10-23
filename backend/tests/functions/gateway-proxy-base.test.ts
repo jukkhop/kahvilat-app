@@ -1,13 +1,14 @@
 import { APIGatewayProxyEvent } from 'aws-lambda'
 
-import GatewayProxyBase from './gateway-proxy-base'
-import { testConfig } from '../fixtures'
-import { ValidationErrorResult, ValidationSchema, ValidationSuccessResult } from '../types'
+import * as CommonTestData from '../test/data/common'
+
+import { GatewayProxyBase } from '../../src/functions'
+import { ValidationErrorResult, ValidationSchema, ValidationSuccessResult } from '../../src/types'
 
 let proxy: GatewayProxyBase
 
 beforeEach(() => {
-  proxy = new GatewayProxyBase(testConfig)
+  proxy = new GatewayProxyBase(CommonTestData.config)
 })
 
 describe('validate', () => {
@@ -18,9 +19,9 @@ describe('validate', () => {
     }
 
     const schema = { foo: 'string', bar: 'string' } as ValidationSchema
-    const { state } = proxy.validate(validEvent, schema) as ValidationSuccessResult
+    const { type } = proxy.validate(validEvent, schema) as ValidationSuccessResult
 
-    expect(state).toBe('success')
+    expect(type).toBe('success')
   })
 
   it('rejects and returns HTTP 400, given missing query string parameters', async () => {
@@ -55,7 +56,7 @@ describe('validate', () => {
 describe('convert', () => {
   it('returns HTTP 200 with data, given a successful function result', async () => {
     const result = proxy.convert({
-      state: 'success',
+      type: 'success',
       data: { foo: 'bar' },
     })
 
@@ -65,7 +66,7 @@ describe('convert', () => {
 
   it('returns HTTP 502 with error, given an erroneous function result', async () => {
     const result = proxy.convert({
-      state: 'error',
+      type: 'error',
       errors: [new Error('Foo failed'), new Error('Bar failed')],
     })
 
@@ -75,7 +76,7 @@ describe('convert', () => {
 
   it('includes the proper CORS headers to the response', async () => {
     const result = proxy.convert({
-      state: 'success',
+      type: 'success',
       data: { foo: 'bar' },
     })
 

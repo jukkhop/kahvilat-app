@@ -1,6 +1,7 @@
-import GoogleCache from './google-cache'
-import { AsyncRedisClient } from '../clients'
-import { testConfig, testData } from '../fixtures'
+import * as CommonTestData from '../test/data/common'
+
+import { GoogleCache } from '../../src/caches'
+import { AsyncRedisClient } from '../../src/clients'
 
 const redisExpFn = jest.fn()
 const redisGetFn = jest.fn()
@@ -10,7 +11,7 @@ const fetchFn = jest.fn()
 let client: AsyncRedisClient
 let cache: GoogleCache
 
-jest.mock('../clients', () => ({
+jest.mock('../../src/clients', () => ({
   AsyncRedisClient: jest.fn(() => ({
     expire: redisExpFn,
     get: redisGetFn,
@@ -20,14 +21,14 @@ jest.mock('../clients', () => ({
 
 beforeEach(() => {
   client = new AsyncRedisClient()
-  cache = new GoogleCache(testConfig, client)
+  cache = new GoogleCache(CommonTestData.config, client)
 })
 
 afterEach(() => {
-  redisExpFn.mockClear()
-  redisGetFn.mockClear()
-  redisSetFn.mockClear()
-  fetchFn.mockClear()
+  redisExpFn.mockReset()
+  redisGetFn.mockReset()
+  redisSetFn.mockReset()
+  fetchFn.mockReset()
 })
 
 describe('findAddress', () => {
@@ -37,8 +38,8 @@ describe('findAddress', () => {
   const { latitude, longitude } = fnParams2
   const cacheKey1 = `find-address?address=${address}`
   const cacheKey2 = `find-address?latitude=${latitude}&longitude=${longitude}`
-  const successResponse = { state: 'success', results: [testData.address] }
-  const errorResponse = { state: 'error', error: 'Something failed' }
+  const successResponse = { type: 'success', results: [CommonTestData.address] }
+  const errorResponse = { type: 'error', error: 'Something failed' }
 
   it('should return a cached response, if present (using address)', async () => {
     redisGetFn.mockResolvedValueOnce(JSON.stringify(successResponse))
@@ -92,8 +93,8 @@ describe('findPlaces', () => {
   const { cursor } = fnParams2
   const cacheKey1 = `find-places?keyword=${keyword}&latitude=${latitude}&longitude=${longitude}&radius=${radius}&type=${type}`
   const cacheKey2 = `find-places?cursor=${cursor}`
-  const successResponse = { state: 'success', results: [testData.place], cursor: 'some-cursor' }
-  const errorResponse = { state: 'error', error: 'Something failed' }
+  const successResponse = { type: 'success', results: [CommonTestData.place], cursor: 'some-cursor' }
+  const errorResponse = { type: 'error', error: 'Something failed' }
 
   it('should return a cached response, if present', async () => {
     redisGetFn.mockResolvedValueOnce(JSON.stringify(successResponse))

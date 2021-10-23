@@ -1,32 +1,29 @@
-import Cache from './cache-base'
-import { AsyncRedisClient } from '../clients'
+import { CacheBase } from '../../src/caches'
+import { AsyncRedisClient } from '../../src/clients'
 
 const redisDelFn = jest.fn()
 const redisExpFn = jest.fn()
 const redisGetFn = jest.fn()
 const redisSetFn = jest.fn()
 
-let cache: Cache
+const client = ({
+  delete: redisDelFn,
+  expire: redisExpFn,
+  get: redisGetFn,
+  set: redisSetFn,
+} as unknown) as AsyncRedisClient
 
-jest.mock('../clients', () => ({
-  AsyncRedisClient: jest.fn(() => ({
-    delete: redisDelFn,
-    expire: redisExpFn,
-    get: redisGetFn,
-    set: redisSetFn,
-  })),
-}))
+let cache: CacheBase
 
 beforeEach(() => {
-  const client = new AsyncRedisClient()
-  cache = new Cache(undefined, undefined, client)
+  cache = new CacheBase(undefined, undefined, client)
 })
 
 afterEach(() => {
-  redisDelFn.mockClear()
-  redisExpFn.mockClear()
-  redisGetFn.mockClear()
-  redisSetFn.mockClear()
+  redisDelFn.mockReset()
+  redisExpFn.mockReset()
+  redisGetFn.mockReset()
+  redisSetFn.mockReset()
 })
 
 it('should cache a given value with the given expiration time', async () => {

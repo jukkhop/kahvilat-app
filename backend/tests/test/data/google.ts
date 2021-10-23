@@ -1,4 +1,4 @@
-import { GoogleAddress, GooglePlace } from '../types'
+import { GoogleAddress, GooglePlace } from '../../../src/types'
 
 const address: GoogleAddress = {
   address_components: [

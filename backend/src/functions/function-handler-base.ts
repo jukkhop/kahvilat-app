@@ -14,7 +14,7 @@ abstract class FunctionHandlerBase {
   abstract handle(params: Record<string, any>): Promise<FunctionResult<any>>
 
   convert<A, B>(response: GoogleResponse<A>, transform: (obj: A) => B): FunctionResult<GoogleResponse<B>> {
-    switch (response.state) {
+    switch (response.type) {
       case 'success':
         return this.mkSuccessResult(response, transform)
       case 'error':
@@ -29,9 +29,9 @@ abstract class FunctionHandlerBase {
     transform: (obj: A) => B,
   ): FunctionSuccessResult<GoogleResponse<B>> {
     return {
-      state: 'success',
+      type: 'success',
       data: {
-        state: 'success',
+        type: 'success',
         results: response.results.map(transform),
         cursor: response.cursor,
       },
@@ -44,7 +44,7 @@ abstract class FunctionHandlerBase {
       : `Third party API call failed with error: ${response.error}`
 
     return {
-      state: 'error',
+      type: 'error',
       errors: [new Error(message)],
     }
   }

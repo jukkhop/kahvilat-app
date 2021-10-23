@@ -1,4 +1,4 @@
-import { Config } from './types'
+import { Config } from '../types'
 
 function getConfig(): Config {
   const { env } = process
@@ -14,7 +14,7 @@ function getConfig(): Config {
   ])
 
   if (errors.length > 0) {
-    throw new Error(errors.map(x => x.message).join('\n'))
+    throw new Error(errors.map((x) => x.message).join('\n'))
   }
 
   return {
@@ -35,12 +35,7 @@ function getConfig(): Config {
 }
 
 function checkVariables(actualVars: string[], expectedVars: string[]): Error[] {
-  // prettier-ignore
-  return (
-    expectedVars
-      .filter(x => !actualVars.includes(x))
-      .map(x => new Error(`Missing environment variable: ${x}`))
-  )
+  return expectedVars.filter((x) => !actualVars.includes(x)).map((x) => new Error(`Missing environment variable: ${x}`))
 }
 
 export { getConfig }

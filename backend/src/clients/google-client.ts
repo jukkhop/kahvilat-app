@@ -82,21 +82,20 @@ class GoogleClient {
       const body = await response.json()
 
       if (!response.ok) {
-        return { state: 'error', status: response.status, error: body }
+        return { type: 'error', status: response.status, error: body }
       }
 
       const { results, next_page_token: cursor = undefined } = body
 
       return {
-        state: 'success',
+        type: 'success',
         results,
         cursor,
       }
-    } catch (ex) {
-      const err: FetchError = ex
-
+    } catch (ex: unknown) {
+      const err = ex as FetchError
       return {
-        state: 'error',
+        type: 'error',
         error: err.message,
       }
     }

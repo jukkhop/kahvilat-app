@@ -14,8 +14,8 @@ class GatewayProxyBase {
     const queryParams = event.queryStringParameters || {}
 
     const missingErrors = Object.keys(schema)
-      .filter(key => !Object.keys(queryParams).includes(key))
-      .map(key => new Error(`Missing query string parameter: ${key}`))
+      .filter((key) => !Object.keys(queryParams).includes(key))
+      .map((key) => new Error(`Missing query string parameter: ${key}`))
 
     const typeErrors = Object.entries(schema)
       .filter(([key, type]) => {
@@ -39,14 +39,14 @@ class GatewayProxyBase {
 
     switch (errors.length) {
       case 0:
-        return { state: 'success' }
+        return { type: 'success' }
       default:
-        return { state: 'error', response: this.mkErrorResponse(400, errors) }
+        return { type: 'error', response: this.mkErrorResponse(400, errors) }
     }
   }
 
   convert(result: FunctionResult<any>): APIGatewayProxyResult {
-    switch (result.state) {
+    switch (result.type) {
       case 'success':
         return this.mkResponse(200, JSON.stringify(result.data))
       case 'error':
@@ -65,7 +65,7 @@ class GatewayProxyBase {
   }
 
   private mkErrorResponse(status: number, errors: Error[]): APIGatewayProxyResult {
-    const error = errors.map(x => x.message).join(', ')
+    const error = errors.map((x) => x.message).join(', ')
     const body = JSON.stringify({ error })
     return this.mkResponse(status, body)
   }

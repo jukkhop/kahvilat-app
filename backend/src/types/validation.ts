@@ -3,11 +3,11 @@ import { APIGatewayProxyResult } from 'aws-lambda'
 type ValidationResult = ValidationSuccessResult | ValidationErrorResult
 
 type ValidationSuccessResult = {
-  state: 'success'
+  type: 'success'
 }
 
 type ValidationErrorResult = {
-  state: 'error'
+  type: 'error'
   response: APIGatewayProxyResult
 }
 
