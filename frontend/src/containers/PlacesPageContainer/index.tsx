@@ -8,7 +8,7 @@ import { PlacesPage } from '../../components/PlacesPage/PlacesPage'
 import { DEFAULT_DISTANCE } from '../../constants'
 import { buildPath, findAddressQuery, findCoordinatesQuery, findPlacesQuery, findMorePlacesQuery } from '../../graphql'
 import { useGeoLocation } from '../../hooks'
-import { Coords, FindAddressData, FindCoordsData, FindPlacesData, FormValues } from '../../types/'
+import { Coords, FindAddressData, FindCoordsData, FindPlacesData, FormValues } from '../../types'
 import { mapPlace, sleep, sortPlaces } from '../../utils'
 
 function PlacesPageContainer(): JSX.Element {
