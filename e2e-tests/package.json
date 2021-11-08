@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "format": "prettier cypress/**/*.ts --check",
-    "lint": "eslint cypress --ext .ts",
+    "format": "prettier  \"cypress/**/*.ts\" --check",
+    "lint": "eslint \"cypress/**/*.ts\"",
     "cypress:run": "cypress run",
     "cypress:open": "cypress open"
   },
