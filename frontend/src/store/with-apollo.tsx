@@ -2,7 +2,7 @@ import React, { Fragment, ReactElement } from 'react'
 import { ApolloProvider, getClient } from './apollo-setup'
 import { getConfig } from '../config'
 
-function WithStore(child: ReactElement): JSX.Element {
+function withApollo(child: ReactElement): JSX.Element {
   const config = getConfig()
   const client = getClient(config)
   return (
@@ -14,4 +14,4 @@ function WithStore(child: ReactElement): JSX.Element {
   )
 }
 
-export default WithStore
+export { withApollo }

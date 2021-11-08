@@ -58,4 +58,4 @@ function PlacesMap(props: Props): JSX.Element {
   )
 }
 
-export default PlacesMap
+export { PlacesMap }

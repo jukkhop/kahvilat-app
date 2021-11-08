@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 
-import Footer from '../Footer'
+import { Footer } from '../Footer'
 
 const Container = styled.div`
   align-items: center;
@@ -75,4 +75,4 @@ function LandingPage(): JSX.Element {
   )
 }
 
-export default LandingPage
+export { LandingPage }

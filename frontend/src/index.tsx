@@ -2,11 +2,12 @@ import React from 'react'
 import { render } from 'react-dom'
 import WebFont from 'webfontloader'
 
-import './index.css'
-import App from './containers/AppContainer'
-import withApollo from './store/with-apollo'
+import { AppContainer } from './containers/AppContainer'
+import { withApollo } from './store/with-apollo'
 
-render(withApollo(<App />), document.getElementById('root'))
+import './index.css'
+
+render(withApollo(<AppContainer />), document.getElementById('root'))
 
 WebFont.load({
   google: {

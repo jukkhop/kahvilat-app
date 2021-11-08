@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react'
 import styled from 'styled-components'
 
-import Header from '../Header'
-import Footer from '../Footer'
+import { Header } from '../Header'
+import { Footer } from '../Footer'
 
 const Container = styled.div`
   display: flex;
@@ -44,4 +44,4 @@ function Layout(props: Props): JSX.Element {
   )
 }
 
-export default Layout
+export { Layout }
