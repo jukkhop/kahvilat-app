@@ -1,11 +1,11 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
-import LandingPageContainer from '../LandingPageContainer'
-import PlacesPageContainer from '../PlacesPageContainer'
+import { LandingPageContainer } from '../LandingPageContainer'
+import { PlacesPageContainer } from '../PlacesPageContainer'
 
-import PrivacyPage from '../../components/PrivacyPage'
-import TermsPage from '../../components/TermsPage'
+import { PrivacyPage } from '../../components/PrivacyPage'
+import { TermsPage } from '../../components/TermsPage'
 
 function AppContainer(): JSX.Element {
   return (
@@ -28,4 +28,4 @@ function AppContainer(): JSX.Element {
   )
 }
 
-export default AppContainer
+export { AppContainer }

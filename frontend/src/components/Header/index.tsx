@@ -32,4 +32,4 @@ function Header(): JSX.Element {
   )
 }
 
-export default Header
+export { Header }

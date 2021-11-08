@@ -3,12 +3,12 @@ import styled from 'styled-components'
 import { Button, Slider, TextField, ThemeProvider, Typography } from '@material-ui/core'
 import { LoadScript } from '@react-google-maps/api'
 
-import PlacesList from '../PlacesList'
-import PlacesMap from '../PlacesMap'
-import Layout from '../Layout'
+import { PlacesList } from './PlacesList'
+import { PlacesMap } from './PlacesMap'
+import { Layout } from '../Layout'
 
 import { getConfig } from '../../config'
-import theme from '../../theme'
+import { theme } from '../../theme'
 import { Coords, Place } from '../../types'
 import { convertDistance } from '../../utils'
 
@@ -180,4 +180,4 @@ function PlacesPage(props: Props): JSX.Element {
   )
 }
 
-export default PlacesPage
+export { PlacesPage }

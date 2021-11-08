@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import PlaceCard from '../PlaceCard'
+import { PlaceCard } from './PlaceCard'
 import { Place } from '../../types'
 
 const Places = styled.ul`
@@ -37,4 +37,4 @@ function PlacesList(props: Props): JSX.Element {
   )
 }
 
-export default PlacesList
+export { PlacesList }

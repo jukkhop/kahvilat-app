@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
 import uniqBy from 'lodash.uniqby'
-import React, { SyntheticEvent, useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLazyQuery } from '@apollo/react-hooks'
 
-import PlacesPage from '../../components/PlacesPage'
+import { PlacesPage } from '../../components/PlacesPage/PlacesPage'
+
 import { DEFAULT_DISTANCE } from '../../constants'
 import { buildPath, findAddressQuery, findCoordinatesQuery, findPlacesQuery, findMorePlacesQuery } from '../../graphql'
 import { useGeoLocation } from '../../hooks'
@@ -143,8 +142,7 @@ function PlacesPageContainer(): JSX.Element {
         .sort(sortPlaces)
     : []
 
-  function onAddressChange(event: SyntheticEvent) {
-    // @ts-ignore
+  function onAddressChange(event: any) {
     setValue('address', event.target.value)
   }
 
@@ -157,7 +155,7 @@ function PlacesPageContainer(): JSX.Element {
       address={foundAddressByCoords?.address || foundAddressByAddress?.address}
       coords={userCoords}
       defaultDistance={DEFAULT_DISTANCE}
-      error={error ? true : false}
+      error={!!error}
       isSubmitted={formState.isSubmitted}
       loading={loading}
       onAddressChange={onAddressChange}
@@ -168,4 +166,4 @@ function PlacesPageContainer(): JSX.Element {
   )
 }
 
-export default PlacesPageContainer
+export { PlacesPageContainer }

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import Layout from '../Layout'
+import { Layout } from '../Layout'
 
 const Heading2 = styled.h2`
   color: rgba(0, 0, 0, 0.85);
@@ -29,4 +29,4 @@ function PrivacyPage(): JSX.Element {
   )
 }
 
-export default PrivacyPage
+export { PrivacyPage }

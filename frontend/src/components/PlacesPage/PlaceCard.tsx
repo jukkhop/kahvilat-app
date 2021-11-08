@@ -107,7 +107,7 @@ interface Props {
   rating: number
 }
 
-function PlaceComponent(props: Props): JSX.Element {
+function PlaceCard(props: Props): JSX.Element {
   const { address, distance, icon, name, openNow, rating } = props
   return (
     <Outer className="place-item">
@@ -136,4 +136,4 @@ function PlaceComponent(props: Props): JSX.Element {
   )
 }
 
-export default PlaceComponent
+export { PlaceCard }
