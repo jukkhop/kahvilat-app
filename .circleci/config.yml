@@ -65,7 +65,7 @@ jobs:
       stage:
         type: string
     docker:
-      - image: circleci/golang:1.9.6
+      - image: circleci/node:12.16.2
     parallelism: 1
     working_directory: ~/repo/frontend
     steps:
@@ -74,16 +74,6 @@ jobs:
       - aws-cli/setup
       - attach_workspace:
           at: ~/repo/frontend
-      - restore_cache:
-          key: frontend-npm-cache
-      - run:
-          command: |
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-            go get -u -v github.com/titanous/s3deploy
-      - save_cache:
-          key: frontend-npm-cache
-          paths:
-            - /go/pkg
       - run:
           name: Set up git-crypt
           command: |
