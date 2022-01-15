@@ -4,9 +4,9 @@ interface GraphQlPath {
   args: Record<string, string>
 }
 
-function buildPath(endpoint: string) {
+function buildPath(endpoint: string, encode?: boolean) {
   return (path: GraphQlPath): string => {
-    const queryString = qs.stringify(path.args, { encode: false })
+    const queryString = qs.stringify(path.args, { encode })
     return `${endpoint}?${queryString}`
   }
 }

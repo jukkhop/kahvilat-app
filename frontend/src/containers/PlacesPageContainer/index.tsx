@@ -41,7 +41,7 @@ function PlacesPageContainer(): JSX.Element {
     const options = {
       variables: {
         address,
-        pathFunction: buildPath('/find-address'),
+        pathFunction: buildPath('/find-address', true),
       },
     }
 
