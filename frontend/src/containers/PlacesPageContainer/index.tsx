@@ -5,71 +5,71 @@ import { useLazyQuery } from '@apollo/react-hooks'
 
 import { PlacesPage } from '../../components/PlacesPage/PlacesPage'
 
-import { DEFAULT_DISTANCE } from '../../constants'
 import { buildPath, findAddressQuery, findCoordinatesQuery, findPlacesQuery, findMorePlacesQuery } from '../../graphql'
 import { useGeoLocation } from '../../hooks'
 import { Coords, FindAddressData, FindCoordsData, FindPlacesData, FormValues } from '../../types'
 import { mapPlace, sleep, sortPlaces } from '../../utils'
 
 function PlacesPageContainer(): JSX.Element {
-  const { formState, getValues, handleSubmit, register, setValue } = useForm()
-  const [userCoords, setUserCoords] = useState<Coords | undefined>(undefined)
+  const initialFormValues: FormValues = { address: '', distance: 500 }
+  const useFormOptions = { defaultValues: initialFormValues }
+
+  const useFormReturn = useForm(useFormOptions)
+  const geoLocation = useGeoLocation()
+  const [currCoords, setCurrCoords] = useState<Coords | undefined>(undefined)
   const [prevAddress, setPrevAddress] = useState<string | undefined>(undefined)
   const [prevDistance, setPrevDistance] = useState<number | undefined>(undefined)
   const [findAddress, findAddressData] = useLazyQuery<FindAddressData>(findAddressQuery)
   const [findCoordinates, findCoordsData] = useLazyQuery<FindCoordsData>(findCoordinatesQuery)
   const [findPlaces, findPlacesData] = useLazyQuery<FindPlacesData>(findPlacesQuery)
-  const geoLocation = useGeoLocation()
 
+  const { getValues, handleSubmit, setValue } = useFormReturn
   const foundAddressByCoords = findAddressData.data?.findAddress.results?.[0]
   const foundAddressByAddress = findCoordsData.data?.findCoordinates.results?.[0]
   const foundPlaces = findPlacesData.data?.findPlaces.results || []
 
   const cursor = findPlacesData.data?.findPlaces.cursor
   const loading = findPlacesData.loading || findCoordsData.loading || findAddressData.loading
-  const error = findPlacesData.error || findCoordsData.error || findAddressData.error
+  const error = !!(findPlacesData.error || findCoordsData.error || findAddressData.error)
 
-  function onFindCoordinates(values: FormValues): void {
+  const onFindCoordinates = useCallback((values: FormValues): void => {
     const { address, distance } = values
     const addressChanged = address !== prevAddress
     const distanceChanged = distance !== prevDistance
 
-    if (userCoords && !addressChanged) {
-      return distanceChanged ? onFindPlaces(distance) : undefined
+    if (currCoords && !addressChanged) {
+      return distanceChanged ? onFindPlaces(currCoords, distance) : undefined
     }
 
-    const options = {
-      variables: {
-        address,
-        pathFunction: buildPath('/find-address', true),
-      },
-    }
+    const pathFunction = buildPath('/find-address', true)
+    const options = { variables: { address, pathFunction } }
 
-    setUserCoords(undefined)
     setPrevAddress(address)
     setPrevDistance(distance)
+    setCurrCoords(undefined)
     findCoordinates(options)
-  }
+  }, [])
 
-  function onFindPlaces(distance?: number): void {
-    if (!userCoords) return
+  const onFindPlaces = useCallback(
+    (coords: Coords, distance: number): void => {
+      const options = {
+        variables: {
+          keyword: 'coffee',
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          pathFunction: buildPath('/find-places'),
+          radius: distance,
+          type: 'cafe',
+        },
+      }
 
-    const options = {
-      variables: {
-        keyword: 'coffee',
-        latitude: userCoords.latitude,
-        longitude: userCoords.longitude,
-        pathFunction: buildPath('/find-places'),
-        radius: distance || DEFAULT_DISTANCE,
-        type: 'cafe',
-      },
-    }
+      setPrevDistance(distance)
+      findPlaces(options)
+    },
+    [currCoords, prevDistance],
+  )
 
-    setPrevDistance(distance)
-    findPlaces(options)
-  }
-
-  async function onSearchMorePlaces() {
+  const onSearchMorePlaces = useCallback(async () => {
     if (!cursor || !findPlacesData.fetchMore) {
       return Promise.resolve()
     }
@@ -95,10 +95,7 @@ function PlacesPageContainer(): JSX.Element {
         }
       },
     })
-  }
-
-  const memoizedOnSearchPlaces = useCallback(onFindPlaces, [userCoords, prevDistance])
-  const memoizedOnSearchMorePlaces = useCallback(onSearchMorePlaces, [cursor])
+  }, [cursor])
 
   useEffect(() => {
     if (!geoLocation) return
@@ -109,59 +106,48 @@ function PlacesPageContainer(): JSX.Element {
         pathFunction: buildPath('/find-address'),
       },
     }
-    setUserCoords(geoLocation)
+    setCurrCoords(geoLocation)
     findAddress(options)
   }, [geoLocation])
 
   useEffect(() => {
     if (foundAddressByAddress) {
-      const { latitude, longitude } = foundAddressByAddress.location
-      setUserCoords({ latitude, longitude })
+      const { address, location } = foundAddressByAddress
+      const { distance } = getValues()
+      setCurrCoords(location)
+      setValue('address', address)
+      onFindPlaces(location, distance)
     }
   }, [foundAddressByAddress])
 
   useEffect(() => {
-    const { distance } = getValues()
-    memoizedOnSearchPlaces(distance)
-  }, [getValues, memoizedOnSearchPlaces])
+    if (foundAddressByCoords) {
+      const { address, location } = foundAddressByCoords
+      const { distance } = getValues()
+      setCurrCoords(location)
+      setValue('address', address)
+      onFindPlaces(location, distance)
+    }
+  }, [foundAddressByCoords])
 
   useEffect(() => {
-    memoizedOnSearchMorePlaces()
-  }, [cursor, memoizedOnSearchMorePlaces])
+    onSearchMorePlaces()
+  }, [cursor, onSearchMorePlaces])
 
-  useEffect(() => {
-    register('address')
-    register('distance')
-    setValue('distance', DEFAULT_DISTANCE)
-  }, [register, setValue])
-
-  const mappedPlaces = userCoords
+  const mappedPlaces = currCoords
     ? uniqBy(foundPlaces, x => x.name)
         .filter(x => x.status === 'OPERATIONAL')
-        .map(mapPlace(userCoords))
+        .map(mapPlace(currCoords))
         .sort(sortPlaces)
     : []
 
-  function onAddressChange(event: any) {
-    setValue('address', event.target.value)
-  }
-
-  function onDistanceChange(_: unknown, value: number | number[]) {
-    setValue('distance', value)
-  }
-
   return (
     <PlacesPage
-      address={foundAddressByCoords?.address || foundAddressByAddress?.address}
-      coords={userCoords}
-      defaultDistance={DEFAULT_DISTANCE}
-      error={!!error}
-      isSubmitted={formState.isSubmitted}
-      loading={loading}
-      onAddressChange={onAddressChange}
-      onDistanceChange={onDistanceChange}
+      coords={currCoords}
+      fetchState={{ loading, error }}
       onSearch={handleSubmit(onFindCoordinates)}
       places={mappedPlaces}
+      useFormReturn={useFormReturn}
     />
   )
 }

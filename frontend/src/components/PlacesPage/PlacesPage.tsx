@@ -1,4 +1,5 @@
-import React, { ChangeEventHandler } from 'react'
+import React from 'react'
+import { Controller, UseFormReturn } from 'react-hook-form'
 import styled from 'styled-components'
 import { Button, Slider, TextField, ThemeProvider, Typography } from '@material-ui/core'
 import { LoadScript } from '@react-google-maps/api'
@@ -9,7 +10,7 @@ import { Layout } from '../Layout'
 
 import { getConfig } from '../../config'
 import { theme } from '../../theme'
-import { Coords, Place } from '../../types'
+import { Coords, FormValues, Place } from '../../types'
 import { convertDistance } from '../../utils'
 
 const Form = styled.form`
@@ -63,40 +64,25 @@ const Message = styled.p`
   text-align: center;
 `
 
-interface Props {
-  address?: string
-  coords?: Coords
-  defaultDistance: number
-  error?: boolean
-  inputErrors?: Record<string, string>
-  isSubmitted: boolean
-  loading: boolean
-  onAddressChange: ChangeEventHandler<HTMLInputElement>
-  onDistanceChange: (event: React.ChangeEvent<any>, value: number | number[]) => void
-  onSearch: () => Promise<any>
-  places?: Place[]
-}
-
-const config = getConfig()
-
 const marks = [250, 500, 750, 1000, 1250, 1500].map(metres => ({
   value: metres,
   label: convertDistance(metres),
 }))
 
-function PlacesPage(props: Props): JSX.Element {
-  const {
-    address,
-    coords,
-    defaultDistance,
-    error,
-    isSubmitted,
-    loading,
-    onAddressChange,
-    onDistanceChange,
-    onSearch,
-    places = [],
-  } = props
+type PlacesPageProps = {
+  coords?: Coords
+  fetchState: { loading: boolean; error: boolean }
+  onSearch: () => Promise<any>
+  places?: Place[]
+  useFormReturn: UseFormReturn<FormValues>
+}
+
+function PlacesPage(props: PlacesPageProps): JSX.Element {
+  const { coords, fetchState, onSearch, places = [], useFormReturn } = props
+  const { control, formState, getValues, setValue } = useFormReturn
+
+  const config = getConfig()
+  const formValues = getValues()
 
   return (
     <Layout>
@@ -104,42 +90,57 @@ function PlacesPage(props: Props): JSX.Element {
         <Form onSubmit={onSearch}>
           <Fields>
             <Field>
-              <TextField
-                autoFocus
-                color="primary"
-                defaultValue={address}
-                fullWidth
-                id="address"
-                key={`textfield-address-${address}`}
-                label="Osoite"
+              <Controller
                 name="address"
-                onChange={onAddressChange}
-                placeholder="Syötä katuosoite"
-                required
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    autoFocus
+                    color="primary"
+                    fullWidth
+                    id={field.name}
+                    inputRef={field.ref}
+                    label="Osoite"
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    onChange={field.onChange}
+                    placeholder="Syötä katuosoite"
+                    required
+                  />
+                )}
               />
             </Field>
             <Field>
               <Typography id="label-for-distance" gutterBottom>
                 Etäisyys
               </Typography>
-              <Slider
-                aria-labelledby="label-for-distance"
-                color="primary"
-                defaultValue={defaultDistance}
-                id="distance"
-                marks={marks}
-                max={1600}
-                min={150}
+              <Controller
                 name="distance"
-                onChange={onDistanceChange}
-                step={50}
-                valueLabelDisplay="on"
+                control={control}
+                render={({ field }) => (
+                  <Slider
+                    aria-labelledby="label-for-distance"
+                    color="primary"
+                    marks={marks}
+                    max={1600}
+                    min={150}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    onChange={(_: any, value: number | number[]) => {
+                      if (typeof value === 'number') setValue('distance', value)
+                    }}
+                    ref={field.ref}
+                    step={50}
+                    value={field.value}
+                    valueLabelDisplay="on"
+                  />
+                )}
               />
             </Field>
           </Fields>
           <Button
             color="primary"
-            disabled={loading}
+            disabled={fetchState.loading}
             fullWidth
             style={{ margin: '1rem 0' }}
             type="submit"
@@ -151,16 +152,16 @@ function PlacesPage(props: Props): JSX.Element {
       </ThemeProvider>
       <LoadScript googleMapsApiKey={config.google.apiKey}>
         {(() => {
-          if (!address && !coords && !isSubmitted) {
+          if (!formValues.address && !formState.isSubmitted) {
             return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaaksesi.</Message>
           }
-          if (loading) {
+          if (fetchState.loading) {
             return <Message>Ladataan...</Message>
           }
-          if (error) {
+          if (fetchState.error) {
             return <Message>Haussa tapahtui virhe.</Message>
           }
-          if (!address || !coords) {
+          if (!formValues.address || !coords) {
             return <Message>Antamaasi osoitetta ei löytynyt. Tarkista oikeinkirjoitus.</Message>
           }
           if (places.length === 0) {

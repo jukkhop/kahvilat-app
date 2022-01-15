@@ -35,7 +35,7 @@ class GatewayProxyBase {
         return new Error(`Invalid type for query string parameter: ${key}`)
       })
 
-    const errors = missingErrors.length > 0 ? missingErrors : missingErrors.concat(typeErrors)
+    const errors = missingErrors.length > 0 ? missingErrors : typeErrors
 
     switch (errors.length) {
       case 0:

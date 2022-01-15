@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClock, faSmile } from '@fortawesome/free-regular-svg-icons'
 import { faWalking } from '@fortawesome/free-solid-svg-icons'
 
-import { COLORS } from '../../constants'
+import { colors } from '../../constants'
 
 const Outer = styled.li`
   display: block;
@@ -118,7 +118,7 @@ function PlaceCard(props: Props): JSX.Element {
         <Name className="place-name">{name}</Name>
         <Address className="place-address">{address}</Address>
         <Details className="place-details">
-          <Detail className="place-open-now" color={openNow ? COLORS.green : COLORS.red}>
+          <Detail className="place-open-now" color={openNow ? colors.green : colors.red}>
             <FontAwesomeIcon icon={faClock} />
             {openNow ? 'auki' : 'suljettu'}
           </Detail>

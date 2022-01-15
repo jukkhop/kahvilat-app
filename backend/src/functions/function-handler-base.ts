@@ -27,7 +27,7 @@ abstract class FunctionHandlerBase {
   private mkSuccessResult<A, B>(
     response: GoogleSuccessResponse<A>,
     transform: (obj: A) => B,
-  ): FunctionSuccessResult<GoogleResponse<B>> {
+  ): FunctionSuccessResult<GoogleSuccessResponse<B>> {
     return {
       type: 'success',
       data: {

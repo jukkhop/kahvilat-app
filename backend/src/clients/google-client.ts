@@ -73,8 +73,12 @@ class GoogleClient {
     return this.request('place/nearbysearch', queryParams())
   }
 
-  private async request<T>(endpoint: string, queryParams: any, encodeParams = false): Promise<Response<T>> {
-    const queryString = qs.stringify(queryParams, { encode: encodeParams })
+  private async request<T>(
+    endpoint: string,
+    queryParams: Record<string, any>,
+    queryParamsEncode = false,
+  ): Promise<Response<T>> {
+    const queryString = qs.stringify(queryParams, { encode: queryParamsEncode })
     const url = `${this.baseUrl}/${endpoint}/json?${queryString}`
 
     try {
