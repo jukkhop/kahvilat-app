@@ -10,7 +10,7 @@
     "start": "sls offline --httpPort 3010 --lambdaPort 3011 start"
   },
   "dependencies": {
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "qs": "^6.10.1",
     "redis": "^3.1.0",
     "redis-mock": "^0.56.3",
