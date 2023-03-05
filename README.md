@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/jukkhop/kahvilat-app/master/kahvilat-ui/public/logo192.png" />
   <h3 align="center">Discover nearby cafeterias</h3>
-  <h4 align="center">https://kahvilat.app</h4>
+  <h4 align="center">https://app.kahvilat.purelogic.xyz</h4>
 </p>
 
 ## Tools and libraries used
