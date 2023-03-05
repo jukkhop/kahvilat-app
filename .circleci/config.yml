@@ -10,9 +10,9 @@ jobs:
       stage:
         type: string
     docker:
-      - image: circleci/node:16.19.0
+      - image: cimg/node:16.19.0
     parallelism: 1
-    working_directory: ~/repo/infrastructure
+    working_directory: ~/repo/kahvilat-infra
     steps:
       - checkout:
           path: ~/repo
@@ -26,6 +26,7 @@ jobs:
       - run:
           name: Set up git-crypt
           command: |
+            sudo apt-get update
             sudo apt-get install -y git-crypt
             echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
             git-crypt unlock ./git-crypt.key
@@ -38,7 +39,7 @@ jobs:
       stage:
         type: string
     docker:
-      - image: circleci/node:16.19.0
+      - image: cimg/node:16.19.0
     parallelism: 1
     working_directory: ~/repo/kahvilat-ui
     steps:
@@ -49,6 +50,7 @@ jobs:
       - run:
           name: Set up git-crypt
           command: |
+            sudo apt-get update
             sudo apt-get install -y git-crypt
             echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
             git-crypt unlock ./git-crypt.key
@@ -65,7 +67,7 @@ jobs:
       stage:
         type: string
     docker:
-      - image: circleci/node:16.19.0
+      - image: cimg/node:16.19.0
     parallelism: 1
     working_directory: ~/repo/kahvilat-ui
     steps:
@@ -77,6 +79,7 @@ jobs:
       - run:
           name: Set up git-crypt
           command: |
+            sudo apt-get update
             sudo apt-get install -y git-crypt
             echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
             git-crypt unlock ./git-crypt.key
@@ -86,7 +89,7 @@ jobs:
 
   prepare-api:
     docker:
-      - image: circleci/node:16.19.0
+      - image: cimg/node:16.19.0
     working_directory: ~/repo/kahvilat-api
     steps:
       - checkout:
@@ -110,7 +113,7 @@ jobs:
       stage:
         type: string
     docker:
-      - image: circleci/node:16.19.0
+      - image: cimg/node:16.19.0
     working_directory: ~/repo/kahvilat-api
     steps:
       - checkout:
@@ -136,6 +139,7 @@ jobs:
       - run:
           name: Set up git-crypt
           command: |
+            sudo apt-get update
             sudo apt-get install -y git-crypt
             echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
             git-crypt unlock ./git-crypt.key
@@ -148,7 +152,7 @@ jobs:
       stage:
         type: string
     docker:
-      - image: circleci/node:16.19.0
+      - image: cimg/node:16.19.0
     working_directory: ~/repo/kahvilat-api-tests
     steps:
       - checkout:
@@ -166,6 +170,7 @@ jobs:
       - run:
           name: Set up git-crypt
           command: |
+            sudo apt-get update
             sudo apt-get install -y git-crypt
             echo "$GIT_CRYPT_KEY" | base64 -d > ./git-crypt.key
             git-crypt unlock ./git-crypt.key
