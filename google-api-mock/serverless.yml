@@ -2,7 +2,7 @@ service: kahvilat-app-google-api-mock
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   region: ${opt:region, 'eu-west-1'}
   stage: ${opt:stage, 'local'}
   apiGateway:

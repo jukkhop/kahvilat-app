@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2019"],
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "outDir": ".build",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2019"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}

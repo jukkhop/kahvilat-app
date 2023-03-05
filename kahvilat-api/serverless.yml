@@ -1,0 +1,101 @@
+service: kahvilat-app
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'local'}
+  environment:
+    CICD_STAGE: ${self:provider.stage}
+    GOOGLE_API_KEY: ${param:google-api-key, ''}
+    GOOGLE_BASE_URL: ${param:google-base-url, 'https://maps.googleapis.com/maps/api'}
+    GOOGLE_LANGUAGE: ${param:google-language, 'fi'}
+    REDIS_HOST: ${param:redis-host, 'localhost'}
+    REDIS_PORT: ${param:redis-port, '6380'}
+    UI_BASE_URL: ${param:ui-base-url, 'http://localhost:3000'}
+
+  apiGateway:
+    shouldStartNameWithService: true
+
+package:
+  excludeDevDependencies: false
+
+functions:
+  find-addresses:
+    handler: src/functions/find-addresses/main.invoke
+    vpc:
+      securityGroupIds:
+        - ${param:security-group-id, ''}
+      subnetIds:
+        - ${param:subnet-id, ''}
+    events:
+      - http:
+          path: /find-addresses
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                address: false
+                latitude: false
+                longitude: false
+
+  find-places:
+    handler: src/functions/find-places/main.invoke
+    vpc:
+      securityGroupIds:
+        - ${param:security-group-id, ''}
+      subnetIds:
+        - ${param:subnet-id, ''}
+    events:
+      - http:
+          path: /find-places
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                cursor: false
+                keyword: false
+                latitude: false
+                longitude: false
+                radius: false
+                type: false
+
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+
+    GatewayResponseDefault5XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude: 'aws-sdk'
+    target: node16
+    define:
+      'require.resolve': undefined
+    platform: node
+    concurrency: 10

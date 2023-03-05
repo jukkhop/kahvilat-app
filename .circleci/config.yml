@@ -10,7 +10,7 @@ jobs:
       stage:
         type: string
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.19.0
     parallelism: 1
     working_directory: ~/repo/infrastructure
     steps:
@@ -33,19 +33,19 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >> -auto-approve
 
-  prepare-frontend:
+  prepare-ui:
     parameters:
       stage:
         type: string
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.19.0
     parallelism: 1
-    working_directory: ~/repo/frontend
+    working_directory: ~/repo/kahvilat-ui
     steps:
       - checkout:
           path: ~/repo
       - attach_workspace:
-          at: ~/repo/frontend
+          at: ~/repo/kahvilat-ui
       - run:
           name: Set up git-crypt
           command: |
@@ -56,24 +56,24 @@ jobs:
           name: Run build script
           command: ./build.sh << parameters.stage >>
       - persist_to_workspace:
-          root: ~/repo/frontend
+          root: ~/repo/kahvilat-ui
           paths:
             - build
 
-  deploy-frontend:
+  deploy-ui:
     parameters:
       stage:
         type: string
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.19.0
     parallelism: 1
-    working_directory: ~/repo/frontend
+    working_directory: ~/repo/kahvilat-ui
     steps:
       - checkout:
           path: ~/repo
       - aws-cli/setup
       - attach_workspace:
-          at: ~/repo/frontend
+          at: ~/repo/kahvilat-ui
       - run:
           name: Set up git-crypt
           command: |
@@ -84,48 +84,48 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >>
 
-  prepare-backend:
+  prepare-api:
     docker:
-      - image: circleci/node:12.16.2
-    working_directory: ~/repo/backend
+      - image: circleci/node:16.19.0
+    working_directory: ~/repo/kahvilat-api
     steps:
       - checkout:
           path: ~/repo
       - restore_cache:
           keys:
-            - backend-npm-cache
+            - api-npm-cache
       - run:
           name: Install dependencies
-          command: yarn install
+          command: npm install
       - save_cache:
-          key: backend-npm-cache
+          key: api-npm-cache
           paths:
             - node_modules
       - run:
           name: Check code and run unit tests
           command: ./check.sh
 
-  deploy-backend:
+  deploy-api:
     parameters:
       stage:
         type: string
     docker:
-      - image: circleci/node:12.16.2
-    working_directory: ~/repo/backend
+      - image: circleci/node:16.19.0
+    working_directory: ~/repo/kahvilat-api
     steps:
       - checkout:
           path: ~/repo
       - aws-cli/setup
       - restore_cache:
           keys:
-            - backend-npm-cache
+            - api-npm-cache
       - run:
           name: Install Serverless CLI and dependencies
           command: |
-            sudo yarn global add serverless
-            yarn install
+            npm install -g serverless
+            npm install
       - save_cache:
-          key: backend-npm-cache
+          key: api-npm-cache
           paths:
             - node_modules
       - run:
@@ -143,24 +143,24 @@ jobs:
           name: Run deploy script
           command: ./deploy.sh << parameters.stage >>
 
-  run-integration-tests:
+  run-api-tests:
     parameters:
       stage:
         type: string
     docker:
-      - image: circleci/node:12.16.2
-    working_directory: ~/repo/integration-tests
+      - image: circleci/node:16.19.0
+    working_directory: ~/repo/kahvilat-api-tests
     steps:
       - checkout:
           path: ~/repo
       - restore_cache:
           keys:
-            - integration-npm-cache
+            - api-tests-npm-cache
       - run:
           name: Install dependencies
-          command: yarn install
+          command: npm install
       - save_cache:
-          key: integration-npm-cache
+          key: api-tests-npm-cache
           paths:
             - node_modules
       - run:
@@ -173,7 +173,7 @@ jobs:
           name: Check code
           command: ./check.sh
       - run:
-          name: Run integration tests
+          name: Run API tests
           command: ./run.sh << parameters.stage >>
 
 workflows:
@@ -186,96 +186,94 @@ workflows:
             branches:
               only:
                 - master
-      - prepare-frontend:
+      - prepare-ui:
           stage: dev
           filters:
             branches:
               only:
                 - master
-      - deploy-frontend:
-          stage: dev
-          requires:
-            - prepare-frontend
-          filters:
-            branches:
-              only:
-                - master
-      - prepare-backend:
-          filters:
-            branches:
-              only:
-                - master
-      - deploy-backend:
+      - deploy-ui:
           stage: dev
           requires:
-            - prepare-backend
+            - prepare-ui
           filters:
             branches:
               only:
                 - master
-      - run-integration-tests:
+      - prepare-api:
+          filters:
+            branches:
+              only:
+                - master
+      - deploy-api:
           stage: dev
           requires:
-            - deploy-backend
+            - prepare-api
+          filters:
+            branches:
+              only:
+                - master
+      - run-api-tests:
+          stage: dev
+          requires:
+            - deploy-api
           filters:
             branches:
               only:
                 - master
       - cypress/install:
-          name: prepare-e2e-tests
-          yarn: true
-          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "e2e-tests/yarn.lock"}}'
-          working_directory: e2e-tests
+          name: prepare-ui-tests
+          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "kahvilat-ui-tests/package-lock.json"}}'
+          working_directory: kahvilat-ui-tests
           filters:
             branches:
               only:
                 - master
       - cypress/run:
-          name: run-e2e-tests
-          yarn: true
-          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "e2e-tests/yarn.lock"}}'
-          working_directory: e2e-tests
+          name: run-ui-tests
+          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "kahvilat-ui-tests/package-lock.json"}}'
+          working_directory: kahvilat-ui-tests
           no-workspace: true
           requires:
-            - deploy-frontend
-            - deploy-backend
-            - prepare-e2e-tests
+            - deploy-ui
+            - deploy-api
+            - prepare-ui-tests
           filters:
             branches:
               only:
                 - master
 
-  prd:
+  prod:
     jobs:
       - deploy-infrastructure:
-          stage: prd
+          stage: prod
           filters:
             branches:
               only:
                 - production
-      - prepare-frontend:
-          stage: prd
+      - prepare-ui:
+          stage: prod
           filters:
             branches:
               only:
                 - production
-      - deploy-frontend:
-          stage: prd
+      - deploy-ui:
+          stage: prod
           requires:
-            - prepare-frontend
+            - prepare-ui
           filters:
             branches:
               only:
                 - production
-      - prepare-backend:
+      - prepare-api:
           filters:
             branches:
               only:
                 - production
-      - deploy-backend:
-          stage: prd
+      - deploy-api:
+          stage: prod
           requires:
-            - prepare-backend
+            - prepare-api
           filters:
             branches:
               only:

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jukkhop/kahvilat-app/master/frontend/public/logo192.png" />
+  <img src="https://raw.githubusercontent.com/jukkhop/kahvilat-app/master/kahvilat-ui/public/logo192.png" />
   <h3 align="center">Discover nearby cafeterias</h3>
   <h4 align="center">https://kahvilat.app</h4>
 </p>
@@ -15,17 +15,16 @@ Miscellaneous
 - [Jest](https://jestjs.io/) for integration and unit testing
 - [git-crypt](https://github.com/AGWA/git-crypt) for encryption
 
-Backend
+API
 
 - Node, TypeScript, ESLint, Prettier
 - Redis as a cache
 - Serverless framework
 - Docker (for local development only)
 
-Frontend
+UI
 
 - React, TypeScript, ESLint, Prettier
-- `apollo-client` as a REST client for its reactive capabilities
 - `material-ui` as an UI framework
 - `react-fontawesome` for icons
 - `react-hook-form` as form library
@@ -34,43 +33,43 @@ Frontend
 
 ## Local development
 
-#### Backend
+#### API
 
 - Install [Node](https://nodejs.org/en/), [Docker](https://www.docker.com/get-started) and [Serverless](https://github.com/serverless/serverless#quick-start)
-- Change directory `cd backend`
+- Change directory `cd kahvilat-api`
 - Up the cache `docker-compose up -d`
-- Install deps `yarn install`
-- Run `yarn start`
+- Install deps `npm install`
+- Run `npm run start`
 - Run `curl http://localhost:3010/local/places` to verify that the API works as expected
 
-#### Frontend
+#### UI
 
-- Change directory `cd frontend`
-- Install deps `yarn install`
+- Change directory `cd kahvilat-ui`
+- Install deps `npm install`
 - Create env file `cp .env.template .env` and adjust variables as needed
-- Run `yarn start`
+- Run `npm run start`
 - Your browser should automatically open at http://localhost:3000/
 
 ## Cloud deployment
 
-Environment-specific variables and secrets are kept in the `environment` folder. Secrets are encrypted, make sure to run `git-crypt unlock` to decrypt them.
+Environment-specific variables and secrets are kept in the `kahvilat-vault` folder. All variables are encrypted, make sure to run `git-crypt unlock` to decrypt them.
 
-#### Manual deployment (infrastructure)
+#### Manual deployment (infra)
 
 - Install [Terraform](https://www.terraform.io/)
-- Change directory `cd infrastructure`
+- Change directory `cd kahvilat-infra`
 - Deploy `./deploy.sh <env>`
 
-#### Manual deployment (backend)
+#### Manual deployment (api)
 
 - Install [Serverless](https://www.serverless.com/)
-- Change directory `cd backend`
+- Change directory `cd kahvilat-api`
 - Deploy `./deploy.sh <env>`
 
-#### Manual deployment (frontend)
+#### Manual deployment (ui)
 
-- Install [s3deploy](https://github.com/bep/s3deploy)
-- Change directory `cd frontend`
+- Install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+- Change directory `cd kahvilat-ui`
 - Build `./build.sh <env>`
 - Deploy `./deploy.sh <env>`
 
@@ -88,4 +87,4 @@ AWS_DEFAULT_REGION
 GIT_CRYPT_KEY
 ```
 
-- Push a new commit to trigger a new deployment, `master` branch deploys to dev environment, and `production` deploys to prd environment.
+- Push a new commit to trigger a new deployment, `master` branch deploys to dev environment, and `production` deploys to prod environment.

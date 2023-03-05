@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { address1, address2, place1, place2, place3, place4, place5, place6 } from './data'
-import { GoogleAddress, GooglePlace } from './types'
+import { Address, Place } from './types/google'
 
 const addr1 = 'fredri'
 const addr2 = 'miehen'
@@ -16,7 +16,7 @@ async function invoke(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
 
   if (path.includes('geocode')) {
     const { address, latlng } = queryStringParameters || {}
-    let results: GoogleAddress[] = []
+    let results: Address[] = []
 
     if (address) {
       if (address.toLowerCase().includes(addr1)) results = [address1]
@@ -34,7 +34,7 @@ async function invoke(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
   if (path.includes('place/nearbysearch')) {
     const { location, radius, pagetoken } = queryStringParameters || {}
 
-    let results: GooglePlace[] = []
+    let results: Place[] = []
     let token: string | undefined
 
     if (location && radius) {
