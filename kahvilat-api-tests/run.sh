@@ -18,6 +18,7 @@ source "../kahvilat-vault/${env}-variables.env"
 
 set +o allexport
 
-yarn install
+API_BASE_URL=${TF_VAR_api_base_url}
 
-API_BASE_URL=${TF_VAR_api_base_url} yarn jest
+npm install
+npm test

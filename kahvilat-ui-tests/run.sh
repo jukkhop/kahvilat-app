@@ -18,7 +18,7 @@ source "../kahvilat-vault/${env}-variables.env"
 
 set +o allexport
 
-cypress_base_url="https://${TF_VAR_ui_domain_name}"
+export CYPRESS_BASE_URL=$"https://${TF_VAR_ui_domain_name}"
 
-yarn install
-CYPRESS_BASE_URL=$cypress_base_url yarn cypress:run
+npm install
+npm run cypress:run

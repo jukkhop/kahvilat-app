@@ -4,6 +4,6 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-yarn format:check
-yarn lint
-yarn test
+npm run format
+npm run lint
+npm test

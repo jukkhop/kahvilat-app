@@ -4,6 +4,6 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-yarn install
-yarn format
-yarn lint
+npm install
+npm run format
+npm run lint
