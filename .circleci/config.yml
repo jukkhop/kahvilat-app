@@ -223,7 +223,7 @@ workflows:
                 - master
       - cypress/install:
           name: prepare-ui-tests
-          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "kahvilat-ui-tests/package-lock.json"}}'
+          cache-key: 'ui-tests-cache-{{ checksum "kahvilat-ui-tests/package-lock.json"}}'
           working_directory: kahvilat-ui-tests
           filters:
             branches:
@@ -231,7 +231,7 @@ workflows:
                 - master
       - cypress/run:
           name: run-ui-tests
-          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "kahvilat-ui-tests/package-lock.json"}}'
+          cache-key: 'ui-tests-cache-{{ checksum "kahvilat-ui-tests/package-lock.json"}}'
           working_directory: kahvilat-ui-tests
           no-workspace: true
           requires:
