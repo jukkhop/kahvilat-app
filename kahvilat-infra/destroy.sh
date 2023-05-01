@@ -14,10 +14,7 @@ shift
 terraform_options="${@:-}"
 
 set -o allexport
-
 source "../kahvilat-vault/${env}-secrets.env"
-source "../kahvilat-vault/${env}-variables.env"
-
 set +o allexport
 
 terraform init \

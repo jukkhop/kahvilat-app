@@ -12,7 +12,6 @@ cd "$(dirname "$0")"
 env="${1}"
 
 source "../kahvilat-vault/${env}-secrets.env"
-source "../kahvilat-vault/${env}-variables.env"
 source "../kahvilat-vault/scripts/aws-utils.sh"
 
 export AWS_ACCESS_KEY_ID="${TF_VAR_aws_access_key}"

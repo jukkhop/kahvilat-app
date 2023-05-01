@@ -12,10 +12,7 @@ fi
 env="${1}"
 
 set -o allexport
-
 source "../kahvilat-vault/${env}-secrets.env"
-source "../kahvilat-vault/${env}-variables.env"
-
 set +o allexport
 
 export AWS_ACCESS_KEY_ID="${TF_VAR_aws_access_key}"
