@@ -11,12 +11,8 @@ cd "$(dirname "$0")"
 
 env="${1}"
 
-set -o allexport
-
 source "../kahvilat-vault/${env}-secrets.env"
 source "../kahvilat-vault/${env}-variables.env"
-
-set +o allexport
 
 export AWS_ACCESS_KEY_ID="${TF_VAR_aws_access_key}"
 export AWS_SECRET_ACCESS_KEY="${TF_VAR_aws_secret_key}"

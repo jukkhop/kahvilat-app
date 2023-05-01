@@ -11,12 +11,8 @@ cd "$(dirname "$0")"
 
 env="${1}"
 
-set -o allexport
-
 source "../kahvilat-vault/${env}-secrets.env"
 source "../kahvilat-vault/${env}-variables.env"
-
-set +o allexport
 
 export REACT_APP_API_BASE_URL=${TF_VAR_api_base_url}
 export REACT_APP_GOOGLE_API_KEY=${TF_VAR_ui_google_api_key}
