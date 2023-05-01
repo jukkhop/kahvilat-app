@@ -1,23 +1,27 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
 import { Button, Slider, TextField, ThemeProvider, Typography } from '@mui/material'
 import { LoadScript } from '@react-google-maps/api'
-import uniqBy from 'lodash.uniqby'
+import fp from 'lodash/fp'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
-import { Layout } from '../../components/Layout'
 import { PlacesList } from './components/PlacesList'
 import { PlacesMap } from './components/PlacesMap'
 
+import { Layout } from '../../components/Layout'
+import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { initConfig } from '../../config'
 import { useGeoLocation, useLazyFetch } from '../../hooks'
-import { findAddressesRequest } from '../../requests/address'
+import { findAddressesRequest } from '../../requests/addresses'
 import { findPlacesRequest } from '../../requests/places'
 import { theme } from '../../theme'
-import { FindAddressesParams, FindAddressesResult, FindPlacesParams, FindPlacesResult, Location } from '../../types/api'
+import { Location } from '../../types/api'
+import { FindAddressesParams, FindAddressesResult } from '../../types/api/address'
+import { FindPlacesParams, FindPlacesResult, Place } from '../../types/api/place'
 import { FormValues, PlacesListItem } from '../../types/ui'
-import { createPlaceItem, showDistance, sortPlaceItems, wait } from '../../utils'
-import { LoadingSpinner } from '../../components/LoadingSpinner'
+import { createPlaceItem, showDistance, wait } from '../../utils'
 
 function PlacesPage(): JSX.Element {
   const useFormReturn = useForm<FormValues>({ defaultValues: formDefaultValues })
@@ -37,6 +41,15 @@ function PlacesPage(): JSX.Element {
   const loading = findAddressesFetch.state === 'loading' || findPlacesFetch.state === 'loading'
   const error = findAddressesFetch.state === 'error' || findPlacesFetch.state === 'error'
 
+  const onFindAddress = useCallback(
+    (params: FindAddressesParams) => {
+      if (findAddressesFetch.state === 'idle') {
+        findAddressesFetch.fetch(...findAddressesRequest(params))
+      }
+    },
+    [findAddressesFetch],
+  )
+
   const onFindPlaces = useCallback(
     (location: Location, distance: number) => {
       const params: FindPlacesParams = {
@@ -55,7 +68,7 @@ function PlacesPage(): JSX.Element {
     [findPlacesFetch],
   )
 
-  const onFindAddressByAddress = useCallback(
+  const onFormSubmit = useCallback(
     (values: FormValues) => {
       const { address, distance } = values
       const addressChanged = address !== prevAddress
@@ -80,15 +93,6 @@ function PlacesPage(): JSX.Element {
     [currentLocation, findAddressesFetch, onFindPlaces, prevAddress, prevDistance],
   )
 
-  const onFindAddressByCoords = useCallback(
-    (params: FindAddressesParams) => {
-      if (findAddressesFetch.state === 'idle') {
-        findAddressesFetch.fetch(...findAddressesRequest(params))
-      }
-    },
-    [findAddressesFetch],
-  )
-
   useEffect(() => {
     if (geoLocation) {
       const params: FindAddressesParams = {
@@ -96,44 +100,45 @@ function PlacesPage(): JSX.Element {
         longitude: geoLocation.longitude,
       }
 
-      onFindAddressByCoords(params)
+      onFindAddress(params)
       setCurrentLocation(geoLocation)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geoLocation])
 
   useEffect(() => {
+    if (findAddressesFetch.state === 'success') {
+      findAddressesFetch.reset()
+    }
+
     if (findAddressesFetch.state === 'success' && findAddressesFetch.data.results.length) {
       const { address, location } = findAddressesFetch.data.results[0]
       const { distance } = getValues()
 
-      findAddressesFetch.reset()
-
       setValue('address', address)
       setCurrentLocation(location)
-      onFindPlaces(location, distance)
+
+      if (formState.isSubmitted) {
+        onFindPlaces(location, distance)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [findAddressesFetch])
 
   useEffect(() => {
     if (findPlacesFetch.state === 'success') {
-      const { results } = findPlacesFetch.data
+      const newPlaceItems = fp.flow(
+        fp.filter((x: Place) => x.status === 'OPERATIONAL'),
+        fp.flatMap(currentLocation ? createPlaceItem(currentLocation) : fp.constant([])),
+        fp.concat(placeItems),
+        fp.orderBy(['openNow', 'rating', 'distance'], ['desc', 'desc', 'asc']),
+        fp.uniqBy((x: PlacesListItem) => x.name),
+      )(findPlacesFetch.data.results)
 
-      const newItems = currentLocation
-        ? uniqBy(results, (x) => x.name)
-            .filter((x) => x.status === 'OPERATIONAL')
-            .map(createPlaceItem(currentLocation))
-        : []
-
-      setPlaceItems(placeItems.concat(newItems).sort(sortPlaceItems))
-
+      setPlaceItems(newPlaceItems)
       findPlacesFetch.reset()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [findPlacesFetch])
 
-  useEffect(() => {
     if (findPlacesFetch.state === 'idle' && findPlacesFetch.data) {
       const { cursor } = findPlacesFetch.data
 
@@ -141,12 +146,13 @@ function PlacesPage(): JSX.Element {
         wait(2000).then(() => findPlacesFetch.fetch(...findPlacesRequest({ cursor })))
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [findPlacesFetch])
 
   return (
     <Layout>
       <ThemeProvider theme={theme}>
-        <Form onSubmit={handleSubmit(onFindAddressByAddress)}>
+        <Form onSubmit={handleSubmit(onFormSubmit)}>
           <Fields>
             <Field>
               <Controller
@@ -214,6 +220,10 @@ function PlacesPage(): JSX.Element {
             return <Message>Anna osoite ja klikkaa &quot;ETSI KAHVILAT&quot; aloittaaksesi.</Message>
           }
 
+          if (formValues.address && !formState.isSubmitted) {
+            return <Message>Klikkaa &quot;ETSI KAHVILAT&quot; aloittaaksesi.</Message>
+          }
+
           if (loading && placeItems.length === 0) {
             return (
               <LoadingSpinnerBlock>
@@ -230,7 +240,7 @@ function PlacesPage(): JSX.Element {
             return <Message>Antamaasi osoitetta ei löytynyt. Tarkista oikeinkirjoitus.</Message>
           }
 
-          if (placeItems.length === 0) {
+          if (formState.isSubmitted && placeItems.length === 0) {
             return <Message>Valitettavasti kahviloita ei löytynyt. Kokeile nostaa etäisyyttä.</Message>
           }
 

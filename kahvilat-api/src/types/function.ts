@@ -25,5 +25,4 @@ type FindAddressesByCoordsFunctionParams = {
 type FindAddressesFunctionParams = FindAddressesByAddressFunctionParams | FindAddressesByCoordsFunctionParams
 
 export type { FunctionParams, FunctionResult, FunctionResultError, FunctionResultSuccess }
-
 export type { FindAddressesByAddressFunctionParams, FindAddressesByCoordsFunctionParams, FindAddressesFunctionParams }

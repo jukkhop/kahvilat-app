@@ -16,26 +16,4 @@ function createPlaceItem(from: Location) {
   }
 }
 
-function sortPlaceItems(a: PlacesListItem, b: PlacesListItem): number {
-  if (a.openNow && !b.openNow) {
-    return -1
-  }
-  if (!a.openNow && b.openNow) {
-    return 1
-  }
-  if (a.rating > b.rating) {
-    return -1
-  }
-  if (a.rating < b.rating) {
-    return 1
-  }
-  if (a.distance < b.distance) {
-    return -1
-  }
-  if (a.distance > b.distance) {
-    return 1
-  }
-  return 0
-}
-
-export { createPlaceItem, sortPlaceItems }
+export { createPlaceItem }
