@@ -6,7 +6,7 @@ import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 
 import { Footer } from '../../components/Footer'
 
-function LandingPage(): JSX.Element {
+export function LandingPage(): JSX.Element {
   return (
     <Container>
       <Header>
@@ -74,5 +74,3 @@ const Button = styled.button`
     height: 35px;
   }
 `
-
-export { LandingPage }

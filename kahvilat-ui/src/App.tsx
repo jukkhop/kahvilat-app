@@ -6,7 +6,7 @@ import { PlacesPage } from './pages/PlacesPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { TermsPage } from './pages/TermsPage'
 
-function App(): JSX.Element {
+export function App(): JSX.Element {
   return (
     <Router>
       <Routes>
@@ -18,5 +18,3 @@ function App(): JSX.Element {
     </Router>
   )
 }
-
-export { App }

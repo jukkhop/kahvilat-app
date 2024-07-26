@@ -22,6 +22,6 @@ context('Terms Page', () => {
     cy.get('footer > ul > a').should('have.length', 2).as('footerLinks')
     cy.get('@footerLinks').first().contains('Privacy statement')
     cy.get('@footerLinks').first().next().contains('Terms of service')
-    cy.get('footer > p').contains('© 2020 Purelogic Softworks')
+    cy.get('footer > p').contains(`© ${new Date().getFullYear()} Purelogic Softworks`)
   })
 })

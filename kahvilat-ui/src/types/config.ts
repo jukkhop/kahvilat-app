@@ -1,4 +1,4 @@
-type Config = {
+export type Config = {
   api: {
     baseUrl: URL
   }
@@ -6,5 +6,3 @@ type Config = {
     apiKey: string
   }
 }
-
-export type { Config }

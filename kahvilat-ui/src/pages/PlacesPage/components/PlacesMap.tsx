@@ -9,7 +9,7 @@ interface Props {
   places: PlacesListItem[]
 }
 
-function PlacesMap(props: Props): JSX.Element {
+export function PlacesMap(props: Props): JSX.Element {
   const { center, places } = props
 
   const onLoad = useCallback(
@@ -56,5 +56,3 @@ const mapOptions = {
   rotateControl: false,
   streetViewControl: false,
 }
-
-export { PlacesMap }

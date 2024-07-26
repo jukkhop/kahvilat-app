@@ -27,13 +27,12 @@ type ErrorState = {
 type SuccessState<T> = {
   state: 'success'
   data: T
-  refetch: (info?: RequestInfo, init?: RequestInit) => void
   reset: () => void
 }
 
-type FetchState<T> = InternalState & (IdleState<T> | LoadingState | ErrorState | SuccessState<T>)
+export type FetchState<T> = InternalState & (IdleState<T> | LoadingState | ErrorState | SuccessState<T>)
 
-function useFetch<T>(info: RequestInfo, init?: RequestInit): FetchState<T> {
+export function useFetch<T>(info: RequestInfo, init?: RequestInit): FetchState<T> {
   const mounted = useRef(true)
   const controller = useRef(new AbortController())
 
@@ -65,7 +64,7 @@ function useFetch<T>(info: RequestInfo, init?: RequestInit): FetchState<T> {
         if (resp.ok) {
           const data = await resp.json()
           if (!mounted.current) return
-          setState({ _init, _status: 'done', state: 'success', data, refetch: onReFetch, reset: onReset })
+          setState({ _init, _status: 'done', state: 'success', data, reset: onReset })
         } else {
           setState({ _init, _status: 'done', state: 'error' })
         }
@@ -88,6 +87,3 @@ function useFetch<T>(info: RequestInfo, init?: RequestInit): FetchState<T> {
 
   return state
 }
-
-export { useFetch }
-export type { FetchState }

@@ -1,48 +1,11 @@
-import { Location } from './location'
+import { Components, Paths } from './openapi'
 
-type FindPlacesInitialQueryParams = {
-  latitude: string
-  longitude: string
-  radius: string
-  type: string
-  keyword: string
-}
+export type Place = Components.Schemas.Place
+export type PlaceType = Components.Schemas.PlaceType
 
-type FindPlacesMoreQueryParams = {
-  cursor: string
-}
+export type GetPlacesParamsRaw = Paths.GetPlaces.QueryParameters
+export type GetPlacesInitialParams = Pick<GetPlacesParamsRaw, 'keyword' | 'latitude' | 'longitude' | 'radius' | 'type'>
+export type GetPlacesMoreParams = Pick<GetPlacesParamsRaw, 'cursor'>
+export type GetPlacesParams = GetPlacesInitialParams | GetPlacesMoreParams
 
-type FindPlacesInitialParams = {
-  latitude: number
-  longitude: number
-  radius: number
-  type: string
-  keyword: string
-}
-
-type FindPlacesMoreParams = {
-  cursor: string
-}
-
-type FindPlacesQueryParams = FindPlacesInitialQueryParams | FindPlacesMoreQueryParams
-type FindPlacesParams = FindPlacesInitialParams | FindPlacesMoreParams
-
-type FindPlacesResult = {
-  results: Place[]
-  cursor?: string
-}
-
-type Place = {
-  address: string
-  icon: string
-  id: string
-  location: Location
-  name: string
-  openNow: boolean
-  rating: number
-  status: string
-  types: string[]
-}
-
-export type { Place }
-export type { FindPlacesQueryParams, FindPlacesParams, FindPlacesResult }
+export type GetPlacesResponse = Paths.GetPlaces.Responses.$200

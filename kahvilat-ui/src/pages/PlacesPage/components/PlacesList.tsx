@@ -8,7 +8,7 @@ interface Props {
   places: PlacesListItem[]
 }
 
-function PlacesList(props: Props): JSX.Element {
+export function PlacesList(props: Props): JSX.Element {
   const { places } = props
 
   return (
@@ -38,5 +38,3 @@ const Places = styled.ul`
   padding-inline-start: 0;
   width: 100%;
 `
-
-export { PlacesList }

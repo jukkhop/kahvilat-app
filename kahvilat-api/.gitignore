@@ -1,6 +1,8 @@
-.build/
-.serverless/
-coverage/
-node_modules/
-serverless-*.yml
-serverless.*.yml
+!jest.config.js
+*.d.ts
+*.js
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out

@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { Layout } from '../../components/Layout'
 
-function PrivacyPage(): JSX.Element {
+export function PrivacyPage(): JSX.Element {
   return (
     <Layout>
       <Heading2>Privacy statement</Heading2>
@@ -28,5 +28,3 @@ const Paragraph = styled.p`
   font-family: Source Sans Pro;
   font-size: 0.875rem;
 `
-
-export { PrivacyPage }

@@ -1,9 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
 
-set -euo pipefail
-
-cd "$(dirname "$0")"
+cd $(dirname $0)
 
 npm run format
 npm run lint
-npm test
+npm run typecheck
+npm run test:unit
+npm run test:integration

@@ -1,35 +1,10 @@
-import { Location } from './location'
+import { Components, Paths } from './openapi'
 
-type FindAddressesByAddressQueryParams = {
-  address: string
-}
+export type Address = Components.Schemas.Address
 
-type FindAddressesByCoordsQueryParams = {
-  latitude: string
-  longitude: string
-}
+export type GetAddressesParamsRaw = Paths.GetAddresses.QueryParameters
+export type GetAddressesByAddressParams = Pick<GetAddressesParamsRaw, 'address'>
+export type GetAddressesByLocationParams = Pick<GetAddressesParamsRaw, 'latitude' | 'longitude'>
+export type GetAddressesParams = GetAddressesByAddressParams | GetAddressesByLocationParams
 
-type FindAddressesByAddressParams = {
-  address: string
-}
-
-type FindAddressesByCoordsParams = {
-  latitude: number
-  longitude: number
-}
-
-type FindAddressesQueryParams = FindAddressesByAddressQueryParams | FindAddressesByCoordsQueryParams
-type FindAddressesParams = FindAddressesByAddressParams | FindAddressesByCoordsParams
-
-type FindAddressesResult = {
-  results: Address[]
-}
-
-type Address = {
-  address: string
-  id: string
-  location: Location
-}
-
-export type { Address }
-export type { FindAddressesQueryParams, FindAddressesParams, FindAddressesResult }
+export type GetAddressesResponse = Paths.GetAddresses.Responses.$200

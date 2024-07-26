@@ -1,4 +1,4 @@
-type Config = {
+export type Config = {
   cicd: {
     stage: string
   }
@@ -15,5 +15,3 @@ type Config = {
     baseUrl: URL
   }
 }
-
-export type { Config }

@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-
 import { Button, Slider, TextField, ThemeProvider, Typography } from '@mui/material'
 import { LoadScript } from '@react-google-maps/api'
 import fp from 'lodash/fp'
@@ -14,58 +12,58 @@ import { Layout } from '../../components/Layout'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { initConfig } from '../../config'
 import { useGeoLocation, useLazyFetch } from '../../hooks'
-import { findAddressesRequest } from '../../requests/addresses'
-import { findPlacesRequest } from '../../requests/places'
-import { theme } from '../../theme'
+import { getAddressesRequest } from '../../requests/addresses'
+import { getPlacesRequest } from '../../requests/places'
+import { theme } from '../../constants/theme'
 import { Location } from '../../types/api'
-import { FindAddressesParams, FindAddressesResult } from '../../types/api/address'
-import { FindPlacesParams, FindPlacesResult, Place } from '../../types/api/place'
+import { GetAddressesParams, GetAddressesResponse } from '../../types/api/address'
+import { GetPlacesParams, GetPlacesResponse, Place } from '../../types/api/place'
 import { FormValues, PlacesListItem } from '../../types/ui'
 import { createPlaceItem, showDistance, wait } from '../../utils'
 
-function PlacesPage(): JSX.Element {
-  const useFormReturn = useForm<FormValues>({ defaultValues: formDefaultValues })
+export function PlacesPage(): JSX.Element {
+  const useFormReturn = useForm<FormValues>({ defaultValues: formDefaults })
   const geoLocation = useGeoLocation()
   const [currentLocation, setCurrentLocation] = useState<Location | undefined>(undefined)
   const [prevAddress, setPrevAddress] = useState<string | undefined>(undefined)
   const [prevDistance, setPrevDistance] = useState<number | undefined>(undefined)
   const [placeItems, setPlaceItems] = useState<PlacesListItem[]>([])
 
-  const findAddressesFetch = useLazyFetch<FindAddressesResult>()
-  const findPlacesFetch = useLazyFetch<FindPlacesResult>()
+  const getAddressesFetch = useLazyFetch<GetAddressesResponse>()
+  const getPlacesFetch = useLazyFetch<GetPlacesResponse>()
 
   const { control, formState, handleSubmit, getValues, setValue } = useFormReturn
   const formValues = getValues()
   const config = initConfig()
 
-  const loading = findAddressesFetch.state === 'loading' || findPlacesFetch.state === 'loading'
-  const error = findAddressesFetch.state === 'error' || findPlacesFetch.state === 'error'
+  const loading = getAddressesFetch.state === 'loading' || getPlacesFetch.state === 'loading'
+  const error = getAddressesFetch.state === 'error' || getPlacesFetch.state === 'error'
 
   const onFindAddress = useCallback(
-    (params: FindAddressesParams) => {
-      if (findAddressesFetch.state === 'idle') {
-        findAddressesFetch.fetch(...findAddressesRequest(params))
+    (params: GetAddressesParams) => {
+      if (getAddressesFetch.state === 'idle') {
+        getAddressesFetch.fetch(...getAddressesRequest(params))
       }
     },
-    [findAddressesFetch],
+    [getAddressesFetch],
   )
 
-  const onFindPlaces = useCallback(
+  const onGetPlaces = useCallback(
     (location: Location, distance: number) => {
-      const params: FindPlacesParams = {
+      const params: GetPlacesParams = {
         keyword: 'coffee',
-        latitude: location.latitude,
-        longitude: location.longitude,
-        radius: distance,
+        latitude: location.latitude.toString(),
+        longitude: location.longitude.toString(),
+        radius: distance.toString(),
         type: 'cafe',
       }
 
-      if (findPlacesFetch.state === 'idle') {
+      if (getPlacesFetch.state === 'idle') {
         setPlaceItems([])
-        findPlacesFetch.fetch(...findPlacesRequest(params))
+        getPlacesFetch.fetch(...getPlacesRequest(params))
       }
     },
-    [findPlacesFetch],
+    [getPlacesFetch],
   )
 
   const onFormSubmit = useCallback(
@@ -78,26 +76,26 @@ function PlacesPage(): JSX.Element {
       if (distanceChanged) setPrevDistance(distance)
 
       if (currentLocation && !addressChanged) {
-        if (distanceChanged) onFindPlaces(currentLocation, distance)
+        if (distanceChanged) onGetPlaces(currentLocation, distance)
         return
       }
 
-      const params: FindAddressesParams = {
+      const params: GetAddressesParams = {
         address,
       }
 
-      if (findAddressesFetch.state === 'idle') {
-        findAddressesFetch.fetch(...findAddressesRequest(params))
+      if (getAddressesFetch.state === 'idle') {
+        getAddressesFetch.fetch(...getAddressesRequest(params))
       }
     },
-    [currentLocation, findAddressesFetch, onFindPlaces, prevAddress, prevDistance],
+    [currentLocation, getAddressesFetch, onGetPlaces, prevAddress, prevDistance],
   )
 
   useEffect(() => {
     if (geoLocation) {
-      const params: FindAddressesParams = {
-        latitude: geoLocation.latitude,
-        longitude: geoLocation.longitude,
+      const params: GetAddressesParams = {
+        latitude: geoLocation.latitude.toString(),
+        longitude: geoLocation.longitude.toString(),
       }
 
       onFindAddress(params)
@@ -107,54 +105,57 @@ function PlacesPage(): JSX.Element {
   }, [geoLocation])
 
   useEffect(() => {
-    if (findAddressesFetch.state === 'success') {
-      findAddressesFetch.reset()
+    if (getAddressesFetch.state === 'success') {
+      getAddressesFetch.reset()
     }
 
-    if (findAddressesFetch.state === 'success' && findAddressesFetch.data.results.length) {
-      const { address, location } = findAddressesFetch.data.results[0]
+    if (getAddressesFetch.state === 'success' && getAddressesFetch.data.items.length) {
+      const { address, location } = getAddressesFetch.data.items[0]
       const { distance } = getValues()
 
       setValue('address', address)
       setCurrentLocation(location)
 
       if (formState.isSubmitted) {
-        onFindPlaces(location, distance)
+        onGetPlaces(location, distance)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [findAddressesFetch])
+  }, [getAddressesFetch])
 
   useEffect(() => {
-    if (findPlacesFetch.state === 'success') {
+    if (getPlacesFetch.state === 'success') {
+      getPlacesFetch.reset()
+    }
+
+    if (getPlacesFetch.state === 'success' && currentLocation) {
       const newPlaceItems = fp.flow(
         fp.filter((x: Place) => x.status === 'OPERATIONAL'),
-        fp.flatMap(currentLocation ? createPlaceItem(currentLocation) : fp.constant([])),
+        fp.map(createPlaceItem(currentLocation)),
         fp.concat(placeItems),
         fp.orderBy(['openNow', 'rating', 'distance'], ['desc', 'desc', 'asc']),
         fp.uniqBy((x: PlacesListItem) => x.name),
-      )(findPlacesFetch.data.results)
+      )(getPlacesFetch.data.items)
 
       setPlaceItems(newPlaceItems)
-      findPlacesFetch.reset()
     }
 
-    if (findPlacesFetch.state === 'idle' && findPlacesFetch.data) {
-      const { cursor } = findPlacesFetch.data
+    if (getPlacesFetch.state === 'idle' && getPlacesFetch.data) {
+      const { cursor } = getPlacesFetch.data
 
       if (cursor) {
-        wait(2000).then(() => findPlacesFetch.fetch(...findPlacesRequest({ cursor })))
+        wait(2000).then(() => getPlacesFetch.fetch(...getPlacesRequest({ cursor })))
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [findPlacesFetch])
+  }, [getPlacesFetch])
 
   return (
     <Layout>
       <ThemeProvider theme={theme}>
         <Form onSubmit={handleSubmit(onFormSubmit)}>
           <Fields>
-            <Field>
+            <Field id="address-field">
               <Controller
                 name="address"
                 control={control}
@@ -175,7 +176,7 @@ function PlacesPage(): JSX.Element {
                 )}
               />
             </Field>
-            <Field>
+            <Field id="distance-field">
               <Typography id="label-for-distance" gutterBottom>
                 Etäisyys
               </Typography>
@@ -323,7 +324,7 @@ const LoadingSpinnerBlock = styled.div`
   margin-top: 1rem;
 `
 
-const formDefaultValues: FormValues = {
+const formDefaults: FormValues = {
   address: '',
   distance: 500,
 }
@@ -332,5 +333,3 @@ const distanceSliderMarks = [250, 500, 750, 1000, 1250, 1500].map((metres) => ({
   value: metres,
   label: showDistance(metres),
 }))
-
-export { PlacesPage }

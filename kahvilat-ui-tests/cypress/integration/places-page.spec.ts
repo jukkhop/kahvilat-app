@@ -13,7 +13,7 @@ context('Places Page', () => {
 
     it('should render the header including the logo image', () => {
       cy.get('header').should('exist')
-      cy.get('header > svg').invoke('attr', 'data-icon').should('equal', 'coffee')
+      cy.get('header > svg').invoke('attr', 'data-icon').should('equal', 'mug-saucer')
     })
 
     it('should render the main element', () => {
@@ -25,7 +25,7 @@ context('Places Page', () => {
       cy.get('footer > ul > a').should('have.length', 2).as('footerLinks')
       cy.get('@footerLinks').first().contains('Privacy statement')
       cy.get('@footerLinks').first().next().contains('Terms of service')
-      cy.get('footer > p').contains('© 2020 Purelogic Softworks')
+      cy.get('footer > p').contains(`© ${new Date().getFullYear()} Purelogic Softworks`)
     })
   })
 
@@ -36,7 +36,7 @@ context('Places Page', () => {
 
     it('should render the address label and input', () => {
       cy.get('form #address-label').contains('Osoite')
-      cy.get('form input#address').should('exist')
+      cy.get('form #address-field').find('input').should('exist')
     })
 
     it('should render the distance label and input', () => {
@@ -53,17 +53,17 @@ context('Places Page', () => {
     })
 
     it('should render the instruction message', () => {
-      cy.get('main > p').contains('Klikkaa "ETSI KAHVILAT" aloittaaksesi.')
+      cy.get('main > p').contains('Anna osoite ja klikkaa "ETSI KAHVILAT" aloittaaksesi.')
     })
 
     it('should render the places map', () => {
-      cy.get('form input#address').type('Fredrikinkatu 22, Helsinki')
+      cy.get('form #address-field').find('input').type('Fredrikinkatu 22, Helsinki')
       cy.get('form button').contains('Etsi kahvilat').click()
       cy.get('main #places-map').should('exist')
     })
 
     it('should render the places list', () => {
-      cy.get('form input#address').type('Fredrikinkatu 22, Helsinki')
+      cy.get('form #address-field').find('input').type('Fredrikinkatu 22, Helsinki')
       cy.get('form button').contains('Etsi kahvilat').click()
       cy.get('main #places-list').should('exist')
     })
@@ -71,62 +71,62 @@ context('Places Page', () => {
 
   describe('Functionality', () => {
     it('should fetch and render the correct amount of places', () => {
-      const placesUrl = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=250&type=cafe'
-      const morePlacesUrl = '**/find-places?cursor=token2'
+      const placesUrl = '**/place?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=250&type=cafe'
+      const morePlacesUrl = '**/place?cursor=token2'
       cy.intercept('GET', placesUrl).as('fetchPlaces')
       cy.intercept('GET', morePlacesUrl).as('fetchMorePlaces')
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-      cy.get('span#distance').find('span').contains('250 m').click()
+      cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
+      cy.get('#distance-field').find('span').contains('250 m').click()
       cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchPlaces').its('response.body.results').should('have.length', 1)
-      cy.wait('@fetchMorePlaces').its('response.body.results').should('have.length', 1)
+      cy.wait('@fetchPlaces').its('response.body.items').should('have.length', 1)
+      cy.wait('@fetchMorePlaces').its('response.body.items').should('have.length', 1)
       cy.get('#places-list').find('.place-item').should('have.length', 2)
     })
 
     it('should fetch and render the correct amount of places, given a larger distance', () => {
-      const placesUrl = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=750&type=cafe'
-      const morePlacesUrl = '**/find-places?cursor=token1'
+      const placesUrl = '**/place?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=750&type=cafe'
+      const morePlacesUrl = '**/place?cursor=token1'
       cy.intercept('GET', placesUrl).as('fetchPlaces')
       cy.intercept('GET', morePlacesUrl).as('fetchMorePlaces')
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-      cy.get('span#distance').find('span').contains('750 m').click()
+      cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
+      cy.get('#distance-field').find('span').contains('750 m').click()
       cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchPlaces').its('response.body.results').should('have.length', 3)
-      cy.wait('@fetchMorePlaces').its('response.body.results').should('have.length', 3)
+      cy.wait('@fetchPlaces').its('response.body.items').should('have.length', 3)
+      cy.wait('@fetchMorePlaces').its('response.body.items').should('have.length', 3)
       cy.get('#places-list').find('.place-item').should('have.length', 6)
     })
 
     it('should re-fetch places when selecting a different address', () => {
-      const placesUrl1 = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=500&type=cafe'
-      const placesUrl2 = '**/find-places?keyword=coffee&latitude=60.1580323&longitude=24.9352637&radius=500&type=cafe'
+      const placesUrl1 = '**/place?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=500&type=cafe'
+      const placesUrl2 = '**/place?keyword=coffee&latitude=60.1580323&longitude=24.9352637&radius=500&type=cafe'
       cy.intercept('GET', placesUrl1).as('fetchPlaces1')
       cy.intercept('GET', placesUrl2).as('fetchPlaces2')
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+      cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
       cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchPlaces1').its('response.body.results').should('have.length', 1)
+      cy.wait('@fetchPlaces1').its('response.body.items').should('have.length', 1)
       cy.get('#places-list').find('.place-address').should('have.length', 2).first().contains('Fredrikinkatu')
-      cy.get('input#address').clear().type('Perämiehenkatu 1, Helsinki')
+      cy.get('#address-field').find('input').clear().type('Perämiehenkatu 1, Helsinki')
       cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchPlaces2').its('response.body.results').should('have.length', 1)
+      cy.wait('@fetchPlaces2').its('response.body.items').should('have.length', 1)
       cy.get('#places-list').find('.place-address').should('have.length', 2).last().contains('Perämiehenkatu')
     })
 
     it('should re-fetch places when selecting a different distance', () => {
-      const placesUrl1 = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=250&type=cafe'
-      const placesUrl2 = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=500&type=cafe'
+      const placesUrl1 = '**/place?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=250&type=cafe'
+      const placesUrl2 = '**/place?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=500&type=cafe'
       cy.intercept('GET', placesUrl1).as('fetchPlaces1')
       cy.intercept('GET', placesUrl2).as('fetchPlaces2')
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-      cy.get('span#distance').find('span').contains('250 m').click()
+      cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
+      cy.get('#distance-field').find('span').contains('250 m').click()
       cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchPlaces1').its('response.body.results').should('have.length', 1)
-      cy.get('span#distance').find('span').contains('500 m').click()
+      cy.wait('@fetchPlaces1').its('response.body.items').should('have.length', 1)
+      cy.get('#distance-field').find('span').contains('500 m').click()
       cy.get('button').contains('Etsi kahvilat').click()
-      cy.wait('@fetchPlaces2').its('response.body.results').should('have.length', 1)
+      cy.wait('@fetchPlaces2').its('response.body.items').should('have.length', 1)
     })
 
     it('should render the correct details for a place that is currently open', () => {
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+      cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
       cy.get('button').contains('Etsi kahvilat').click()
       cy.get('#places-list').find('.place-item').should('have.length', 2).first().as('placeItem')
       cy.get('@placeItem').find('.place-details').as('placeDetails')
@@ -139,7 +139,7 @@ context('Places Page', () => {
     })
 
     it('should render the correct details for a place that is currently closed', () => {
-      cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+      cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
       cy.get('button').contains('Etsi kahvilat').click()
       cy.get('#places-list').find('.place-item').should('have.length', 2).first().next().as('placeItem')
       cy.get('@placeItem').find('.place-details').as('placeDetails')
@@ -154,40 +154,40 @@ context('Places Page', () => {
     describe('Status message', () => {
       const headers = { 'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Origin': '*' }
       const errorResponse = { statusCode: 500, body: { error: 'Something failed' }, headers, delayMs: 500 }
-      const emptyResponse = { statusCode: 200, body: { results: [] }, headers, delayMs: 500 }
+      const emptyResponse = { statusCode: 200, body: { items: [] }, headers, delayMs: 500 }
 
       it('should render an instruction message initially', () => {
-        cy.get('main > p').contains('Klikkaa "ETSI KAHVILAT" aloittaaksesi.')
+        cy.get('main > p').contains('Anna osoite ja klikkaa "ETSI KAHVILAT" aloittaaksesi.')
       })
 
-      it('should render a loading message when data is being fetched', () => {
-        const url = '**/find-places?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=500&type=cafe'
+      it('should render a loading indicator when data is being fetched', () => {
+        const url = '**/place?keyword=coffee&latitude=60.1631932&longitude=24.93846&radius=500&type=cafe'
         cy.intercept('GET', url).as('fetchPlaces')
-        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
         cy.get('button').contains('Etsi kahvilat').click()
-        cy.get('main > p').contains('Ladataan..')
+        cy.get('svg[data-icon="spinner"]').should('exist')
         cy.wait('@fetchPlaces')
       })
 
       it('should render a generic error message when there is an error while fetching', () => {
-        cy.intercept({ method: 'GET', url: '**/find-address?*' }, errorResponse).as('fetchAddress')
-        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.intercept({ method: 'GET', url: '**/address?*' }, errorResponse).as('fetchAddress')
+        cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
         cy.get('button').contains('Etsi kahvilat').click()
         cy.wait('@fetchAddress')
         cy.get('main > p').contains('Haussa tapahtui virhe.')
       })
 
       it('should render a specific error message when no address could be found', () => {
-        cy.intercept({ method: 'GET', url: '**/find-address?*' }, emptyResponse).as('fetchAddress')
-        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.intercept({ method: 'GET', url: '**/address?*' }, emptyResponse).as('fetchAddress')
+        cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
         cy.get('button').contains('Etsi kahvilat').click()
         cy.wait('@fetchAddress')
         cy.get('main > p').contains('Antamaasi osoitetta ei löytynyt.')
       })
 
       it('should render a specific error message when no places could be found', () => {
-        cy.intercept({ method: 'GET', url: '**/find-places?*' }, emptyResponse).as('fetchPlaces')
-        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.intercept({ method: 'GET', url: '**/place?*' }, emptyResponse).as('fetchPlaces')
+        cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
         cy.get('button').contains('Etsi kahvilat').click()
         cy.wait('@fetchPlaces')
         cy.get('main > p').contains('Valitettavasti kahviloita ei löytynyt.')
@@ -196,8 +196,8 @@ context('Places Page', () => {
 
     describe('Sorting of places', () => {
       it('should sort places primarily by openness, preferring open places over ones that are currently closed', () => {
-        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-        cy.get('span#distance').find('span').contains('750 m').click()
+        cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
+        cy.get('#distance-field').find('span').contains('750 m').click()
         cy.get('button').contains('Etsi kahvilat').click()
         cy.get('#places-list .place-item').should('have.length', 6).as('placeItems')
         cy.get('@placeItems').first().find('.place-open-now').contains('auki')
@@ -205,8 +205,8 @@ context('Places Page', () => {
       })
 
       it('should sort then by rating, preferring higher-rated places over lower-rated ones', () => {
-        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-        cy.get('span#distance').find('span').contains('750 m').click()
+        cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
+        cy.get('#distance-field').find('span').contains('750 m').click()
         cy.get('button').contains('Etsi kahvilat').click()
         cy.get('#places-list .place-item').should('have.length', 6).as('placeItems')
         cy.get('@placeItems').first().next().find('.place-distance').contains('500 m')
@@ -215,9 +215,9 @@ context('Places Page', () => {
         cy.get('@placeItems').last().prev().find('.place-rating').contains('4.1')
       })
 
-      it('should sort then by distance, preferring places that are closer over ones that are farther', () => {
-        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
-        cy.get('span#distance').find('span').contains('750 m').click()
+      it('should sort then by distance, preferring places that are closer over ones that are farther away', () => {
+        cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
+        cy.get('#distance-field').find('span').contains('750 m').click()
         cy.get('button').contains('Etsi kahvilat').click()
         cy.get('#places-list .place-item').should('have.length', 6).as('placeItems')
         cy.get('@placeItems').first().next().next().find('.place-rating').contains('4.4')
@@ -229,30 +229,26 @@ context('Places Page', () => {
 
     describe('Geolocation API disabled', () => {
       it('should leave the address field initially empty', () => {
-        cy.get('input#address').should('have.value', '')
+        cy.get('#address-field').find('input').should('have.value', '')
       })
 
       it('should fetch address data and auto-complete the user-typed address', () => {
-        cy.intercept('GET', '**/find-address?address=Fredrikinkatu%2022,%20Helsinki').as('fetchAddress')
-        cy.get('input#address').type('Fredrikinkatu 22, Helsinki')
+        cy.intercept('GET', '**/address?address=Fredrikinkatu+22%2C+Helsinki').as('fetchAddress')
+        cy.get('#address-field').find('input').type('Fredrikinkatu 22, Helsinki')
         cy.get('button').contains('Etsi kahvilat').click()
-        cy.wait('@fetchAddress').its('response.body.results').should('have.length', 1)
-        cy.get('input#address').should('have.value', 'Fredrikinkatu 22, 00120 Helsinki, Suomi')
+        cy.wait('@fetchAddress').its('response.body.items').should('have.length', 1)
+        cy.get('#address-field').find('input').should('have.value', 'Fredrikinkatu 22, 00120 Helsinki, Suomi')
       })
     })
 
     describe('Geolocation API enabled', () => {
       const latitude = 60.1580323
       const longitude = 24.9352637
-      const addressUrl = `**/find-address?latitude=${latitude}&longitude=${longitude}`
-      const placesUrl = `**/find-places?keyword=coffee&latitude=${latitude}&longitude=${longitude}&radius=500&type=cafe`
-      const morePlacesUrl = '**/find-places?cursor=token3'
+      const addressUrl = `**/address?latitude=${latitude}&longitude=${longitude}`
 
       beforeEach(() => {
         cy.reload()
         cy.intercept('GET', addressUrl).as('fetchAddress')
-        cy.intercept('GET', placesUrl).as('fetchPlaces')
-        cy.intercept('GET', morePlacesUrl).as('fetchMorePlaces')
 
         cy.visit('/places', {
           onBeforeLoad(window) {
@@ -264,14 +260,8 @@ context('Places Page', () => {
       })
 
       it('should automatically fetch address data and fill the address field', () => {
-        cy.wait('@fetchAddress').its('response.body.results').should('have.length', 1)
-        cy.get('input#address').should('have.value', 'Perämiehenkatu 1, 00150 Helsinki, Suomi')
-      })
-
-      it('should automatically fetch and render places data using the default distance', () => {
-        cy.wait('@fetchPlaces').its('response.body.results').should('have.length', 1)
-        cy.wait('@fetchMorePlaces').its('response.body.results').should('have.length', 1)
-        cy.get('#places-list').find('.place-item').should('have.length', 2)
+        cy.wait('@fetchAddress').its('response.body.items').should('have.length', 1)
+        cy.get('#address-field').find('input').should('have.value', 'Perämiehenkatu 1, 00150 Helsinki, Suomi')
       })
     })
   })

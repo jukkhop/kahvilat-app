@@ -1,3 +1,5 @@
 export * from './address'
+export * from './health'
 export * from './location'
+export * from './openapi'
 export * from './place'

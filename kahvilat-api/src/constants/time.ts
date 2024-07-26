@@ -1,4 +1,2 @@
-const MINUTE_IN_SECONDS = 60
-const DAY_IN_SECONDS = 86400
-
-export { MINUTE_IN_SECONDS, DAY_IN_SECONDS }
+export const MINUTE_IN_SECONDS = 60
+export const DAY_IN_SECONDS = 86400

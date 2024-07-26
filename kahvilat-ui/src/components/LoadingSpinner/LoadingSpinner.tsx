@@ -17,7 +17,7 @@ interface LoadingSpinnerProps {
   style?: CSSProperties
 }
 
-function LoadingSpinner(props: LoadingSpinnerProps) {
+export function LoadingSpinner(props: LoadingSpinnerProps) {
   const { className, color, style } = props
 
   return (
@@ -30,5 +30,3 @@ function LoadingSpinner(props: LoadingSpinnerProps) {
     />
   )
 }
-
-export { LoadingSpinner }

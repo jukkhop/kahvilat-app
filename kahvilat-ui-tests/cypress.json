@@ -1,6 +1,8 @@
 {
-  "baseUrl": "https://dev.kahvilat.app",
+  "baseUrl": "http://localhost:3000",
   "defaultCommandTimeout": 5000,
   "testFiles": "**/*.spec.ts",
-  "video": false
+  "video": false,
+  "viewportWidth": 1440,
+  "viewportHeight": 900
 }

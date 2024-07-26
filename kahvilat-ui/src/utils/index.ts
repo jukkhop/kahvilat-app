@@ -1,3 +1,4 @@
 export * from './places'
-export * from './threading'
+export * from './promises'
+export * from './requests'
 export * from './units'

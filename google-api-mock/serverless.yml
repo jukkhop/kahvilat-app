@@ -13,7 +13,7 @@ package:
 
 functions:
   main:
-    handler: src/main.invoke
+    handler: src/main.handler
     events:
       - http:
           path: /maps/api/geocode/{format}
@@ -24,6 +24,8 @@ functions:
               paths:
                 format: true
               querystrings:
+                key: false
+                language: false
                 address: false
                 latlng: false
       - http:
@@ -35,6 +37,8 @@ functions:
               paths:
                 format: true
               querystrings:
+                key: false
+                language: false
                 keyword: false
                 location: false
                 pagetoken: false

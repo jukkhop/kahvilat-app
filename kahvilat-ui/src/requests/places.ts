@@ -1,27 +1,29 @@
 import { initConfig } from '../config'
-import { FindPlacesParams } from '../types/api'
+import { GetPlacesParams } from '../types/api'
 import { getOptions } from '../utils/requests'
 
 const config = initConfig()
 
-const findPlacesRequest = (params: FindPlacesParams): [RequestInfo, RequestInit] => {
-  const url = new URL(`${config.api.baseUrl}find-places`)
-  const { searchParams } = url
+export const getPlacesRequest = (params: GetPlacesParams): [RequestInfo, RequestInit] => {
+  const keyword = 'keyword' in params ? params.keyword : undefined
+  const latitude = 'latitude' in params ? params.latitude : undefined
+  const longitude = 'longitude' in params ? params.longitude : undefined
+  const radius = 'radius' in params ? params.radius : undefined
+  const type = 'type' in params ? params.type : undefined
+  const cursor = 'cursor' in params ? params.cursor : undefined
 
-  if ('cursor' in params) {
-    searchParams.set('cursor', params.cursor)
-  } else {
-    searchParams.set('keyword', params.keyword)
-    searchParams.set('latitude', params.latitude.toString())
-    searchParams.set('longitude', params.longitude.toString())
-    searchParams.set('radius', params.radius.toString())
-    searchParams.set('type', params.type)
-  }
+  const url = new URL('/place', config.api.baseUrl)
+  const search = url.searchParams
 
-  const info: RequestInfo = url.toString()
-  const init: RequestInit = getOptions()
+  if (keyword) search.set('keyword', keyword)
+  if (latitude) search.set('latitude', latitude)
+  if (longitude) search.set('longitude', longitude)
+  if (radius) search.set('radius', radius)
+  if (type) search.set('type', type)
+  if (cursor) search.set('cursor', cursor)
+
+  const info = url.toString()
+  const init = getOptions()
 
   return [info, init]
 }
-
-export { findPlacesRequest }

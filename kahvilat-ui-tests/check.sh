@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -euo pipefail
+set -e
 
-cd "$(dirname "$0")"
+cd $(dirname $0)
 
 npm install
 npm run format

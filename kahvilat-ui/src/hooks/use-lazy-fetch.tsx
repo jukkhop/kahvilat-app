@@ -27,13 +27,12 @@ type ErrorState = {
 type SuccessState<T> = {
   state: 'success'
   data: T
-  refetch: (info?: RequestInfo, init?: RequestInit) => void
   reset: () => void
 }
 
-type LazyFetchState<T> = InternalState & (IdleState<T> | LoadingState | ErrorState | SuccessState<T>)
+export type LazyFetchState<T> = InternalState & (IdleState<T> | LoadingState | ErrorState | SuccessState<T>)
 
-function useLazyFetch<T>(info?: RequestInfo, init?: RequestInit): LazyFetchState<T> {
+export function useLazyFetch<T>(info?: RequestInfo, init?: RequestInit): LazyFetchState<T> {
   const mounted = useRef(true)
   const controller = useRef(new AbortController())
 
@@ -67,7 +66,7 @@ function useLazyFetch<T>(info?: RequestInfo, init?: RequestInit): LazyFetchState
         if (resp.ok) {
           const data = await resp.json()
           if (!mounted.current) return
-          setState({ _info, _init, _status: 'done', state: 'success', data, refetch: onFetch, reset: onReset })
+          setState({ _info, _init, _status: 'done', state: 'success', data, reset: onReset })
         } else {
           setState({ _info, _init, _status: 'done', state: 'error' })
         }
@@ -90,6 +89,3 @@ function useLazyFetch<T>(info?: RequestInfo, init?: RequestInit): LazyFetchState
 
   return state
 }
-
-export { useLazyFetch }
-export type { LazyFetchState }

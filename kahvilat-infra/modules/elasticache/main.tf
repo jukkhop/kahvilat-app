@@ -4,7 +4,7 @@ resource "aws_elasticache_subnet_group" "main" {
 }
 
 resource "aws_elasticache_cluster" "main" {
-  cluster_id           = "kahvilat-app-${terraform.workspace}-redis-cluster"
+  cluster_id           = var.cluster_id
   engine               = "redis"
   node_type            = "cache.t2.micro"
   num_cache_nodes      = 1

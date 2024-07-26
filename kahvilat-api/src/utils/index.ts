@@ -1,1 +1,5 @@
-export * from './api'
+export * from './google'
+export * from './lambda'
+export * from './result'
+export * from './results'
+export * from './types'

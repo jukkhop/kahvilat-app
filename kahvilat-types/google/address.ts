@@ -2,7 +2,7 @@
 
 import { Geometry, PlusCode } from './common'
 
-type Address = {
+export type Address = {
   address_components: AddressComponent[]
   formatted_address: string
   geometry: Geometry
@@ -16,14 +16,3 @@ type AddressComponent = {
   short_name: string
   types: string[]
 }
-
-type FindAddressesByAddressParams = {
-  address: string
-}
-
-type FindAddressesByCoordsParams = {
-  latitude: number
-  longitude: number
-}
-
-export type { Address, FindAddressesByAddressParams, FindAddressesByCoordsParams }

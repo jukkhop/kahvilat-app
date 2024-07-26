@@ -1,4 +1,5 @@
-import CacheBase from './cache-base'
-import GoogleCache from './google-cache'
+import { CacheBase } from './base'
+import { CacheError, CacheResult } from './error'
+import { GoogleCache } from './google'
 
-export { CacheBase, GoogleCache }
+export { CacheBase, CacheError, CacheResult, GoogleCache }

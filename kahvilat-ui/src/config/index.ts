@@ -1,6 +1,6 @@
 import { Config } from '../types/config'
 
-function initConfig(): Config {
+export function initConfig(): Config {
   const { REACT_APP_API_BASE_URL, REACT_APP_GOOGLE_API_KEY } = process.env
 
   if (!REACT_APP_API_BASE_URL) {
@@ -20,5 +20,3 @@ function initConfig(): Config {
     },
   }
 }
-
-export { initConfig }

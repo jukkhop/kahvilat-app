@@ -86,38 +86,3 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
-
-resource "aws_security_group" "lambda" {
-  name        = "kahvilat-app-${terraform.workspace}-lambda-sg"
-  description = "Security group for Lambda functions"
-  vpc_id      = aws_vpc.main.id
-
-  egress {
-    protocol         = "-1"
-    from_port        = 0
-    to_port          = 0
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  tags = {
-    Name = "kahvilat-app-${terraform.workspace}-lambda-sg"
-  }
-}
-
-resource "aws_security_group" "redis" {
-  name        = "kahvilat-app-${terraform.workspace}-redis-sg"
-  description = "Security group for Redis cluster"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    protocol        = "tcp"
-    from_port       = 6379
-    to_port         = 6379
-    security_groups = [aws_security_group.lambda.id]
-  }
-
-  tags = {
-    Name = "kahvilat-app-${terraform.workspace}-redis-sg"
-  }
-}

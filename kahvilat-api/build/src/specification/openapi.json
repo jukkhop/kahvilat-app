@@ -1,0 +1,537 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "kahvilat-api-{{awsStage}}",
+        "version": "1.0.0"
+    },
+    "servers": [],
+    "tags": [
+        { "name": "CreatedBy", "description": "Cloud Development Kit" },
+        { "name": "Project", "description": "kahvilat-app" },
+        { "name": "Stage", "description": "{{awsStage}}" }
+    ],
+    "paths": {
+        "/{proxy+}": {
+            "options": {
+                "description": "Options method for pre-flight requests.",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [],
+                "x-amazon-apigateway-integration": {
+                    "$ref": "#/components/x-amazon-apigateway-integrations/options"
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "operationId": "getHealth",
+                "description": "For checking the operational status of the API.",
+                "tags": ["Health"],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/GetHealthResponse"
+                    }
+                },
+                "security": [],
+                "x-amazon-apigateway-integration": {
+                    "$ref": "#/components/x-amazon-apigateway-integrations/get"
+                }
+            }
+        },
+        "/address": {
+            "get": {
+                "operationId": "getAddresses",
+                "description": "Get a list of addresses.",
+                "tags": ["Address"],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "address",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 3
+                        },
+                        "description": "Postal address",
+                        "example": "Mannerheimintie 1, Helsinki"
+                    },
+                    {
+                        "in": "query",
+                        "name": "latitude",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^(\\+|-)?(?:90(?:(?:\\.0{1,15})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\.[0-9]{1,15})?))$"
+                        },
+                        "description": "Geographic latitude",
+                        "example": "60.1681195"
+                    },
+                    {
+                        "in": "query",
+                        "name": "longitude",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^(\\+|-)?(?:180(?:(?:\\.0{1,15})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,15})?))$"
+                        },
+                        "description": "Geographic longitude",
+                        "example": "24.9392183"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/GetAddressesResponse"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalError"
+                    },
+                    "502": {
+                        "$ref": "#/components/responses/BadGateway"
+                    }
+                },
+                "x-amazon-apigateway-integration": {
+                    "$ref": "#/components/x-amazon-apigateway-integrations/get"
+                }
+            }
+        },
+        "/place": {
+            "get": {
+                "operationId": "getPlaces",
+                "description": "Get a list of places.",
+                "tags": ["Place"],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "cursor",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "description": "Cursor for fetching the next page"
+                    },
+                    {
+                        "in": "query",
+                        "name": "keyword",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 3
+                        },
+                        "description": "The keyword to search with",
+                        "example": "coffee"
+                    },
+                    {
+                        "in": "query",
+                        "name": "latitude",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^(\\+|-)?(?:90(?:(?:\\.0{1,15})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\.[0-9]{1,15})?))$"
+                        },
+                        "description": "Geographic latitude",
+                        "example": "60.1681195"
+                    },
+                    {
+                        "in": "query",
+                        "name": "longitude",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^(\\+|-)?(?:180(?:(?:\\.0{1,15})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,15})?))$"
+                        },
+                        "description": "Geographic longitude",
+                        "example": "24.9392183"
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/components/schemas/PlaceType"
+                        },
+                        "description": "Type of place",
+                        "example": "cafe"
+                    },
+                    {
+                        "in": "query",
+                        "name": "radius",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9])$"
+                        },
+                        "description": "Maximum distance from given latitude and longitude",
+                        "example": "500"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/GetPlacesResponse"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalError"
+                    },
+                    "502": {
+                        "$ref": "#/components/responses/BadGateway"
+                    }
+                },
+                "x-amazon-apigateway-integration": {
+                    "$ref": "#/components/x-amazon-apigateway-integrations/get"
+                }
+            }
+        }
+    },
+    "components": {
+        "responses": {
+            "BadRequest": {
+                "description": "Failed to validate the incoming request",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "errors": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ValidationError"
+                                    }
+                                }
+                            },
+                            "required": ["errors"],
+                            "additionalProperties": false
+                        }
+                    }
+                }
+            },
+            "InternalError": {
+                "description": "Server ran into an unexpected error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Additional information about the error"
+                                }
+                            },
+                            "required": ["message"],
+                            "additionalProperties": false
+                        }
+                    }
+                }
+            },
+            "BadGateway": {
+                "description": "Unable to reach third-party service (e.g. Google API)",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Additional information about the error"
+                                }
+                            },
+                            "required": ["message"],
+                            "additionalProperties": false
+                        }
+                    }
+                }
+            },
+            "GetHealthResponse": {
+                "description": "Service is operating and healthy",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string",
+                                    "enum": ["OK"]
+                                }
+                            },
+                            "required": ["status"],
+                            "additionalProperties": false
+                        }
+                    }
+                }
+            },
+            "GetAddressesResponse": {
+                "description": "Success",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Address"
+                                    }
+                                },
+                                "cursor": {
+                                    "type": "string",
+                                    "description": "Cursor to fetch the next page of addresses with"
+                                }
+                            },
+                            "required": ["items"],
+                            "additionalProperties": false
+                        }
+                    }
+                }
+            },
+            "GetPlacesResponse": {
+                "description": "Success",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Place"
+                                    }
+                                },
+                                "cursor": {
+                                    "type": "string",
+                                    "description": "Cursor to fetch the next page of places with"
+                                }
+                            },
+                            "required": ["items"],
+                            "additionalProperties": false
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "Address": {
+                "type": "object",
+                "description": "Represents an address",
+                "properties": {
+                    "address": {
+                        "type": "string",
+                        "example": "Mannerheimintie 1, Helsinki"
+                    },
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                        "example": "b1361968-aad1-46bb-bad4-50bc35a92e6f"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/Location"
+                    }
+                },
+                "required": ["id", "address", "location"],
+                "additionalProperties": false
+            },
+            "Location": {
+                "type": "object",
+                "description": "Represents a geographic location",
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "example": 60.1681195
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "example": 24.9392183
+                    }
+                },
+                "required": ["latitude", "longitude"],
+                "additionalProperties": false
+            },
+            "Place": {
+                "type": "object",
+                "description": "Represents a place (eg. a cafeteria or a restaurant)",
+                "properties": {
+                    "address": {
+                        "type": "string",
+                        "example": "Mannerheimintie 1, Helsinki"
+                    },
+                    "icon": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                        "example": "b1361968-aad1-46bb-bad4-50bc35a92e6f"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/Location"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "openNow": {
+                        "type": "boolean"
+                    },
+                    "rating": {
+                        "type": "number",
+                        "minimum": 100,
+                        "maximum": 2000
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "types": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PlaceType"
+                        }
+                    }
+                },
+                "required": ["address", "icon", "id", "location", "name", "openNow", "rating", "status", "types"],
+                "additionalProperties": false
+            },
+            "PlaceType": {
+                "type": "string",
+                "description": "Type of place (e.g. coffee shop, grocery store, etc)",
+                "enum": [
+                    "accounting",
+                    "airport",
+                    "amusement_park",
+                    "aquarium",
+                    "art_gallery",
+                    "atm",
+                    "bakery",
+                    "bank",
+                    "bar",
+                    "beauty_salon",
+                    "bicycle_store",
+                    "book_store",
+                    "bowling_alley",
+                    "bus_station",
+                    "cafe",
+                    "campground",
+                    "car_dealer",
+                    "car_rental",
+                    "car_repair",
+                    "car_wash",
+                    "casino",
+                    "cemetery",
+                    "church",
+                    "city_hall",
+                    "clothing_store",
+                    "convenience_store",
+                    "courthouse",
+                    "dentist",
+                    "department_store",
+                    "doctor",
+                    "drugstore",
+                    "electrician",
+                    "electronics_store",
+                    "embassy",
+                    "establishment",
+                    "fire_station",
+                    "florist",
+                    "food",
+                    "funeral_home",
+                    "furniture_store",
+                    "gas_station",
+                    "gym",
+                    "hair_care",
+                    "hardware_store",
+                    "hindu_temple",
+                    "home_goods_store",
+                    "hospital",
+                    "insurance_agency",
+                    "jewelry_store",
+                    "laundry",
+                    "lawyer",
+                    "library",
+                    "light_rail_station",
+                    "liquor_store",
+                    "local_government_office",
+                    "locksmith",
+                    "lodging",
+                    "meal_delivery",
+                    "meal_takeaway",
+                    "mosque",
+                    "movie_rental",
+                    "movie_theater",
+                    "moving_company",
+                    "museum",
+                    "night_club",
+                    "painter",
+                    "park",
+                    "parking",
+                    "pet_store",
+                    "pharmacy",
+                    "physiotherapist",
+                    "plumber",
+                    "point_of_interest",
+                    "police",
+                    "post_office",
+                    "primary_school",
+                    "real_estate_agency",
+                    "restaurant",
+                    "roofing_contractor",
+                    "rv_park",
+                    "school",
+                    "secondary_school",
+                    "shoe_store",
+                    "shopping_mall",
+                    "spa",
+                    "stadium",
+                    "storage",
+                    "store",
+                    "subway_station",
+                    "supermarket",
+                    "synagogue",
+                    "taxi_stand",
+                    "tourist_attraction",
+                    "train_station",
+                    "transit_station",
+                    "travel_agency",
+                    "university",
+                    "veterinary_care",
+                    "zoo"
+                ]
+            },
+            "ValidationError": {
+                "type": "object",
+                "description": "Type of validation error returned along with HTTP 404",
+                "properties": {
+                    "data": {},
+                    "instancePath": { "type": "string" },
+                    "keyword": {},
+                    "message": { "type": "string" },
+                    "params": {},
+                    "parentSchema": {},
+                    "propertyName": { "type": "string" },
+                    "schema": {},
+                    "schemaPath": { "type": "string" }
+                },
+                "required": ["instancePath", "keyword", "params", "schemaPath"],
+                "additionalProperties": false
+            }
+        },
+        "x-amazon-apigateway-integrations": {
+            "get": {
+                "httpMethod": "GET",
+                "payloadFormatVersion": "1.0",
+                "type": "AWS_PROXY",
+                "uri": "{{lambdaArn}}"
+            },
+            "options": {
+                "httpMethod": "OPTIONS",
+                "payloadFormatVersion": "1.0",
+                "type": "AWS_PROXY",
+                "uri": "{{lambdaArn}}"
+            }
+        }
+    }
+}

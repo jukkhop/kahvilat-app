@@ -1,24 +1,23 @@
 import { initConfig } from '../config'
-import { FindAddressesParams } from '../types/api'
+import { GetAddressesParams } from '../types/api'
 import { getOptions } from '../utils/requests'
 
 const config = initConfig()
 
-const findAddressesRequest = (params: FindAddressesParams): [RequestInfo, RequestInit] => {
-  const url = new URL(`${config.api.baseUrl}find-addresses`)
-  const { searchParams } = url
+export const getAddressesRequest = (params: GetAddressesParams): [RequestInfo, RequestInit] => {
+  const address = 'address' in params ? params.address : undefined
+  const latitude = 'latitude' in params ? params.latitude : undefined
+  const longitude = 'longitude' in params ? params.longitude : undefined
 
-  if ('address' in params) {
-    searchParams.set('address', params.address)
-  } else {
-    searchParams.set('latitude', params.latitude.toString())
-    searchParams.set('longitude', params.longitude.toString())
-  }
+  const url = new URL('/address', config.api.baseUrl)
+  const search = url.searchParams
 
-  const info: RequestInfo = url.toString()
-  const init: RequestInit = getOptions()
+  if (address) search.set('address', address)
+  if (latitude) search.set('latitude', latitude)
+  if (longitude) search.set('longitude', longitude)
+
+  const info = url.toString()
+  const init = getOptions()
 
   return [info, init]
 }
-
-export { findAddressesRequest }

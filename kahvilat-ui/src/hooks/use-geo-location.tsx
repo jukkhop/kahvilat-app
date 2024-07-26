@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Location } from '../types/api'
 
-function useGeoLocation(): Location | undefined {
+export function useGeoLocation(): Location | undefined {
   const [location, setLocation] = useState<Location | undefined>(undefined)
 
   useEffect(() => {
@@ -15,5 +15,3 @@ function useGeoLocation(): Location | undefined {
 
   return location
 }
-
-export { useGeoLocation }

@@ -16,7 +16,7 @@ interface Props {
   rating: number
 }
 
-function PlaceCard(props: Props): JSX.Element {
+export function PlaceCard(props: Props): JSX.Element {
   const { address, distance, icon, name, openNow, rating } = props
 
   return (
@@ -136,5 +136,3 @@ const Address = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
 `
-
-export { PlaceCard }

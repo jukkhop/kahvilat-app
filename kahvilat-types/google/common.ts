@@ -1,25 +1,23 @@
 /* eslint-disable camelcase */
 
-type Bounds = {
+export type Bounds = {
   northeast: Location
   southwest: Location
 }
 
-type Geometry = {
+export type Geometry = {
   bounds?: Bounds
   location: Location
   location_type?: string
   viewport: Bounds
 }
 
-type Location = {
+export type Location = {
   lat: number
   lng: number
 }
 
-type PlusCode = {
+export type PlusCode = {
   compound_code: string
   global_code: string
 }
-
-export type { Bounds, Geometry, Location, PlusCode }

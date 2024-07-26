@@ -1,6 +1,6 @@
 import { Config } from '../types/config'
 
-function initConfig(): Config {
+export function initConfig(): Config {
   const { env } = process
 
   const errors = checkVariables(Object.keys(env), [
@@ -14,7 +14,7 @@ function initConfig(): Config {
   ])
 
   if (errors.length > 0) {
-    throw new Error(errors.map((x) => x.message).join('\n'))
+    throw Error(errors.map((x) => x.message).join('\n'))
   }
 
   return {
@@ -39,7 +39,5 @@ function initConfig(): Config {
 function checkVariables(actualVars: string[], expectedVars: string[]): Error[] {
   return expectedVars
     .filter((variable) => !actualVars.includes(variable))
-    .map((variable) => new Error(`Missing environment variable: ${variable}`))
+    .map((variable) => Error(`Missing environment variable: ${variable}`))
 }
-
-export { initConfig }

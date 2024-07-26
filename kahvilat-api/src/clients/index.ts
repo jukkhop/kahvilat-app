@@ -1,4 +1,5 @@
-import AsyncRedisClient from './async-redis-client'
-import GoogleClient from './google-client'
+import { ClientBase } from './base'
+import { ClientError, ClientResult } from './error'
+import { GoogleClient } from './google'
 
-export { AsyncRedisClient, GoogleClient }
+export { ClientBase, ClientError, ClientResult, GoogleClient }

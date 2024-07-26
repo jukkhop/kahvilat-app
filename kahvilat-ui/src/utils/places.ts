@@ -2,7 +2,7 @@ import { getDistance } from 'geolib'
 import { Location, Place } from '../types/api'
 import { PlacesListItem } from '../types/ui'
 
-function createPlaceItem(from: Location) {
+export function createPlaceItem(from: Location) {
   return (place: Place): PlacesListItem => {
     return {
       address: place.address,
@@ -15,5 +15,3 @@ function createPlaceItem(from: Location) {
     }
   }
 }
-
-export { createPlaceItem }

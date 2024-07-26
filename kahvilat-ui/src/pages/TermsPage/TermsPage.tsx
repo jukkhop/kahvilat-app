@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Layout } from '../../components/Layout'
 
-function TermsPage(): JSX.Element {
+export function TermsPage(): JSX.Element {
   return (
     <Layout>
       <Heading2>Terms of service</Heading2>
@@ -29,5 +29,3 @@ const Paragraph = styled.p`
   font-family: Source Sans Pro;
   font-size: 0.875rem;
 `
-
-export { TermsPage }

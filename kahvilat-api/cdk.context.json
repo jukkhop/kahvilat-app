@@ -1,0 +1,38 @@
+{
+  "vpc-provider:account=262897496864:filter.tag:Name=kahvilat-app-prod-vpc:region=eu-west-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-09d36a7e10e5e5958",
+    "vpcCidrBlock": "10.0.0.0/16",
+    "ownerAccountId": "262897496864",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Private",
+        "type": "Private",
+        "subnets": [
+          {
+            "subnetId": "subnet-0abaf3dae4a5e99cc",
+            "cidr": "10.0.1.0/24",
+            "availabilityZone": "eu-west-1a",
+            "routeTableId": "rtb-0da68977caeff2392"
+          }
+        ]
+      },
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-0243b79f2225b76dc",
+            "cidr": "10.0.2.0/24",
+            "availabilityZone": "eu-west-1a",
+            "routeTableId": "rtb-090ee3d533e983970"
+          }
+        ]
+      }
+    ]
+  },
+  "security-group:account=262897496864:region=eu-west-1:securityGroupName=kahvilat-app-prod-lambda-sg:vpcId=vpc-09d36a7e10e5e5958": {
+    "securityGroupId": "sg-09c500241fff77cdc",
+    "allowAllOutbound": false
+  }
+}

@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
 
+import { PlaceType } from '../api'
 import { Geometry, PlusCode } from './common'
 
-type Place = {
+export type Place = {
   business_status: string
   geometry: Geometry
   icon: string
@@ -17,9 +18,7 @@ type Place = {
   rating: number
   reference: string
   scope: string
-  types: string[]
+  types: PlaceType[]
   user_ratings_total: number
   vicinity: string
 }
-
-export type { Place }

@@ -8,7 +8,7 @@ interface Props {
   children: ReactNode[]
 }
 
-function Layout(props: Props): JSX.Element {
+export function Layout(props: Props): JSX.Element {
   const { children } = props
 
   return (
@@ -45,5 +45,3 @@ const Main = styled.main`
     padding-bottom: 2.5rem;
   }
 `
-
-export { Layout }

@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-function Footer(): JSX.Element {
+export function Footer(): JSX.Element {
   const currentYear = new Date().getFullYear()
 
   return (
@@ -60,5 +60,3 @@ const Links = styled.ul`
     }
   }
 `
-
-export { Footer }

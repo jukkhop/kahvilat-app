@@ -1,4 +1,4 @@
-const mkHeaders = (contentType?: string | undefined): Record<string, string> => {
+function createHeaders(contentType?: string | undefined): Record<string, string> {
   const headersMap = new Map<string, string>()
 
   if (contentType) {
@@ -8,11 +8,9 @@ const mkHeaders = (contentType?: string | undefined): Record<string, string> => 
   return Object.fromEntries(headersMap)
 }
 
-const getOptions = (): RequestInit => {
+export function getOptions(): RequestInit {
   return {
     method: 'GET',
-    headers: mkHeaders('application/json'),
+    headers: createHeaders('application/json'),
   }
 }
-
-export { getOptions }
